@@ -1,9 +1,11 @@
+// external imports
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
+// project import 
 import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+// import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -21,21 +23,29 @@ import JumpStartOutline from  '../../assets/icons/JumpStartOutline'
 
 
 export default function TabLayout() {
+  const styles = getStyles()
   const colorScheme = useColorScheme();
-
+  const iconColor = "white"
   return (
-    <Tabs
+    <Tabs 
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
+        tabBarShowLabel: false,
         tabBarStyle: Platform.select({
           ios: {
             // Use a transparent background on iOS to show the blur effect
             position: 'absolute',
+            height: 80,
+            backgroundColor: 'transparent',
           },
-          default: {},
+          default: {
+            position: 'absolute',
+            height: 80,
+            backgroundColor: 'transparent',
+          },
         }),
       }}>
       <Tabs.Screen
@@ -44,9 +54,9 @@ export default function TabLayout() {
           title: 'Home',
           tabBarIcon: ({ color, focused }) => {
             if (focused) {
-              return <HomeFilled size={28} color="orange" />
+              return <HomeFilled size={28} color={iconColor} />
             } else {
-              return <HomeOutline size={28} color="orange" />
+              return <HomeOutline size={28} color={iconColor} />
             }
           } 
         }}
@@ -58,9 +68,9 @@ export default function TabLayout() {
           
           tabBarIcon: ({ color, focused }) => {
             if (focused) {
-              return <ConfessionFilled size={28} color="orange" />
+              return <ConfessionFilled size={28} color={iconColor} />
             } else {
-              return <ConfessionOutline size={28} color="orange" />
+              return <ConfessionOutline size={28} color={iconColor} />
             }
           } 
           
@@ -69,12 +79,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="events"
         options={{
-          title: 'Events',// tabBarIcon: ({ color }) => <EventOutline size={28} color="orange" />,
+          title: 'Events',
           tabBarIcon: ({ color, focused }) => {
             if (focused) {
-              return <EventFilled size={28} color="orange" />
+              return <EventFilled size={28} color={iconColor} />
             } else {
-              return  <EventOutline size={28} color="orange" />
+              return  <EventOutline size={28} color={iconColor} />
             }
           } 
         }}
@@ -85,13 +95,22 @@ export default function TabLayout() {
           title: 'Jump Start',
           tabBarIcon: ({ color, focused }) => {
             if (focused) {
-              return <JumpStartFilled size={50} color="orange" />
+              return <JumpStartFilled size={50} color={iconColor} />
             } else {
-              return <JumpStartOutline size={50} color="orange" />;
+              return <JumpStartOutline size={50} color={iconColor} />;
             }
           } 
         }}
       />
     </Tabs>
   );
+}
+
+
+function getStyles() {
+  return StyleSheet.create(
+    {
+      
+    }
+  )
 }

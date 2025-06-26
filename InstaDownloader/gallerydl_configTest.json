@@ -1,0 +1,22 @@
+{
+  "extractor": {
+    "instagram": {
+      "cookies": {
+        "sessionid": "48292730845%3AH11TpNmHO6mVjg%3A3%3AAYeAtXukKunu3tVQqM0DYQA82zLLWjrAZ6ervgbPdw"
+      },
+      "include": ["posts"],
+      "recursive": false,
+      "tagged": false,
+      "reels": false,
+      "highlights": false,
+      "stories": false,
+      "igtv": false,
+      "videos": true,
+      "order-files": "asc",
+      "order-posts": "desc",
+      "max-posts": 10,
+      "sleep-request": [6, 15],
+      "metadata": true
+    }
+  }
+}

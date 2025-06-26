@@ -1,10 +1,19 @@
-import { View, Text} from "react-native"
+// external imports 
+import { View, Text, StyleSheet} from "react-native"
+
+// project imports
+import ScreenWrapper from '../ScreenWrapper';
+
 
 
 export default function EventsScreen() {
     return (
-        <View>
-        <Text style={{color: 'white'}}>Events</Text>
-        </View>
-    )
+        <ScreenWrapper>
+            <Text style={{color: 'white'}}>Events</Text>
+        </ScreenWrapper>
+    );
 }
+
+const styles = StyleSheet.create({
+  
+});

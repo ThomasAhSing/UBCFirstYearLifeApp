@@ -1,0 +1,23 @@
+{
+  "extractor": {
+    "instagram": {
+      "cookies": {
+        "sessionid": "48292730845%3AM7FXab7ucyms1d%3A22%3AAAYeSlM1ft_Eb0gZjKa2WOWMxwdE9F1tAkcg32UZdLQ"
+      },
+      "include": "posts",
+      "videos": true,
+      "tagged": false,
+      "linked": false,
+      "mentions": false,
+      "stories": false,
+      "highlights": false,
+      "igtv": false,
+      "comments": false,
+      "sleep": [10, 20],
+      "sleep-request": [3, 6],
+      "retries": 4,
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+       "skip": true
+    }
+  }
+}
