@@ -7,12 +7,17 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ScreenWrapper from '../ScreenWrapper';
 import Heading from '../Heading'
+import PostFlatList from '../PostFlatList'
 
 export default function HomeScreen() {
+
+
+
   return (
     <ScreenWrapper>
         <Heading/>
         <Text style={{color: 'white'}}>Home Screen</Text>
+        <PostFlatList></PostFlatList>
     </ScreenWrapper>
   );
 }

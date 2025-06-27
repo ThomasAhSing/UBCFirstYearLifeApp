@@ -1,7 +1,7 @@
 // external imports
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, FlatList } from 'react-native';
 
 // project import 
 import { HapticTab } from '@/components/HapticTab';
