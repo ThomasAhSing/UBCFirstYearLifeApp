@@ -17,7 +17,7 @@ export default function HomeScreen() {
     <ScreenWrapper>
         <Heading/>
         <Text style={{color: 'white'}}>Home Screen</Text>
-        <PostFlatList></PostFlatList>
+        <PostFlatList/>
     </ScreenWrapper>
   );
 }

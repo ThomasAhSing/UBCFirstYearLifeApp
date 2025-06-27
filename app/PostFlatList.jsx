@@ -17,8 +17,7 @@ export default function PostFlatList() {
             <FlatList 
             // NOTE : data line will change if format of json data changes
             data = {allPosts}
-            renderItem = {({item}) => <Post post = {item}/>
-        }
+            renderItem = {({item}) => <Post post = {item}/>}
             />
         </View>
     )
