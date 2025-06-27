@@ -1,7 +1,7 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import Sidecar from './Sidecar'
 
-const imageMap = {
+export const imageMap = {
   'pictures/jason_pfp.jpg': require('../data/posts/pictures/jason_pfp.jpg'),
   'pictures/jason_post1_img1.jpg': require('../data/posts/pictures/jason_post1_img1.jpg'),
   'pictures/jason_post1_img2.jpg': require('../data/posts/pictures/jason_post1_img2.jpg'),
@@ -45,7 +45,7 @@ export default function Post({ post }) {
         />
         <Text style={styles.username}>{post.username}</Text>
       </View>
-      <Sidecar/>
+      <Sidecar style = {{width: '100%'}} post = {post}/>
       
       
     </View>
@@ -55,6 +55,7 @@ export default function Post({ post }) {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+    width: '100%',
   },
   profile_pic: {
     width: 30,

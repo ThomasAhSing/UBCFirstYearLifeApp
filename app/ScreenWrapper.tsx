@@ -10,7 +10,8 @@ export default function ScreenWrapper({ children }: Props) {
     <SafeAreaView 
     style={{ 
       flex: 1,
-      backgroundColor: '#0C2A42'
+      backgroundColor: '#0C2A42',
+      width: '100%'
      }} 
     edges={['top', 'bottom']}
     >

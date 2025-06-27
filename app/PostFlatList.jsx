@@ -8,13 +8,13 @@ export default function PostFlatList() {
     allPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
 
     return (
-        <View style={styles.contaienr}>
-            <FlatList 
-            // NOTE : data line will change if format of json data changes
-            data = {allPosts}
-            renderItem = {({item}) => <Post post = {item}/>}
-            />
-        </View>
+        
+        <FlatList 
+        // NOTE : data line will change if format of json data changes
+        style={styles.container}
+        data = {allPosts}
+        renderItem = {({item}) => <Post post = {item}/>}
+        />
     )
 
 }
@@ -23,5 +23,15 @@ export default function PostFlatList() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        width: '100%'
     },
+
 })
+
+{/* <View style={styles.container}>
+            <FlatList 
+            // NOTE : data line will change if format of json data changes
+            data = {allPosts}
+            renderItem = {({item}) => <Post post = {item}/>}
+            />
+        </View> */}
