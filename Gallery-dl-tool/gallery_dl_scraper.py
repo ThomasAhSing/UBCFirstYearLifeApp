@@ -6,7 +6,7 @@ from datetime import datetime
 from collections import defaultdict
 import time
 import random
-# TODO add posted field (default false) for all posts
+
 # ===== CONFIGURATION =====
 usernames = ["ubcwsoccer", "ubctbirds", "jasontheween"]
 numPostsToFetch = 2
@@ -106,7 +106,7 @@ def scrape_instagram_posts(usernames, config_file, output_base, numPostsToFetch)
 if __name__ == "__main__":
     result = scrape_instagram_posts(usernames, config_file, output_base, numPostsToFetch)
 
-    with open("instagram_all_posts.json", "w", encoding="utf-8") as f:
+    with open("all_posts.json", "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2)
 
     print(f"✅ Saved posts grouped by username to instagram_all_posts.json")
