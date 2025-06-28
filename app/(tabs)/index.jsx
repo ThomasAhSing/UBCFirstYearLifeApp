@@ -17,13 +17,11 @@ export default function HomeScreen() {
     <ScreenWrapper>
         <Heading/>
         {/* <Text style={{color: 'white'}}>Home Screen</Text> */}
-        <PostFlatList style = {styles.postFlatList}/>
+        <PostFlatList/>
     </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  postFlatList: {
-    width: '100%'
-  }
+  
 });

@@ -45,7 +45,7 @@ export default function Post({ post }) {
         />
         <Text style={styles.username}>{post.username}</Text>
       </View>
-      <Sidecar style = {{width: '100%'}} post = {post}/>
+      <Sidecar post = {post}/>
       
       
     </View>
@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     width: '100%',
+    // backgroundColor: 'gray',
   },
   profile_pic: {
     width: 30,
