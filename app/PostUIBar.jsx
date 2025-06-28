@@ -7,9 +7,9 @@ import BookmarkFilled from '@/assets/icons/BookmarkFilled'
 export default function PostUIBar({post}) {
     return (
         <View style = {styles.container}>
-            <View style>
+            <View style = {styles.likeContainer}>
                 <HeartOutline style = {styles.heart} color= 'white'/>
-                <Text>{post.likes}</Text>
+                <Text style={styles.likeCount}>{post.likes}</Text>
             </View>
             
             <BookmarkOutline style = {styles.bookmark} color= 'white'/>
@@ -25,9 +25,17 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignContent: 'center',
     },
+    likeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     heart: {
         width: 30,
         height: 30,
+    },
+    likeCount: {
+        color: 'white',
+        justifyContent: 'center'
     },
     bookmark: {
         width: 30,
