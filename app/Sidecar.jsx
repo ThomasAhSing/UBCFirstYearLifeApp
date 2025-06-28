@@ -1,14 +1,14 @@
-import {FlatList, StyleSheet, Text, View, Image} from 'react-native'
+import {FlatList, StyleSheet, Text, View, Image, Dimensions} from 'react-native'
 import {imageMap} from './Post'
 import { useState, useEffect } from 'react'
 
 
 export default function Sidecar({post}) {
-    const [ratios, setRatios] = useState({});
+    const screenWidth = Dimensions.get('window').width
     // console.log(imageMap)
     // console.log(100)
     // add implementation for videos
-
+    console.log(screenWidth)
     
     
     
@@ -16,11 +16,11 @@ export default function Sidecar({post}) {
             <FlatList
                 style={styles.container}
                 data = {post.media}
-                
+                pagingEnabled
                 renderItem = {({item}) => (
                     // <View style = {{width: '100%'}}>
                     <Image
-                    style = {styles.sidecarImage}
+                    style = {{width: screenWidth, height: 100}}
                     source={imageMap[item.image_url]}
                     
                 />

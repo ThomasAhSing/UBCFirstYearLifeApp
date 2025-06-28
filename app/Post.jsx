@@ -54,7 +54,6 @@ export default function Post({ post }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
     width: '100%',
     // backgroundColor: 'gray',
   },
