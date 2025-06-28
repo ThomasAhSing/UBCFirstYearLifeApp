@@ -1,5 +1,6 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import Sidecar from './Sidecar'
+import PostUIBar from './PostUIBar';
 
 export const imageMap = {
   'pictures/jason_pfp.jpg': require('../data/posts/pictures/jason_pfp.jpg'),
@@ -46,7 +47,7 @@ export default function Post({ post }) {
         <Text style={styles.username}>{post.username}</Text>
       </View>
       <Sidecar post = {post}/>
-      
+      <PostUIBar  post = {post}/>
       
     </View>
   );
