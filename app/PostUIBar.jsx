@@ -1,4 +1,4 @@
-import {FlatList, StyleSheet, Text, View, Image, Dimensions} from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import LikeButton from './LikeButton'
 import SaveButton from './SaveButton'
 

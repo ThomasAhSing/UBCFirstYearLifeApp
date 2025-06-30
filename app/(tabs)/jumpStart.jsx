@@ -1,8 +1,8 @@
 // external imports
-import { View, Text, StyleSheet } from "react-native"
+import { StyleSheet, Text } from "react-native";
 
 // project imports
-import ScreenWrapper from "../ScreenWrapper"
+import ScreenWrapper from "../ScreenWrapper";
 
 export default function JumpStartScreen() {
     return (

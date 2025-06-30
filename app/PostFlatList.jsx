@@ -1,4 +1,4 @@
-import {FlatList, StyleSheet, Text, View} from 'react-native'
+import { FlatList, StyleSheet } from 'react-native'
 import postsData from '../data/posts/all_posts.json'
 import Post from './Post'
 

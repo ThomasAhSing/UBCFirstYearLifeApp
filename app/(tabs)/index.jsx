@@ -1,13 +1,8 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import Heading from '../Heading';
+import PostFlatList from '../PostFlatList';
 import ScreenWrapper from '../ScreenWrapper';
-import Heading from '../Heading'
-import PostFlatList from '../PostFlatList'
 
 export default function HomeScreen() {
 

@@ -1,5 +1,5 @@
 // external imports 
-import { View, Text, StyleSheet} from "react-native"
+import { StyleSheet, Text } from "react-native";
 
 // project imports
 import ScreenWrapper from '../ScreenWrapper';
