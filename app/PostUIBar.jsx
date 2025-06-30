@@ -1,14 +1,15 @@
 import {FlatList, StyleSheet, Text, View, Image, Dimensions} from 'react-native'
-import HeartOutline from '@/assets/icons/HeartOutline'
-import HeartFilled from '@/assets/icons/HeartFilled'
+import LikeButton from './LikeButton'
 import BookmarkOutline from '@/assets/icons/BookmarkOutline'
 import BookmarkFilled from '@/assets/icons/BookmarkFilled'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PostUIBar({post}) {
     return (
         <View style = {styles.container}>
             <View style = {styles.likeContainer}>
-                <HeartOutline style = {styles.heart} color= 'white'/>
+                {/* <HeartOutline style = {styles.heart} /> */}
+                <LikeButton/>
                 <Text style={styles.likeCount}>{post.likes}</Text>
             </View>
             
