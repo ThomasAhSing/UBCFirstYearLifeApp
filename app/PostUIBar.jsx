@@ -1,8 +1,6 @@
 import {FlatList, StyleSheet, Text, View, Image, Dimensions} from 'react-native'
 import LikeButton from './LikeButton'
-import BookmarkOutline from '@/assets/icons/BookmarkOutline'
-import BookmarkFilled from '@/assets/icons/BookmarkFilled'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import SaveButton from './SaveButton'
 
 export default function PostUIBar({post}) {
     return (
@@ -13,7 +11,7 @@ export default function PostUIBar({post}) {
                 <Text style={styles.likeCount}>{post.likes}</Text>
             </View>
             
-            <BookmarkOutline style = {styles.bookmark} color= 'white'/>
+            <SaveButton shortcode={post.shortcode}/>
         </View>    
     )
 

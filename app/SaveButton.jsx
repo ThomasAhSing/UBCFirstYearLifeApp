@@ -1,29 +1,28 @@
 import { useEffect, useState } from 'react'
 import { StyleSheet, TouchableOpacity } from 'react-native'
-import HeartOutline from '@/assets/icons/HeartOutline'
-import HeartFilled from '@/assets/icons/HeartFilled'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import BookmarkOutline from '@/assets/icons/BookmarkOutline'
+import BookmarkFilled from '@/assets/icons/BookmarkFilled'
 
-export default function LikeButton({ shortcode }) {
-  const [liked, setLiked] = useState(false)
+export default function SaveButton({ shortcode }) {
+  const [bookmarked, setBookmarked] = useState(false)
 
-// TODO increase like count 
 
   const onPress = () => {
-    const newLiked = !liked
-    setLiked(newLiked)
-    const saveLiked = async () => {
+    const newBookmarked = !bookmarked
+    setBookmarked(newBookmarked)
+    const saveBookmarked = async () => {
       try {
         const jsonValueGet = await AsyncStorage.getItem(shortcode);
         let data = jsonValueGet != null ? JSON.parse(jsonValueGet) : null;
         if (data != null) {
           // previosuly stored
-          data.liked = newLiked
+          data.bookmarked = newBookmarked
         } else {
           // not previosuly stored
           data = {
-            "liked": newLiked,
-            "bookmarked": false,
+            "liked": false,
+            "bookmarked": newBookmarked,
           }
         }
 
@@ -41,30 +40,30 @@ export default function LikeButton({ shortcode }) {
 
       }
     };
-    saveLiked()
+    saveBookmarked()
   }
 
   useEffect(() => {
-    const getLiked = async () => {
-      setLiked(false)
+    const getBookmarked = async () => {
+      setBookmarked(false)
       try {
         const jsonValue = await AsyncStorage.getItem(shortcode);
         const data = jsonValue != null ? JSON.parse(jsonValue) : null;
-        if (data?.liked) {
-          setLiked(true)
+        if (data?.bookmarked) {
+          setBookmarked(true)
         }
       } catch (e) {
         // error reading value
       }
     };
-    getLiked()
+    getBookmarked()
   }, [shortcode])
 
 
   return (
     <TouchableOpacity
       onPress={onPress}>
-      {liked ? <HeartFilled color="red" /> : <HeartOutline color="white" />}
+      {bookmarked ? <BookmarkFilled color="#F5BB44" /> : <BookmarkOutline color="white" />}
     </TouchableOpacity>
   )
 

@@ -27,6 +27,7 @@ export default function Sidecar({post}) {
                 style={{width: imgWidth, height: imgHeight}}
                 data = {post.media}
                 pagingEnabled
+                showsHorizontalScrollIndicator={false}
                 onScroll={handleScroll}
                 horizontal = {true}
                 renderItem = {({item}) => {
