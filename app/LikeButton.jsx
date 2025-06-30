@@ -1,125 +1,71 @@
 import { useEffect, useState } from 'react'
-import {StyleSheet, TouchableOpacity} from 'react-native'
+import { StyleSheet, TouchableOpacity } from 'react-native'
 import HeartOutline from '@/assets/icons/HeartOutline'
 import HeartFilled from '@/assets/icons/HeartFilled'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// export default function LikeButton({shortcode}) {
-//     const [liked, setLiked] = useState(false)
-//     const onPress = () => {
-//         setLiked(!liked)
-//         const saveLiked = async () => {
-//         try {
-//             const jsonValueGet = await AsyncStorage.getItem(shortcode);
-//             let data = jsonValueGet != null ? JSON.parse(jsonValueGet) : null;
-//             if (data !== null) {
-//                 // previosuly stored
-//                 data.liked = liked
-//             } else {
-//                 // not previosuly stored
-//                 data = {
-//                     "liked" : liked,
-//                     "saved": false,
-//                 }
-//             }
-//             const storeData = async (value) => {
-//             try {
-//                 const jsonValueSet = JSON.stringify(value);
-//                 await AsyncStorage.setItem(shortcode, jsonValueSet);
-//             } catch (e) {
-//                 // saving error
-//             }
-//             };
+export default function LikeButton({ shortcode }) {
+  const [liked, setLiked] = useState(false)
 
-//         } catch (e) {
-//             // error reading value
-//         }
-//         };
-//     }
+// TODO increase like count 
 
-//     const getData = async () => {
-//     try {
-//         const jsonValue = await AsyncStorage.getItem('my-key');
-//         const data =  jsonValue != null ? JSON.parse(jsonValue) : null;
-//         if (data !== null) {
-//             setLiked(data.liked)
-//         } else {
-//             setLiked(false)
-//         }
-//     } catch (e) {
-//         // error reading value
-//     }
-//     saveLiked();
-//     };
-
-//     return (
-//           <TouchableOpacity 
-//           onPress = {onPress}>
-//             {liked ? <HeartFilled color="red"/> : <HeartOutline color="white"/>}
-//           </TouchableOpacity>
-//     )
-
-// }
-export default function LikeButton({shortcode}) {
-    const [liked, setLiked] = useState(false)
-    const onPress = () => {
-      const newLiked = !liked
-        setLiked(newLiked)
-        const saveLiked = async () => {
-        try {
-            const jsonValueGet = await AsyncStorage.getItem(shortcode);
-            let data = jsonValueGet != null ? JSON.parse(jsonValueGet) : null;
-            if (data !=null) {
-                // previosuly stored
-                data.liked = newLiked
-            } else {
-                // not previosuly stored
-                data = {
-                    "liked" : newLiked,
-                    "saved": false,
-                }
-            }
-            
-            try {
-                const jsonValueSet = JSON.stringify(data);
-                await AsyncStorage.setItem(shortcode, jsonValueSet);
-            } catch (e) {
-                // saving 
-                console.log("error saving")
-            }
-
-        } catch (e) {
-            // error reading value
-            console.log("error reading", e)
-
-        }
-        };
-        saveLiked()
-    }
-
-    useEffect(() => {
-      const getLiked = async () => {
-        setLiked(false)
+  const onPress = () => {
+    const newLiked = !liked
+    setLiked(newLiked)
+    const saveLiked = async () => {
       try {
-          const jsonValue = await AsyncStorage.getItem(shortcode);
-          const data =  jsonValue != null ? JSON.parse(jsonValue) : null;
-          if (data?.liked) {
-            setLiked(true)
+        const jsonValueGet = await AsyncStorage.getItem(shortcode);
+        let data = jsonValueGet != null ? JSON.parse(jsonValueGet) : null;
+        if (data != null) {
+          // previosuly stored
+          data.liked = newLiked
+        } else {
+          // not previosuly stored
+          data = {
+            "liked": newLiked,
+            "saved": false,
           }
+        }
+
+        try {
+          const jsonValueSet = JSON.stringify(data);
+          await AsyncStorage.setItem(shortcode, jsonValueSet);
+        } catch (e) {
+          // saving 
+          console.log("error saving")
+        }
+
       } catch (e) {
-          // error reading value
+        // error reading value
+        console.log("error reading", e)
+
       }
-      };
-      getLiked()
-    }, [shortcode])
+    };
+    saveLiked()
+  }
 
-    
+  useEffect(() => {
+    const getLiked = async () => {
+      setLiked(false)
+      try {
+        const jsonValue = await AsyncStorage.getItem(shortcode);
+        const data = jsonValue != null ? JSON.parse(jsonValue) : null;
+        if (data?.liked) {
+          setLiked(true)
+        }
+      } catch (e) {
+        // error reading value
+      }
+    };
+    getLiked()
+  }, [shortcode])
 
-    return (
-          <TouchableOpacity 
-          onPress = {onPress}>
-            {liked ? <HeartFilled color="red"/> : <HeartOutline color="white"/>}
-          </TouchableOpacity>
-    )
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}>
+      {liked ? <HeartFilled color="red" /> : <HeartOutline color="white" />}
+    </TouchableOpacity>
+  )
 
 }
