@@ -40,11 +40,15 @@ export default function TabLayout() {
             position: 'relative',
             height: 80,
             backgroundColor: '#0C2A42',
+            borderTopWidth: 1,
+        borderTopColor: '#173E63',
           },
           default: {
             position: 'relative',
             height: 80,
             backgroundColor: '#0C2A42',
+            borderTopWidth: 1,
+          borderTopColor: '#173E63',
           },
         }),
       }}>

@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomColor: "#0F3655",
+    borderBottomColor: "#173E63",
     borderBottomWidth: 1,
   },
   baseText: {
