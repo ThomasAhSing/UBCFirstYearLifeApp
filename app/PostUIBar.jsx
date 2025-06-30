@@ -9,7 +9,7 @@ export default function PostUIBar({post}) {
         <View style = {styles.container}>
             <View style = {styles.likeContainer}>
                 {/* <HeartOutline style = {styles.heart} /> */}
-                <LikeButton/>
+                <LikeButton shortcode={post.shortcode}/>
                 <Text style={styles.likeCount}>{post.likes}</Text>
             </View>
             
