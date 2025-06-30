@@ -56,6 +56,8 @@ export default function Post({ post }) {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    paddingTop: 10,
+    paddingBottom: 10,
     // backgroundColor: 'gray',
   },
   profile_pic: {
@@ -67,6 +69,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingBottom: 10,
   },
   username: {
     color: 'white',

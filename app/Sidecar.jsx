@@ -20,7 +20,7 @@ export default function Sidecar({post}) {
         setCurrentIndex(index)
         console.log(currentIndex)
     }
-    
+    // TODO fix when one picture dot doesnt appear
     return (
         <View>
                 <FlatList
@@ -52,6 +52,8 @@ export default function Sidecar({post}) {
 const styles = StyleSheet.create({
     dotContainer: {
         // position: 'absolute',
+        paddingTop: 5,
+        paddingBottom: 5,
         flexDirection: 'row',
         justifyContent: 'center',
         flex: 1,
@@ -59,8 +61,8 @@ const styles = StyleSheet.create({
     dot: {
         marginLeft: 2,
         marginRight: 2,
-        width: 8,
-        height: 8,
+        width: 6,
+        height: 6,
         borderRadius: 4,
         backgroundColor: '#A77F2E'
     }, 

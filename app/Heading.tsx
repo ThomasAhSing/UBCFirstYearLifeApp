@@ -33,6 +33,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    borderBottomColor: "#0F3655",
+    borderBottomWidth: 1,
   },
   baseText: {
     color: 'white',

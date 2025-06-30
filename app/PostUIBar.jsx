@@ -23,16 +23,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignContent: 'center',
+        paddingLeft: 10,
+        paddingRight: 10,
     },
     likeContainer: {
         flexDirection: 'row',
         alignItems: 'center',
     },
-    heart: {
-        width: 30,
-        height: 30,
+    likeIcon: {
+        
     },
     likeCount: {
+        paddingLeft: 5,
         color: 'white',
         justifyContent: 'center'
     },
