@@ -23,4 +23,18 @@ export const Colors = {
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
   },
+  confessions: {
+  PlaceVanier: {
+    background: "#FFDAD5",
+    accent: "#D65A4E"
+  },
+  TotemPark: {
+    background: "#DDEEDF",
+    accent: "#5C8C66"
+  },
+  OrchardCommons: {
+    background: "#E8DFFB",
+    accent: "#7A5CA0"
+  }
+}
 };

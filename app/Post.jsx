@@ -29,6 +29,7 @@ export const imageMap = {
   'pictures/ubcwsoccer_post2_img1.jpg': require('../data/posts/pictures/ubcwsoccer_post2_img1.jpg'),
 };
 
+// TODO add caption
 
 export default function Post({ post }) {
   const fileNameKey = post.profile.profile_pic_url

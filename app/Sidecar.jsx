@@ -1,7 +1,7 @@
-import {FlatList, StyleSheet, Text, View, Image, Dimensions} from 'react-native'
-import {imageMap} from './Post'
 import { useState } from 'react'
+import { Dimensions, FlatList, Image, StyleSheet, View } from 'react-native'
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
+import { imageMap } from './Post'
 
 export default function Sidecar({post}) {
     const screenWidth = Dimensions.get('window').width
