@@ -8,6 +8,7 @@ import { useState } from 'react'
 import ScreenWrapper from "../ScreenWrapper";
 import Heading from "../Heading"
 import ConfessionsOptionsBar from '../confessionComponents/ConfessionsOptionsBar';
+import ConfessionsGrid from '../confessionComponents/ConfessionsGrid';
 
 export default function ConfessionsScreen() {
   const [selectedResidence, setSelectedResidence] = useState("Totem Park")
@@ -17,6 +18,7 @@ export default function ConfessionsScreen() {
       <Heading/>
       <ConfessionsOptionsBar selectedResidence={selectedResidence} setSelectedResidence={setSelectedResidence}/>
       <Text style={{color: 'white'}}>Confessions</Text>
+      <ConfessionsGrid selectedResidence={selectedResidence} setSelectedResidence={setSelectedResidence}/>
     </ScreenWrapper>
   );
 }

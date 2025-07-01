@@ -6,7 +6,7 @@ import ScreenWrapper from '../ScreenWrapper';
 
 export default function HomeScreen() {
 
-
+// TODO add double tap image to like 
 
   return (
     <ScreenWrapper>
