@@ -29,16 +29,21 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignContent: 'center',
+        justifyContent: 'center',
+        paddingLeft: 10,
+        padding: 10,
     },
     resBtn: {
         color: 'white',
-        marginLeft: 10,
+        marginLeft: 7,
+        marginRight: 7,
         borderWidth: 1,
         width: 75,
         height: 25,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 7,
+        fontFamily: 'InterSemiBold'
     },
     totemUnselected: {
         color: Colors.confessions.TotemPark.accent,

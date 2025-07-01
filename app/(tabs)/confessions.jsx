@@ -2,6 +2,7 @@
 import { StyleSheet, Text } from 'react-native';
 import { useState } from 'react'
 
+// TODO, add popup telling user what confessions is when they first open
 
 // project imports
 import ScreenWrapper from "../ScreenWrapper";
