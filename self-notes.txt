@@ -1,0 +1,3 @@
+activate venv
+source venv/bin/activate  //for codespaces
+source venv/bin/activate  //for windows git bash
