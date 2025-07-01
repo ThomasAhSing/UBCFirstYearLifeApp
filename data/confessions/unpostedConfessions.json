@@ -4,6 +4,8 @@
       "postId": 1,
       "cutoffDate": "2024-10-22",
       "count": 2,
+      "posted": false,
+      "previewImage": "/static/previews/totem_park_1_thumb.png",
       "confessions": [
         {
           "id": "13",
@@ -17,8 +19,7 @@
           "content": "i need to makeout w smo before i shoot up the damn school",
           "timestamp": "2024-10-17T18:00:00"
         }
-      ],
-      "posted": false
+      ]
     }
   ],
   "Orchard Commons": [
@@ -26,6 +27,8 @@
       "postId": 1,
       "cutoffDate": "2024-10-22",
       "count": 2,
+      "posted": false,
+      "previewImage": "/static/previews/orchard_commons_1_thumb.png",
       "confessions": [
         {
           "id": "39",
@@ -39,8 +42,7 @@
           "content": "I saw your golden cartier bracelet in hebb entrance where the sofas are",
           "timestamp": "2024-10-20T06:00:00"
         }
-      ],
-      "posted": false
+      ]
     }
   ],
   "Place Vanier": [
@@ -48,6 +50,8 @@
       "postId": 1,
       "cutoffDate": "2024-10-22",
       "count": 1,
+      "posted": false,
+      "previewImage": "/static/previews/place_vanier_1_thumb.png",
       "confessions": [
         {
           "id": "54",
@@ -55,8 +59,7 @@
           "content": "To that brown girl that always has a new package every time she's in the commons block...",
           "timestamp": "2024-10-21T12:00:00"
         }
-      ],
-      "posted": false
+      ]
     }
   ]
 }

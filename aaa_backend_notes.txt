@@ -1,0 +1,8 @@
+imageGenerator.py (3 cases) - all handle in backend
+Case 1: preview for posts in Confessions tabs
+    - as soon as a new post is made with first confession generate image for
+    - first confession. Add link to image in post json object
+Case 2: for share link preview 
+    - react native sends postID and confessionIndex to Express backend
+    - express calls python helper to generate image
+    - cache image for later use

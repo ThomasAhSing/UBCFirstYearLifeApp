@@ -4,6 +4,8 @@
       "postId": 1,
       "cutoffDate": "2024-10-15",
       "count": 5,
+      "posted": true,
+      "previewImage": "/static/previews/totem_park_1_thumb.png",
       "confessions": [
         {
           "id": "17",
@@ -35,13 +37,14 @@
           "content": "i love the guys that skate...",
           "timestamp": "2024-10-08T16:36:29"
         }
-      ],
-      "posted": true
+      ]
     },
     {
       "postId": 2,
       "cutoffDate": "2024-10-15",
       "count": 5,
+      "posted": true,
+      "previewImage": "/static/previews/totem_park_2_thumb.png",
       "confessions": [
         {
           "id": "21",
@@ -73,13 +76,14 @@
           "content": "Hi, I'm Roy. Honestly, I don't care anymore...",
           "timestamp": "2024-09-16T03:12:13"
         }
-      ],
-      "posted": true
+      ]
     },
     {
       "postId": 3,
       "cutoffDate": "2024-10-15",
       "count": 5,
+      "posted": true,
+      "previewImage": "/static/previews/totem_park_3_thumb.png",
       "confessions": [
         {
           "id": "7",
@@ -111,13 +115,14 @@
           "content": "Learn some decency and stop posting about yourself",
           "timestamp": "2024-08-22T23:34:21"
         }
-      ],
-      "posted": true
+      ]
     },
     {
       "postId": 4,
       "cutoffDate": "2024-10-15",
       "count": 5,
+      "posted": true,
+      "previewImage": "/static/previews/totem_park_4_thumb.png",
       "confessions": [
         {
           "id": "3",
@@ -149,8 +154,7 @@
           "content": "thought leopard print hair guy was cool bc well dope hair, but he has to be the biggest cornball ever ...",
           "timestamp": "2024-08-02T16:33:52"
         }
-      ],
-      "posted": true
+      ]
     }
   ],
   "Orchard Commons": [
@@ -158,6 +162,8 @@
       "postId": 1,
       "cutoffDate": "2024-10-15",
       "count": 5,
+      "posted": true,
+      "previewImage": "/static/previews/orchard_commons_1_thumb.png",
       "confessions": [
         {
           "id": "43",
@@ -189,13 +195,14 @@
           "content": "blonde asian shawty working at bigway hella bad",
           "timestamp": "2024-10-03T10:35:08"
         }
-      ],
-      "posted": true
+      ]
     },
     {
       "postId": 2,
       "cutoffDate": "2024-10-15",
       "count": 5,
+      "posted": true,
+      "previewImage": "/static/previews/orchard_commons_2_thumb.png",
       "confessions": [
         {
           "id": "36",
@@ -227,13 +234,14 @@
           "content": "Scooter dom technically did nothing wrong (allegedly), he just has the most punch-able face in the world.",
           "timestamp": "2024-09-14T21:42:34"
         }
-      ],
-      "posted": true
+      ]
     },
     {
       "postId": 3,
       "cutoffDate": "2024-10-15",
       "count": 5,
+      "posted": true,
+      "previewImage": "/static/previews/orchard_commons_3_thumb.png",
       "confessions": [
         {
           "id": "23",
@@ -265,13 +273,14 @@
           "content": "I saw the Porte Guy at OC! OMG such a cutie patotieee",
           "timestamp": "2024-09-05T14:37:28"
         }
-      ],
-      "posted": true
+      ]
     },
     {
       "postId": 4,
       "cutoffDate": "2024-10-15",
       "count": 5,
+      "posted": true,
+      "previewImage": "/static/previews/orchard_commons_4_thumb.png",
       "confessions": [
         {
           "id": "31",
@@ -303,8 +312,7 @@
           "content": "Hire a new admin clearly dis 1 doesn't know how to post",
           "timestamp": "2024-08-04T13:33:21"
         }
-      ],
-      "posted": true
+      ]
     }
   ],
   "Place Vanier": [
@@ -312,6 +320,8 @@
       "postId": 1,
       "cutoffDate": "2024-10-15",
       "count": 5,
+      "posted": true,
+      "previewImage": "/static/previews/place_vanier_1_thumb.png",
       "confessions": [
         {
           "id": "59",
@@ -343,13 +353,14 @@
           "content": "I am going to kill myself",
           "timestamp": "2024-09-21T10:57:12"
         }
-      ],
-      "posted": true
+      ]
     },
     {
       "postId": 2,
       "cutoffDate": "2024-10-15",
       "count": 5,
+      "posted": true,
+      "previewImage": "/static/previews/place_vanier_2_thumb.png",
       "confessions": [
         {
           "id": "52",
@@ -381,13 +392,14 @@
           "content": "Is there a vanier basketball runs gc? If so someone put it in the comments",
           "timestamp": "2024-08-27T15:47:44"
         }
-      ],
-      "posted": true
+      ]
     },
     {
       "postId": 3,
       "cutoffDate": "2024-10-15",
       "count": 4,
+      "posted": true,
+      "previewImage": "/static/previews/place_vanier_3_thumb.png",
       "confessions": [
         {
           "id": "48",
@@ -413,8 +425,7 @@
           "content": "all of you here are so corny fr...",
           "timestamp": "2024-08-07T22:11:41"
         }
-      ],
-      "posted": true
+      ]
     }
   ]
 }
