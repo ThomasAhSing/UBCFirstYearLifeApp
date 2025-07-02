@@ -5,6 +5,8 @@ import datetime
 import os
 import emoji
 import re
+import json
+from datetime import datetime
 
 # Configurable settings
 colors = {
@@ -60,66 +62,71 @@ def draw_rectangle_rounded_top(draw, rect, radius, color):
     draw.pieslice([x2 - 2 * radius, y1, x2, y1 + 2 * radius], 270, 360, fill=color)
 
 def draw_text_with_emojis(draw, base_img, text, position, font, max_width):
+    x_start, y = position
+    line_height = EMOJI_SIZE + 8
+
+    # Split into tokens (words and emojis)
+    tokens = split_text_and_emojis(text)
+
+    # Step 1: Wrap lines using textwrap but measure pixel length
+    lines = []
+    current_line = []
+    current_width = 0
+
+    for token in tokens:
+        token_width = EMOJI_SIZE if emoji.is_emoji(token) else draw.textlength(token, font=font)
+        
+        if current_width + token_width > max_width and current_line:
+            lines.append(current_line)
+            current_line = [token]
+            current_width = token_width
+        else:
+            current_line.append(token)
+            current_width += token_width
+
+    if current_line:
+        lines.append(current_line)
+
+    # Step 2: Draw each line
+    for line in lines:
+        x = x_start
+        for token in line:
+            if emoji.is_emoji(token):
+                code = '-'.join(f"{ord(c):x}" for c in token)
+                emoji_path = os.path.join(EMOJI_FOLDER, f"{code}.png")
+                if not os.path.exists(emoji_path):
+                    emoji_path = download_emoji_image(code)
+                if emoji_path and os.path.exists(emoji_path):
+                    try:
+                        emoji_img = Image.open(emoji_path).resize((EMOJI_SIZE, EMOJI_SIZE))
+                        base_img.paste(emoji_img, (x, y), emoji_img.convert("RGBA"))
+                    except Exception:
+                        pass
+                x += EMOJI_SIZE
+            else:
+                draw.text((x, y), token, font=font, fill="black")
+                x += draw.textlength(token, font=font)
+        y += line_height
+
+def draw_text_wrapped(draw, text, position, font, max_width, line_spacing=8):
     x, y = position
-    space_width = draw.textlength(' ', font=font)
-    words = split_text_and_emojis(text)
-    line = []
-    line_width = 0
+    lines = []
+    words = text.split()
+    current_line = ""
 
     for word in words:
-        if emoji.is_emoji(word):
-            width = EMOJI_SIZE
+        test_line = f"{current_line} {word}".strip()
+        if draw.textlength(test_line, font=font) <= max_width:
+            current_line = test_line
         else:
-            width = draw.textlength(word, font=font)
+            lines.append(current_line)
+            current_line = word
+    if current_line:
+        lines.append(current_line)
 
-        if line_width + width > max_width:
-            x_offset = x
-            for token in line:
-                if emoji.is_emoji(token):
-                    code = '-'.join(f"{ord(c):x}" for c in token)
-                    emoji_path = os.path.join(EMOJI_FOLDER, f"{code}.png")
-                    if os.path.exists(emoji_path):
-                        try:
-                            emoji_img = Image.open(emoji_path).resize((EMOJI_SIZE, EMOJI_SIZE))
-                            base_img.paste(emoji_img, (x_offset, y), emoji_img.convert("RGBA"))
-                        except Exception:
-                            pass  # Skip broken emoji image
-                    else:
-                        emoji_path = download_emoji_image(code)
-                        if emoji_path and os.path.exists(emoji_path):
-                            emoji_img = Image.open(emoji_path).resize((EMOJI_SIZE, EMOJI_SIZE))
-                            base_img.paste(emoji_img, (x_offset, y), emoji_img.convert("RGBA"))
-                    x_offset += EMOJI_SIZE
-                else:
-                    draw.text((x_offset, y), token, font=font, fill="black")
-                    x_offset += draw.textlength(token, font=font)
-            y += EMOJI_SIZE + 8
-            line = [word]
-            line_width = width
-        else:
-            line.append(word)
-            line_width += width
-
-    x_offset = x
-    for token in line:
-        if emoji.is_emoji(token):
-            code = '-'.join(f"{ord(c):x}" for c in token)
-            emoji_path = os.path.join(EMOJI_FOLDER, f"{code}.png")
-            
-            if not os.path.exists(emoji_path):
-                emoji_path = download_emoji_image(code)
-            
-            if emoji_path and os.path.exists(emoji_path):
-                try:
-                    emoji_img = Image.open(emoji_path).resize((EMOJI_SIZE, EMOJI_SIZE))
-                    base_img.paste(emoji_img, (x_offset, y), emoji_img.convert("RGBA"))
-                except Exception:
-                    pass
-            x_offset += EMOJI_SIZE
-        else:
-            draw.text((x_offset, y), token, font=font, fill="black")
-            x_offset += draw.textlength(token, font=font)
-
+    for line in lines:
+        draw.text((x, y), line, font=font, fill="black")
+        y += font.getbbox(line)[3] + line_spacing  # Move y down
 
 
 
@@ -139,8 +146,9 @@ def generate_confession_image(residence, confession_text, submission_date, outpu
     except:
         font_title = font_subtitle = font_body = font_small = font_italic = ImageFont.load_default()
 
-    bg_color = colors[residence]["background"]
-    accent = colors[residence]["accent"]
+    bg_color = colors[residence.replace(" ", "")]["background"]
+    accent = colors[residence.replace(" ", "")]["accent"]
+
 
     img = Image.new("RGB", (width, height), bg_color)
     draw = ImageDraw.Draw(img)
@@ -168,13 +176,20 @@ def generate_confession_image(residence, confession_text, submission_date, outpu
     if remove_emojis:
         confession_text = remove_emojis_from_text(confession_text)
 
-    draw_text_with_emojis(
-        draw,
-        img,
-        confession_text,
-        (bottom_box[0] + 20, bottom_box[1] + 100),
-        font_body,
-        max_width=bottom_box[2] - bottom_box[0] - 40
+    # draw_text_with_emojis(
+    #     draw,
+    #     img,
+    #     confession_text,
+    #     (bottom_box[0] + 20, bottom_box[1] + 100),
+    #     font_body,
+    #     max_width=bottom_box[2] - bottom_box[0] - 40
+    # )
+    draw_text_wrapped(
+    draw,
+    confession_text,
+    (bottom_box[0] + 20, bottom_box[1] + 100),
+    font=font_body,
+    max_width=bottom_box[2] - bottom_box[0] - 40
     )
 
     # Make the "Submitted on" text italic and gray
@@ -185,26 +200,56 @@ def generate_confession_image(residence, confession_text, submission_date, outpu
     print(f"Image saved to {output_path}")
 
 
-# Example usage
 if __name__ == "__main__":
-    generate_confession_image(
-        residence="TotemPark",
-        confession_text="leopard hair 😭 guy just proved their point 😭😭",
-        submission_date="4/1/25, 12:39 PM",
-        output_path="totem_confession_output.png",
-        remove_emojis=True  # Set to True to remove emojis from rendering
-    )
-    generate_confession_image(
-        residence="OrchardCommons",
-        confession_text="i went to the store",
-        submission_date="4/2/25, 12:39 PM",
-        output_path="orchard_confession_output.png",
-        remove_emojis=True  # Set to True to remove emojis from rendering
-    )
-    generate_confession_image(
-        residence="PlaceVanier",
-        confession_text="tsangy pangy paxy daxy",
-        submission_date="4/3/25, 12:39 PM",
-        output_path="vanier_confession_output.png",
-        remove_emojis=True  # Set to True to remove emojis from rendering
-    )
+
+    input_files = [
+        "../data/confessions/postedConfessions.json",
+        "../data/confessions/unpostedConfessions.json"
+    ]
+
+    os.makedirs("../data/confessions/previewImages", exist_ok=True)  # make sure the folder exists
+
+    for file_path in input_files:
+        with open(file_path, "r") as f:
+            data = json.load(f)
+            for residence, posts in data.items():
+                for post in posts:
+                    for confession in post['confessions']:
+                        if confession['confessionIndex'] == 1:
+                            cid = confession['confessionID']
+                            pid = post['postId']
+                            timestamp = datetime.fromisoformat(confession['timestamp'])
+                            formatted_date = timestamp.strftime("%-m/%-d/%y, %-I:%M %p")
+                            output_name = f"../data/confessions/previewImages/{residence.replace(' ', '_').lower()}_cid{cid}_pid{pid}.png"
+                            generate_confession_image(
+                                residence=residence,
+                                confession_text=confession['content'],
+                                submission_date=formatted_date,
+                                output_path=output_name,
+                                remove_emojis=True
+                            )
+
+
+# # Example usage
+# if __name__ == "__main__":
+#     generate_confession_image(
+#         residence="TotemPark",
+#         confession_text="leopard hair 😭 guy just proved their point 😭😭",
+#         submission_date="4/1/25, 12:39 PM",
+#         output_path="totem_confession_output.png",
+#         remove_emojis=True  # Set to True to remove emojis from rendering
+#     )
+#     generate_confession_image(
+#         residence="OrchardCommons",
+#         confession_text="i went to the store",
+#         submission_date="4/2/25, 12:39 PM",
+#         output_path="orchard_confession_output.png",
+#         remove_emojis=True  # Set to True to remove emojis from rendering
+#     )
+#     generate_confession_image(
+#         residence="PlaceVanier",
+#         confession_text="tsangy pangy paxy daxy",
+#         submission_date="4/3/25, 12:39 PM",
+#         output_path="vanier_confession_output.png",
+#         remove_emojis=True  # Set to True to remove emojis from rendering
+#     )
