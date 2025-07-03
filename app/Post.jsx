@@ -33,7 +33,6 @@ export const imageMap = {
 
 export default function Post({ post }) {
   const fileNameKey = post.profile.profile_pic_url
-  console.log("Looking up key:", fileNameKey);
 
   return (
     <View style={styles.container}>

@@ -1,30 +1,61 @@
-import { TouchableOpacity, StyleSheet, Text, View, Image, FlatList } from 'react-native'
+import {
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+  Image,
+} from 'react-native'
 
-
-import { Colors } from "@/constants/Colors"
 import confessions from "@/data/confessions/postedConfessions.json"
- 
-export default function ConfessionsGrid({selectedResidence, setSelectedResidence}) {
-    const RES_CON_DATA = confessions[selectedResidence] // list of post jsons
-    return (
-          <FlatList
-          data={RES_CON_DATA}
-          renderItem={({item}) => {
-            <TouchableOpacity >
-                <Image></Image>
-            </TouchableOpacity>
-          }}/>
-    )
+import { confessionImageMap } from "@/app/(tabs)/confessions"
+import { Colors } from '@/constants/Colors'
 
+export default function ConfessionsGrid({ selectedResidence }) {
+  const RES_CON_DATA = confessions[selectedResidence]
+  const windowWidth = Math.floor(Dimensions.get('window').width)
+
+  const numCols = 3
+  const spacing = 1
+
+  const baseSize = Math.floor(windowWidth / numCols)
+  const leftover = windowWidth - baseSize * numCols 
+
+  return (
+    <FlatList
+      data={RES_CON_DATA}
+      numColumns={numCols}
+      keyExtractor={(item) => item.postId.toString()}
+      renderItem={({ item, index }) => {
+        const col = index % numCols
+        let itemWidth = baseSize
+
+        if (col === 1) itemWidth += leftover
+
+        return (
+          <TouchableOpacity
+            style={{
+              width: itemWidth,
+              height: baseSize,
+              borderBottomWidth: spacing,
+              borderRightWidth: col === numCols - 1 ? 0 : spacing,
+              borderColor: Colors.background,
+              backgroundColor: 'white',
+            }}
+          >
+            <Image
+              source={confessionImageMap[selectedResidence][item.postId]}
+              style={{ width: '100%', height: '100%' }}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
+        )
+      }}
+    />
+  )
 }
 
-
 const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
-        alignContent: 'center',
-        justifyContent: 'center',
-        paddingLeft: 10,
-        padding: 10,
-    },
+  container: {
+    flex: 1,
+  },
 })

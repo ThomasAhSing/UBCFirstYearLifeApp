@@ -23,6 +23,7 @@ export const Colors = {
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
   },
+  background: '#0C2A42',
   confessions: {
   PlaceVanier: {
     background: "#FFDAD5",

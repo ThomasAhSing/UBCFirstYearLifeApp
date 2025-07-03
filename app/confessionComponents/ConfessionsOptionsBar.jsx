@@ -5,6 +5,8 @@ import { TouchableOpacity, StyleSheet, Text, View } from 'react-native'
 
 import { Colors } from "@/constants/Colors"
 
+// TODO abstract each button int a ResBtn components and simplify stying, fix so that not blakc text text color is accent color
+// or background color
  
 export default function ConfessionsOptionsBar({selectedResidence, setSelectedResidence}) {
 
@@ -12,16 +14,24 @@ export default function ConfessionsOptionsBar({selectedResidence, setSelectedRes
         <View style = {styles.container}>
             <TouchableOpacity 
             style={[styles.resBtn, styles.totemUnselected, selectedResidence==="Totem Park" && styles.totemSelected]}
-            onPress = {() => setSelectedResidence("Totem Park")}>Totem</TouchableOpacity>
+            onPress = {() => setSelectedResidence("Totem Park")}>
+                <Text style={styles.resBtnText}>Totem</Text>
+            </TouchableOpacity>
             
             <TouchableOpacity 
             style={[styles.resBtn, styles.orchardUnselected, selectedResidence==="Orchard Commons" && styles.orchardSelected]}
-            onPress = {() => setSelectedResidence("Orchard Commons")}>Orchard</TouchableOpacity>
+            onPress = {() => setSelectedResidence("Orchard Commons")}>
+                <Text style={styles.resBtnText}>Orchard</Text>
+            </TouchableOpacity>
             <TouchableOpacity
             style={[styles.resBtn, styles.vanierUnselected, selectedResidence==="Place Vanier" && styles.vanierSelected]}
-            onPress = {() => setSelectedResidence("Place Vanier")}>Vanier</TouchableOpacity>
+            onPress = {() => setSelectedResidence("Place Vanier")}>
+                <Text style={styles.resBtnText}>Vanier</Text>
+            </TouchableOpacity>
         </View>    
     )
+
+    
 
 }
 
@@ -35,7 +45,6 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     resBtn: {
-        color: 'white',
         marginLeft: 7,
         marginRight: 7,
         borderWidth: 1,
@@ -44,7 +53,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 7,
-        fontFamily: 'InterSemiBold'
+        
     },
     totemUnselected: {
         color: Colors.confessions.TotemPark.accent,
@@ -75,5 +84,9 @@ const styles = StyleSheet.create({
         color: Colors.confessions.PlaceVanier.background,
         borderColor: Colors.confessions.PlaceVanier.accent,
         backgroundColor: Colors.confessions.PlaceVanier.accent,
+    },
+    resBtnText: {
+        // color: 'white',
+        fontFamily: 'InterSemiBold',
     },
 })
