@@ -11,6 +11,7 @@ import ScreenWrapper from "../ScreenWrapper";
 import Heading from "../Heading"
 import ConfessionsOptionsBar from '../confessionComponents/ConfessionsOptionsBar';
 import ConfessionsGrid from '../confessionComponents/ConfessionsGrid';
+import AllConfessionsScroller from '../confessionComponents/AllConfessionsScroller'
 
 export const confessionImageMap = {
   "Totem Park": {
@@ -38,12 +39,14 @@ export const confessionImageMap = {
 
 export default function ConfessionsScreen() {
   const [selectedResidence, setSelectedResidence] = useState("Totem Park")
+  const [allConfessionsScrollerVisible, setAllConfessionsScrollerVisible] = useState(false)
 
   return (
     <ScreenWrapper>
       <Heading/>
       <ConfessionsOptionsBar selectedResidence={selectedResidence} setSelectedResidence={setSelectedResidence}/>
       <Text style={{color: 'white'}}>Confessions</Text>
+      
       <ConfessionsGrid selectedResidence={selectedResidence} setSelectedResidence={setSelectedResidence}/>
     </ScreenWrapper>
   );

@@ -2,14 +2,10 @@ import { useState } from 'react'
 import { Dimensions, FlatList, Image, StyleSheet, View } from 'react-native'
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
 import { imageMap } from './Post'
+import RenderedConfession from './RenderedConfession'
 
-export default function Sidecar({post}) { // media is 
-    const screenWidth = Dimensions.get('window').width
-    const firstMedia = imageMap[post.media[0].image_url]
-    const { width: firstWidth, height: firstHeight } = resolveAssetSource(firstMedia);
-    const imgWidth = screenWidth;
-    const aspectRatio = firstHeight / firstWidth; 
-    const imgHeight = imgWidth * aspectRatio;
+export default function ConfessionsSidercar({confessions}) { // media is 
+    const postSize = Dimensions.get('window').width
 
     const [currentIndex, setCurrentIndex] = useState(0)
     
@@ -23,25 +19,22 @@ export default function Sidecar({post}) { // media is
     return (
         <View>
                 <FlatList
-                style={{width: imgWidth, height: imgHeight}}
-                data = {post.media}
+                style={{width: postSize, height: postSize}}
+                data = {confessions}
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
                 onScroll={handleScroll}
                 horizontal = {true}
                 renderItem = {({item}) => {
                 return (
-                    <Image
-                    style = {{width: imgWidth, height: imgHeight}}
-                    resizeMode='cover'
-                    source={imageMap[item.image_url]}/>
+                    <RenderedConfession confession={item}/>
                 )}}/>
-                <View style={styles.dotContainer}>
+                {/* <View style={styles.dotContainer}>
                     {post.media.map((_, index) => (
                         <View key={index}
                         style = {[styles.dot, currentIndex == index && styles.activeDot]}/>
                     ))}
-                </View>
+                </View> */}
         </View>    
     )
 

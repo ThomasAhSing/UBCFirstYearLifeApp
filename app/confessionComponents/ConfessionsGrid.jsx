@@ -4,7 +4,10 @@ import {
   FlatList,
   Dimensions,
   Image,
+  Modal,
+  View,
 } from 'react-native'
+import { useState } from 'react'
 
 import confessions from "@/data/confessions/postedConfessions.json"
 import { confessionImageMap } from "@/app/(tabs)/confessions"
@@ -20,8 +23,17 @@ export default function ConfessionsGrid({ selectedResidence }) {
   const baseSize = Math.floor(windowWidth / numCols)
   const leftover = windowWidth - baseSize * numCols 
 
+ 
+
   return (
-    <FlatList
+    <View style={styles.container}>
+      <Modal
+        style={styles.allConfessionsScroller}
+        >
+          <AllConfessionsScroller RES_CON_DATA={RES_CON_DATA}/>
+      </Modal>
+      <FlatList
+      style = {styles.grid}
       data={RES_CON_DATA}
       numColumns={numCols}
       keyExtractor={(item) => item.postId.toString()}
@@ -51,6 +63,8 @@ export default function ConfessionsGrid({ selectedResidence }) {
         )
       }}
     />
+    </View>
+    
   )
 }
 
@@ -58,4 +72,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  allConfessionsScroller: {
+    flex: 1,
+  },
+  grid: {
+    flex: 1,
+  }
 })
