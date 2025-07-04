@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Dimensions, FlatList, Image, StyleSheet, View } from 'react-native'
+import { Dimensions, FlatList, Image, StyleSheet, View, Text } from 'react-native'
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
-import { imageMap } from './Post'
 import RenderedConfession from './RenderedConfession'
 
-export default function ConfessionsSidercar({confessions}) { // media is 
+export default function ConfessionsSidecar({confessions}) { // media is 
+    // console.log(confessions)
     const postSize = Dimensions.get('window').width
 
     const [currentIndex, setCurrentIndex] = useState(0)
@@ -23,18 +23,13 @@ export default function ConfessionsSidercar({confessions}) { // media is
                 data = {confessions}
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
-                onScroll={handleScroll}
+                // onScroll={handleScroll}
                 horizontal = {true}
                 renderItem = {({item}) => {
                 return (
-                    <RenderedConfession confession={item}/>
+                    <RenderedConfession confessionObj={item}/>
                 )}}/>
-                {/* <View style={styles.dotContainer}>
-                    {post.media.map((_, index) => (
-                        <View key={index}
-                        style = {[styles.dot, currentIndex == index && styles.activeDot]}/>
-                    ))}
-                </View> */}
+                <Text>Thomas</Text>
         </View>    
     )
 

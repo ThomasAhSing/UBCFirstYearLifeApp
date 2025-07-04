@@ -6,12 +6,14 @@ import {
   Image,
   Modal,
   View,
+  Text,
 } from 'react-native'
 import { useState } from 'react'
 
 import confessions from "@/data/confessions/postedConfessions.json"
 import { confessionImageMap } from "@/app/(tabs)/confessions"
 import { Colors } from '@/constants/Colors'
+import AllConfessionsScroller from './AllConfessionsScroller'
 
 export default function ConfessionsGrid({ selectedResidence }) {
   const RES_CON_DATA = confessions[selectedResidence]
@@ -23,14 +25,17 @@ export default function ConfessionsGrid({ selectedResidence }) {
   const baseSize = Math.floor(windowWidth / numCols)
   const leftover = windowWidth - baseSize * numCols 
 
- 
+  const [modalVisible, setModalVisible] = useState(false); 
 
   return (
     <View style={styles.container}>
       <Modal
-        style={styles.allConfessionsScroller}
+        style={styles.modal}
+        transparent={true}
+        visible={true}
         >
-          <AllConfessionsScroller RES_CON_DATA={RES_CON_DATA}/>
+          <AllConfessionsScroller style={styles.allConfessionsScroller} RES_CON_DATA={RES_CON_DATA}/>
+          {/* <Text>Full screen scroller</Text> */}
       </Modal>
       <FlatList
       style = {styles.grid}
@@ -70,6 +75,9 @@ export default function ConfessionsGrid({ selectedResidence }) {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  modal: {
     flex: 1,
   },
   allConfessionsScroller: {

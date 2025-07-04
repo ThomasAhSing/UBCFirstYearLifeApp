@@ -13,19 +13,19 @@ export default function ConfessionsOptionsBar({selectedResidence, setSelectedRes
     return (
         <View style = {styles.container}>
             <TouchableOpacity 
-            style={[styles.resBtn, styles.totemUnselected, selectedResidence==="Totem Park" && styles.totemSelected]}
-            onPress = {() => setSelectedResidence("Totem Park")}>
+            style={[styles.resBtn, styles.totemUnselected, selectedResidence==="TotemPark" && styles.totemSelected]}
+            onPress = {() => setSelectedResidence("TotemPark")}>
                 <Text style={styles.resBtnText}>Totem</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
-            style={[styles.resBtn, styles.orchardUnselected, selectedResidence==="Orchard Commons" && styles.orchardSelected]}
-            onPress = {() => setSelectedResidence("Orchard Commons")}>
+            style={[styles.resBtn, styles.orchardUnselected, selectedResidence==="OrchardCommons" && styles.orchardSelected]}
+            onPress = {() => setSelectedResidence("OrchardCommons")}>
                 <Text style={styles.resBtnText}>Orchard</Text>
             </TouchableOpacity>
             <TouchableOpacity
-            style={[styles.resBtn, styles.vanierUnselected, selectedResidence==="Place Vanier" && styles.vanierSelected]}
-            onPress = {() => setSelectedResidence("Place Vanier")}>
+            style={[styles.resBtn, styles.vanierUnselected, selectedResidence==="PlaceVanier" && styles.vanierSelected]}
+            onPress = {() => setSelectedResidence("PlaceVanier")}>
                 <Text style={styles.resBtnText}>Vanier</Text>
             </TouchableOpacity>
         </View>    

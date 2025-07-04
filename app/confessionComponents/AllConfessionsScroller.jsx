@@ -9,14 +9,14 @@ import {
 import confessions from "@/data/confessions/postedConfessions.json"
 import { confessionImageMap } from "@/app/(tabs)/confessions"
 import { Colors } from '@/constants/Colors'
-import ConfessionsSidercar from "./ConfessionsSidercar"
+import ConfessionsPost from "./ConfessionsPost"
 
 export default function AllConfessionsScroller({ RES_CON_DATA }) {
     return (
         <FlatList
                 data={RES_CON_DATA}
                 renderItem={({item}) => (
-                    <ConfessionsSidercar confessions = {item.confessions}/>
+                    <ConfessionsPost confessions = {item.confessions}/>
                     // <FlatList
                     //     data={item.confessions}
                     //     renderItem={({item : confession}) => (

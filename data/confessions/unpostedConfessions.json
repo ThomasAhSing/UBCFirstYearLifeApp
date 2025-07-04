@@ -1,5 +1,5 @@
 {
-  "Totem Park": [
+  "TotemPark": [
     {
       "postId": 5,
       "cutoffDate": "2024-10-22",
@@ -10,21 +10,21 @@
         {
           "confessionID": 55,
           "confessionIndex": 1,
-          "residence": "Totem Park",
+          "residence": "TotemPark",
           "content": "That Asian guy with tats is actually super rude and gross (didn't have any manners ordering food at all just demanded it) and I saw him blowing vape in ppls faces.",
           "timestamp": "2024-10-16T12:00:00"
         },
         {
           "confessionID": 56,
           "confessionIndex": 2,
-          "residence": "Totem Park",
+          "residence": "TotemPark",
           "content": "i need to makeout w smo before i shoot up the damn school",
           "timestamp": "2024-10-17T18:00:00"
         }
       ]
     }
   ],
-  "Orchard Commons": [
+  "OrchardCommons": [
     {
       "postId": 5,
       "cutoffDate": "2024-10-22",
@@ -35,21 +35,21 @@
         {
           "confessionID": 57,
           "confessionIndex": 1,
-          "residence": "Orchard Commons",
+          "residence": "OrchardCommons",
           "content": "who is the giant woman adult person who always eats at oc",
           "timestamp": "2024-10-19T00:00:00"
         },
         {
           "confessionID": 58,
           "confessionIndex": 2,
-          "residence": "Orchard Commons",
+          "residence": "OrchardCommons",
           "content": "I saw your golden cartier bracelet in hebb entrance where the sofas are",
           "timestamp": "2024-10-20T06:00:00"
         }
       ]
     }
   ],
-  "Place Vanier": [
+  "PlaceVanier": [
     {
       "postId": 4,
       "cutoffDate": "2024-10-22",
@@ -60,7 +60,7 @@
         {
           "confessionID": 59,
           "confessionIndex": 1,
-          "residence": "Place Vanier",
+          "residence": "PlaceVanier",
           "content": "To that brown girl that always has a new package every time she's in the commons block...",
           "timestamp": "2024-10-21T12:00:00"
         }

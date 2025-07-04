@@ -160,7 +160,7 @@ def generate_confession_image(residence, confession_text, submission_date, outpu
     accent_box = (top_box[0], top_box[1], top_box[2], top_box[1] + 20)
     draw_rectangle_rounded_top(draw, accent_box, radius=10, color=accent)
 
-    title_text = f"{residence.replace('TotemPark', 'Totem Park').replace('PlaceVanier', 'Place Vanier').replace('OrchardCommons', 'Orchard Commons')} Confessions"
+    title_text = f"{residence.replace('TotemPark', 'TotemPark').replace('PlaceVanier', 'PlaceVanier').replace('OrchardCommons', 'OrchardCommons')} Confessions"
     desc = "Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person.\nAll confessions are anonymous."
 
     draw.text((top_box[0] + 20, top_box[1] + 40), title_text, font=font_title, fill="black")
