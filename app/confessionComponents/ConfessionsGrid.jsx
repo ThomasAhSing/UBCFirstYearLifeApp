@@ -17,6 +17,7 @@ import { Colors } from '@/constants/Colors'
 import AllConfessionsScroller from './AllConfessionsScroller'
 import BackIcon from '@/assets/icons/BackIcon'
 import PlusIcon from '@/assets/icons/PlusIcon'
+import AddConfessionScreen from './AddConfessionScreen'
 
 // TODO implement gesture when when swipe right from left takes back from allscroller to previews
 // TODO add opening on crrect index not at start when click on preview
@@ -30,22 +31,34 @@ export default function ConfessionsGrid({ selectedResidence }) {
   const baseSize = Math.floor(windowWidth / numCols)
   const leftover = windowWidth - baseSize * numCols 
 
-  const [modalVisible, setModalVisible] = useState(false); 
-  const toggleModalVisible = () => {
-    setModalVisible(!modalVisible)
+  // let prevScreen = "preview"
+  const [screen, setScreen] = useState("preview")
+
+
+  const toggleAllConfessionsScroller = () => {
+    if (screen === "preview") {
+      setScreen("allConfessionsScroller")
+    } else if (screen === "allConfessionsScroller") {
+      setScreen("preview")
+    }
   }
 
-  const handleGestureEvent = (event) => {
-  if (event.nativeEvent.translationX > windowWidth * 0.2) { 
-    setModalVisible(false)
+  const toggleAddConfession = () => { //return to preview if in addConfession
+    if (screen !== "addConfession") {
+      // prevScreen = screen
+      setScreen("addConfession")
+    } else if (screen === "addConfession") {
+      setScreen("preview")
+    }
   }
-  };
+
+
 
   return (
     <View style={styles.container}>
       
 
-      {!modalVisible && (
+      {screen==="preview" && (
         <FlatList
       style = {styles.grid}
       data={RES_CON_DATA}
@@ -59,7 +72,7 @@ export default function ConfessionsGrid({ selectedResidence }) {
 
         return (
           <TouchableOpacity
-          onPress={toggleModalVisible}
+          onPress={toggleAllConfessionsScroller}
             style={{
               width: itemWidth,
               height: baseSize,
@@ -80,10 +93,10 @@ export default function ConfessionsGrid({ selectedResidence }) {
     />
       )}
 
-      {modalVisible && (
+      {screen==="allConfessionsScroller" && (
         // <GestureDetector onGestureEvent={handleGestureEvent}>
           <View style={styles.modal}>
-          <TouchableOpacity onPress={toggleModalVisible}>
+          <TouchableOpacity onPress={toggleAllConfessionsScroller}>
             <BackIcon size={30} color='white'/>
           </TouchableOpacity>
           <AllConfessionsScroller style={styles.allConfessionsScroller} RES_CON_DATA={RES_CON_DATA}/>
@@ -92,9 +105,26 @@ export default function ConfessionsGrid({ selectedResidence }) {
         
       )}
 
-      <TouchableOpacity style={styles.addButton}>
-        <PlusIcon size={30} color='white'/>
-      </TouchableOpacity>
+      {screen==="addConfession" && (
+        <View style={styles.addConfessionScreen}>
+          <TouchableOpacity onPress={toggleAddConfession}>
+            <BackIcon size={30} color='white'/>
+          </TouchableOpacity>
+          <Text style ={{color: 'red'}}>Add confessiom</Text>
+        </View>
+
+
+        
+      )}
+
+      {screen !=="addConfession" && (
+        <TouchableOpacity
+        style={styles.addButton}
+        onPress={toggleAddConfession}>
+          <PlusIcon size={30} color='white'/>
+        </TouchableOpacity>
+      )}
+      
     </View>
     
   )
@@ -124,5 +154,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  addConfessionScreen: {
+    height: '100%',
   },
 })
