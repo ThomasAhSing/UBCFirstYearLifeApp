@@ -9,11 +9,14 @@ import {
   Text,
 } from 'react-native'
 import { useState } from 'react'
+import { GestureDetector } from 'react-native-gesture-handler'
 
 import confessions from "@/data/confessions/postedConfessions.json"
 import { confessionImageMap } from "@/app/(tabs)/confessions"
 import { Colors } from '@/constants/Colors'
 import AllConfessionsScroller from './AllConfessionsScroller'
+import BackIcon from '@/assets/icons/BackIcon'
+
 
 export default function ConfessionsGrid({ selectedResidence }) {
   const RES_CON_DATA = confessions[selectedResidence]
@@ -26,18 +29,21 @@ export default function ConfessionsGrid({ selectedResidence }) {
   const leftover = windowWidth - baseSize * numCols 
 
   const [modalVisible, setModalVisible] = useState(false); 
+  const toggleModalVisible = () => {
+    setModalVisible(!modalVisible)
+  }
+
+  const handleGestureEvent = (event) => {
+  if (event.nativeEvent.translationX > windowWidth * 0.2) { 
+    setModalVisible(false)
+  }
+  };
 
   return (
     <View style={styles.container}>
-      <Modal
-        style={styles.modal}
-        transparent={true}
-        visible={true}
-        >
-          <AllConfessionsScroller style={styles.allConfessionsScroller} RES_CON_DATA={RES_CON_DATA}/>
-          {/* <Text>Full screen scroller</Text> */}
-      </Modal>
-      <FlatList
+
+      {!modalVisible && (
+        <FlatList
       style = {styles.grid}
       data={RES_CON_DATA}
       numColumns={numCols}
@@ -50,6 +56,7 @@ export default function ConfessionsGrid({ selectedResidence }) {
 
         return (
           <TouchableOpacity
+          onPress={toggleModalVisible}
             style={{
               width: itemWidth,
               height: baseSize,
@@ -68,17 +75,31 @@ export default function ConfessionsGrid({ selectedResidence }) {
         )
       }}
     />
+      )}
+
+      {modalVisible && (
+        <GestureDetector onGestureEvent={handleGestureEvent}>
+          <View style={styles.modal}>
+          <TouchableOpacity onPress={toggleModalVisible}>
+            <BackIcon size={30} color='white'/>
+          </TouchableOpacity>
+          <AllConfessionsScroller style={styles.allConfessionsScroller} RES_CON_DATA={RES_CON_DATA}/>
+        </View>
+        </GestureDetector>
+        
+      )}
     </View>
     
   )
 }
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   modal: {
-    flex: 1,
+    height: '100%',
   },
   allConfessionsScroller: {
     flex: 1,

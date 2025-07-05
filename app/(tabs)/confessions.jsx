@@ -44,8 +44,11 @@ export default function ConfessionsScreen() {
   return (
     <ScreenWrapper>
       <Heading/>
-      <ConfessionsOptionsBar selectedResidence={selectedResidence} setSelectedResidence={setSelectedResidence}/>
-      <Text style={{color: 'white'}}>Confessions</Text>
+      <ConfessionsOptionsBar 
+      style={styles.optionsBar}
+      selectedResidence={selectedResidence} 
+      setSelectedResidence={setSelectedResidence}
+      />
       
       <ConfessionsGrid selectedResidence={selectedResidence} setSelectedResidence={setSelectedResidence}/>
     </ScreenWrapper>
