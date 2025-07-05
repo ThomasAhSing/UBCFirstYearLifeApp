@@ -16,8 +16,10 @@ import { confessionImageMap } from "@/app/(tabs)/confessions"
 import { Colors } from '@/constants/Colors'
 import AllConfessionsScroller from './AllConfessionsScroller'
 import BackIcon from '@/assets/icons/BackIcon'
+import PlusIcon from '@/assets/icons/PlusIcon'
 
-
+// TODO implement gesture when when swipe right from left takes back from allscroller to previews
+// TODO add opening on crrect index not at start when click on preview
 export default function ConfessionsGrid({ selectedResidence }) {
   const RES_CON_DATA = confessions[selectedResidence]
   const windowWidth = Math.floor(Dimensions.get('window').width)
@@ -41,6 +43,7 @@ export default function ConfessionsGrid({ selectedResidence }) {
 
   return (
     <View style={styles.container}>
+      
 
       {!modalVisible && (
         <FlatList
@@ -78,16 +81,20 @@ export default function ConfessionsGrid({ selectedResidence }) {
       )}
 
       {modalVisible && (
-        <GestureDetector onGestureEvent={handleGestureEvent}>
+        // <GestureDetector onGestureEvent={handleGestureEvent}>
           <View style={styles.modal}>
           <TouchableOpacity onPress={toggleModalVisible}>
             <BackIcon size={30} color='white'/>
           </TouchableOpacity>
           <AllConfessionsScroller style={styles.allConfessionsScroller} RES_CON_DATA={RES_CON_DATA}/>
         </View>
-        </GestureDetector>
+        // </GestureDetector>
         
       )}
+
+      <TouchableOpacity style={styles.addButton}>
+        <PlusIcon size={30} color='white'/>
+      </TouchableOpacity>
     </View>
     
   )
@@ -106,5 +113,16 @@ const styles = StyleSheet.create({
   },
   grid: {
     flex: 1,
-  }
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    height: 50,
+    width: 50,
+    backgroundColor: Colors.goldAccent,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
 })

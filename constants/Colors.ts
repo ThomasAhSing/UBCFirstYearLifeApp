@@ -24,6 +24,7 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
   background: '#0C2A42',
+  goldAccent: '#FFB915',
   confessions: {
   PlaceVanier: {
     background: "#FFDAD5",

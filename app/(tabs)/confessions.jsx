@@ -1,6 +1,8 @@
 // external imports
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useState } from 'react'
+
+import { Colors } from '@/constants/Colors';
 
 
 
@@ -12,6 +14,7 @@ import Heading from "../Heading"
 import ConfessionsOptionsBar from '../confessionComponents/ConfessionsOptionsBar';
 import ConfessionsGrid from '../confessionComponents/ConfessionsGrid';
 import AllConfessionsScroller from '../confessionComponents/AllConfessionsScroller'
+import PlusIcon from '@/assets/icons/PlusIcon'
 
 export const confessionImageMap = {
   "TotemPark": {
@@ -49,12 +52,24 @@ export default function ConfessionsScreen() {
       selectedResidence={selectedResidence} 
       setSelectedResidence={setSelectedResidence}
       />
-      
+      {/* <TouchableOpacity style={styles.addButton}>
+        <PlusIcon size={30} color='white'/>
+      </TouchableOpacity> */}
       <ConfessionsGrid selectedResidence={selectedResidence} setSelectedResidence={setSelectedResidence}/>
     </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  
+  addButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    height: 50,
+    width: 50,
+    backgroundColor: Colors.goldAccent,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
 });
