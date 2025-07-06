@@ -200,56 +200,43 @@ def generate_confession_image(residence, confession_text, submission_date, outpu
     print(f"Image saved to {output_path}")
 
 
+# if __name__ == "__main__":
+
+#     input_files = [
+#         "../data/confessions/postedConfessions.json",
+#         "../data/confessions/unpostedConfessions.json"
+#     ]
+
+#     os.makedirs("../data/confessions/previewImages", exist_ok=True)  # make sure the folder exists
+
+#     for file_path in input_files:
+#         with open(file_path, "r") as f:
+#             data = json.load(f)
+#             for residence, posts in data.items():
+#                 for post in posts:
+#                     for confession in post['confessions']:
+#                         if confession['confessionIndex'] == 1:
+#                             cid = confession['confessionID']
+#                             pid = post['postId']
+#                             timestamp = datetime.fromisoformat(confession['timestamp'])
+#                             formatted_date = timestamp.strftime("%-m/%-d/%y, %-I:%M %p")
+#                             output_name = f"../data/confessions/previewImages/{residence.replace(' ', '_').lower()}_cid{cid}_pid{pid}.png"
+#                             generate_confession_image(
+#                                 residence=residence,
+#                                 confession_text=confession['content'],
+#                                 submission_date=formatted_date,
+#                                 output_path=output_name,
+#                                 remove_emojis=True
+#                             )
+
+
+# Example usage
 if __name__ == "__main__":
 
-    input_files = [
-        "../data/confessions/postedConfessions.json",
-        "../data/confessions/unpostedConfessions.json"
-    ]
-
-    os.makedirs("../data/confessions/previewImages", exist_ok=True)  # make sure the folder exists
-
-    for file_path in input_files:
-        with open(file_path, "r") as f:
-            data = json.load(f)
-            for residence, posts in data.items():
-                for post in posts:
-                    for confession in post['confessions']:
-                        if confession['confessionIndex'] == 1:
-                            cid = confession['confessionID']
-                            pid = post['postId']
-                            timestamp = datetime.fromisoformat(confession['timestamp'])
-                            formatted_date = timestamp.strftime("%-m/%-d/%y, %-I:%M %p")
-                            output_name = f"../data/confessions/previewImages/{residence.replace(' ', '_').lower()}_cid{cid}_pid{pid}.png"
-                            generate_confession_image(
-                                residence=residence,
-                                confession_text=confession['content'],
-                                submission_date=formatted_date,
-                                output_path=output_name,
-                                remove_emojis=True
-                            )
-
-
-# # Example usage
-# if __name__ == "__main__":
-#     generate_confession_image(
-#         residence="TotemPark",
-#         confession_text="leopard hair 😭 guy just proved their point 😭😭",
-#         submission_date="4/1/25, 12:39 PM",
-#         output_path="totem_confession_output.png",
-#         remove_emojis=True  # Set to True to remove emojis from rendering
-#     )
-#     generate_confession_image(
-#         residence="OrchardCommons",
-#         confession_text="i went to the store",
-#         submission_date="4/2/25, 12:39 PM",
-#         output_path="orchard_confession_output.png",
-#         remove_emojis=True  # Set to True to remove emojis from rendering
-#     )
-#     generate_confession_image(
-#         residence="PlaceVanier",
-#         confession_text="tsangy pangy paxy daxy",
-#         submission_date="4/3/25, 12:39 PM",
-#         output_path="vanier_confession_output.png",
-#         remove_emojis=True  # Set to True to remove emojis from rendering
-#     )
+    generate_confession_image(
+        residence="OrchardCommons",
+        confession_text="i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store i went to the store ",
+        submission_date="4/2/25, 12:39 PM",
+        output_path="orchard_confession_output.png",
+        remove_emojis=True  # Set to True to remove emojis from rendering
+    )

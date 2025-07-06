@@ -110,7 +110,8 @@ export default function ConfessionsGrid({ selectedResidence }) {
           <TouchableOpacity onPress={toggleAddConfession}>
             <BackIcon size={30} color='white'/>
           </TouchableOpacity>
-          <Text style ={{color: 'red'}}>Add confessiom</Text>
+          <AddConfessionScreen/>
+          
         </View>
 
 
