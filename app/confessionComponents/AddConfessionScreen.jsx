@@ -11,6 +11,7 @@ import {
 import { useState } from 'react'
   import { Dropdown } from 'react-native-element-dropdown';
 import ResidenceIcon from '@/assets/icons/ResidenceIcon'
+import { Colors } from '@/constants/Colors';
 
     const data = [
     { label: 'Totem Park', residence: 'TotemPark' },
@@ -18,10 +19,33 @@ import ResidenceIcon from '@/assets/icons/ResidenceIcon'
     { label: 'Place Vanier', residence: 'PlaceVanier' }
   ];
 
+
+
+// TODO abstarct post with like abr and everythong to take a sidecar 
+
 export default function AddConfessionScreen({ RES_CON_DATA }) {
   const [residence, setResidence] = useState(null);
   const [text, onChangeText] = useState('')
   const [height, setHeight] = useState(40)
+  const [errorMessage, setErrorMessage] = useState("")
+
+  const submitConfession = () => {
+    console.log("submitted confession")
+  }
+
+  const onPress = () => {
+    if (residence === null) {
+      setErrorMessage("*** Please select your residence ***")
+      return;
+    }
+    if (text === '') {
+      setErrorMessage("*** Confession can't be empty ***")
+      return;
+    }
+    setErrorMessage("")
+    submitConfession()
+  }
+
     // console.log(residence)
     return (
       <View style={styles.container}>
@@ -67,9 +91,23 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
         <View style = {styles.charCounterWrapper}>
           <Text style={styles.charCounter}>3/10</Text>
         </View>
-        
       </View>
       
+      <TouchableOpacity 
+      style={styles.submitBtn}
+      onPress={onPress}
+      >
+        <Text style = {{color: '#2C2C2C',
+      fontFamily: "RobotoBold",}}>
+          Submit Confession
+        </Text>
+      </TouchableOpacity>
+
+      <Text style = {styles.note}>
+        Note: Your confession will be included in the next post, not immediately
+      </Text>
+      
+      <Text style={styles.errorMessage}>{errorMessage}</Text>
       </View>
       
     );
@@ -82,8 +120,10 @@ const styles = StyleSheet.create({
     // alignItems: 'center'
   },
   dropdownContaienr: {
-    backgroundColor: 'transparent',
-
+    // backgroundColor: 'transparent',
+    backgroundColor: '#2B4C65',
+    borderWidth: 0,
+    borderRadius: 10,
   },
   dropdown: {
       margin: 16,
@@ -112,7 +152,7 @@ const styles = StyleSheet.create({
       marginRight: 15,
     },
     itemContainer: {
-      backgroundColor: '#2B4C65',
+      backgroundColor: 'transparent',
       borderRadius: 10,
       border: 'none',
     },
@@ -126,6 +166,7 @@ const styles = StyleSheet.create({
       color: 'white',
       paddingLeft: 20,
       fontSize: 20,
+      marginTop: 15,
     },
     confessionInput: {
       height: 40,
@@ -135,6 +176,7 @@ const styles = StyleSheet.create({
       color: 'white',
       fontSize: 15,
       border: 'none',
+      marginTop: 15,
     },
     charCounterWrapper: {
       alignItems: 'flex-end',
@@ -142,6 +184,27 @@ const styles = StyleSheet.create({
     },
     charCounter: {
 
-    }
+    },
+    submitBtn: {
+      backgroundColor: Colors.goldAccent,
+      alignSelf: 'flex-start',
+      padding: 10,
+      borderRadius: 10,
+      marginLeft: 15,
+      marginTop: 25,
+    },
+    note: {
+      fontFamily: 'RobotoItalic',
+      color: 'white',
+      fontSize: 12,
+      paddingLeft: 15,
+      marginTop: 15,
+    },
+    errorMessage: {
+      color: '#ff4d4d',
+      fontStyle: 'italic',
+      marginTop: 15,
+      marginLeft: 15,
+    },
 
 })

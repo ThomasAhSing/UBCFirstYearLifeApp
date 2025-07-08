@@ -21,6 +21,7 @@ export default function RootLayout() {
     InterSemiBold: require('../assets/fonts/Inter_18pt-SemiBold.ttf'),
     RobotoRegular: require('../assets/fonts/Roboto-Regular.ttf'),
     RobotoItalic: require('../assets/fonts/Roboto-Italic.ttf'),
+    RobotoBold: require('../assets/fonts/Roboto-Bold.ttf'),
   });
 
   if (!loaded) {
