@@ -22,6 +22,7 @@ import { Colors } from '@/constants/Colors';
 
 
 // TODO abstarct post with like abr and everythong to take a sidecar 
+// TODO add gestures to close keybaord
 
 export default function AddConfessionScreen({ RES_CON_DATA }) {
   const [residence, setResidence] = useState(null);

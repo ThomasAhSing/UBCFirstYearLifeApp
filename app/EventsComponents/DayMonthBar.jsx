@@ -38,7 +38,7 @@ export default function DayMonthBar({ viewMode, setViewMode }) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        // flex: 1,
         alignItems: 'center'
     },
     text: {
@@ -46,5 +46,6 @@ const styles = StyleSheet.create({
     },
     slider: {
         width: '40%',
+        backgroundColor: 'transparent',
     },
 })
