@@ -47,5 +47,6 @@ const styles = StyleSheet.create({
     slider: {
         width: '40%',
         backgroundColor: 'transparent',
+        borderRadius: 10,
     },
 })

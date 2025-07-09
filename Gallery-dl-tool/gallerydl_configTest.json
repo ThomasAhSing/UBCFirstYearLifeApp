@@ -2,7 +2,7 @@
   "extractor": {
     "instagram": {
       "cookies": {
-        "sessionid": "48292730845%3AH11TpNmHO6mVjg%3A3%3AAYeAtXukKunu3tVQqM0DYQA82zLLWjrAZ6ervgbPdw"
+        "sessionid": "48292730845%3ATZ1IoC4pRqwkjH%3A14%3AAYe7FeIYtSgfke3UQVCrB5wtd53LySOJP6x77ixvag"
       },
       "include": ["posts"],
       "recursive": false,
