@@ -24,7 +24,9 @@
       "biography": "Official Instagram of UBC Women's Soccer\ud83c\udde8\ud83c\udde6\u26bd\ufe0f\n9x National Champions \ud83c\udfc6 Including 2024\n17x CanadaWest Champions \ud83c\udfc6 Including 2024",
       "profile_pic_url": "pictures/ubcwsoccer_pfp.jpg"
     },
-    "isEvent": false,
+    "isEvent": true,
+    "location": "Sienna Field",
+    "dateTimeOfEvent": "2025-07-13T15:00:00-07:00",
     "eventDayTime": null
   },
   "DKlaAf9MjzE": {
@@ -47,7 +49,9 @@
       "biography": "Official Instagram of UBC Women's Soccer\ud83c\udde8\ud83c\udde6\u26bd\ufe0f\n9x National Champions \ud83c\udfc6 Including 2024\n17x CanadaWest Champions \ud83c\udfc6 Including 2024",
       "profile_pic_url": "pictures/ubcwsoccer_pfp.jpg"
     },
-    "isEvent": false,
+    "isEvent": true,
+    "location": "Streetball Stadium",
+    "dateTimeOfEvent": "2025-07-10T17:00:00-07:00",
     "eventDayTime": null
   },
   "DLIsuW5hpHT": {
@@ -128,7 +132,9 @@
       "biography": "streamer @fazeclan \njason@unitedtalent.com",
       "profile_pic_url": "pictures/jason_pfp.jpg"
     },
-    "isEvent": false,
+    "isEvent": true,
+    "location": "Chinatown",
+    "dateTimeOfEvent": "2025-07-10T21:00:00-07:00",
     "eventDayTime": null
   },
   "DIwf3_0R5FC": {
@@ -181,7 +187,9 @@
       "biography": "streamer @fazeclan \njason@unitedtalent.com",
       "profile_pic_url": "pictures/jason_pfp.jpg"
     },
-    "isEvent": false,
+    "isEvent": true,
+    "location": "Paris",
+    "dateTimeOfEvent": "2025-07-10T10:00:00-07:00",
     "eventDayTime": null
   }
 }

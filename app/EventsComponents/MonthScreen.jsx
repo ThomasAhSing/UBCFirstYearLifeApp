@@ -15,14 +15,19 @@ const eventsByDate = {
   '2025-07-29': 13,
 };
 
-export default function MonthScreen({}) {
+export default function MonthScreen({viewMode, setViewMode, dateString, setDateString}) {
 
-  const today = new Date().toISOString().split('T')[0]; // e.g. "2025-07-08"
+  // const today = new Date().toISOString().split('T')[0]; // e.g. "2025-07-08"
   const windowWidth = Dimensions.get('window').width
   const dayButtonWidth = Math.floor(windowWidth / 8)
   const [selected, setSelected] = useState('')
+
+  const onPress = () => {
+    
+  }
   return (
     <View style={styles.container}>
+      
       
       <Calendar
         style={{
@@ -43,23 +48,21 @@ export default function MonthScreen({}) {
         }}
         dayComponent={({ date, state }) => {
           const count = eventsByDate[date.dateString];
-          const isToday = today === date.dateString
           return (
-            <TouchableOpacity style={{ 
+            <TouchableOpacity 
+            onPress = {onPress}
+            style={{ 
               alignItems: 'center',
               width: dayButtonWidth,
               height: 60,
               paddingTop: 15,
-              // borderWidth: 1,
-              // borderColor: 'gray',
-              // justifyContent: 'space-between'
              }}>
               <Text
                 style={[{
                   color: state === 'disabled' ? '#A9A9A9' : 'white',
-                  
-                  // fontWeight: 'bold'
-                }, isToday && {color: '#00BFFF'}]}>
+                }, 
+                dateString === date.dateString && {color: '#00BFFF'}
+                ]}>
                 {date.day}
               </Text>
               {count && (
