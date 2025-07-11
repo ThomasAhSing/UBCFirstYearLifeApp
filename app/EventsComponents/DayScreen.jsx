@@ -45,19 +45,48 @@ export default function DayScreen({ dateString }) {
 
 const styles = StyleSheet.create({
   container: {
+
   }
 });
 
 
-function getAllDaysOfMonth(dateString) {
+function getAllDaysOfMonth(dateString) { 
   const [year, month] = dateString.split('-');
   const daysInMonth = new Date(year, month, 0).getDate(); // month is 1-based here
+  const result = []; 
 
+  for (let day = 1; day <= daysInMonth; day++) {     
+    const dayString = String(day).padStart(2, '0');  
+    result.push(`${year}-${month}-${dayString}`);
+  }
+
+  return result;
+}
+
+function buildFlatEventsOfMonth(dateString) {
+  const [year, month] = dateString.split('-');
+  const daysInMonth = new Date(year, month, 0).getDate(); // month is 1-based here
   const result = [];
 
   for (let day = 1; day <= daysInMonth; day++) {
     const dayString = String(day).padStart(2, '0');
-    result.push(`${year}-${month}-${dayString}`);
+    const fullDate = `${year}-${month}-${dayString}`
+    result.push({
+      type: "header",
+      date: fullDate,
+    })
+    const shortcodes = eventsData[fullDate] || []
+    const posts = shortcodes.map(shortcode => postData[shortcode])
+    posts.sort((a, b) =>
+      new Date(a.dateTimeOfEvent) - new Date(b.dateTimeOfEvent)
+    );
+    posts.forEach((post) => {
+      result.push({
+        type: "post",
+        date: fullDate,
+        postData: post,
+      })
+    });
   }
 
   return result;
