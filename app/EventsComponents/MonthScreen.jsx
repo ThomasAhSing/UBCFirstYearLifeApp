@@ -15,7 +15,7 @@ const eventsByDate = {
   '2025-07-29': 13,
 };
 
-export default function MonthScreen({viewMode, setViewMode, dateString, setDateString}) {
+export default function MonthScreen({viewMode, setViewMode, dateString, setDateString, scrollToIndexInDay}) {
 
   // const today = new Date().toISOString().split('T')[0]; // e.g. "2025-07-08"
   const windowWidth = Dimensions.get('window').width

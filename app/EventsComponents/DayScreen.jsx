@@ -1,6 +1,6 @@
 // external imports 
 import { StyleSheet, Text, View, FlatList } from "react-native";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import eventsData from '@/data/events.json'
 import postData from '@/data/posts/all_posts.json'
@@ -19,15 +19,18 @@ const eventsByDate = {
   '2025-07-29': 13,
 };
 
-export default function DayScreen({ dateString }) {
+export default function DayScreen({ dateString, flatListRef }) {
 
 
   const eventsOfMonthFlatListData = buildFlatEventsOfMonth(dateString)
 
   const [viewMode, setViewMode] = useState("Month")
+
+
   return (
     <View style={styles.container}>
       <FlatList
+        ref = {flatListRef}
         data={eventsOfMonthFlatListData}
         renderItem={({ item }) => {
           if (item.type === "header") {

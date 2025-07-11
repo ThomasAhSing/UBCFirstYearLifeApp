@@ -32,20 +32,32 @@ export default function EventsScreen() {
 
   const [viewMode, setViewMode] = useState("Month")
   const [dateString, setDateString] = useState(todayDateString)
+
+  const flatListRef = useRef(null);
+
+  const scrollToIndexInDay = (i) => {
+    flatListRef.current?.scrollToIndex({
+      index: i,
+      animated: true,
+      viewPosition: 0.5,
+    });
+  };
   return (
     <ScreenWrapper>
       <Heading />
       <View style={styles.dayMonthBar}>
-        <DayMonthBar viewMode={viewMode} setViewMode={setViewMode} />
+        <DayMonthBar viewMode={viewMode} setViewMode={setViewMode}
+        scrollToIndexInDay={scrollToIndexInDay} />
       </View>
-      <View style={{ flex : 1 }}>
+      <View style={{ flex: 1 }}>
         {viewMode === "Month" &&
           <MonthScreen
             viewMode={viewMode} setViewMode={setViewMode}
             dateString={dateString} setDateString={setDateString}
+            scrollToIndexInDay={scrollToIndexInDay}
           />}
 
-        {viewMode === "Day" && <DayScreen dateString={todayDateString} />}
+        {viewMode === "Day" && <DayScreen dateString={todayDateString} flatListRef={flatListRef}/>}
       </View>
     </ScreenWrapper>
   );

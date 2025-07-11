@@ -12,7 +12,7 @@ import { Colors } from '@/constants/Colors'
 const VIEW_MODES = ['Day', 'Month']
 
 
-export default function DayMonthBar({ viewMode, setViewMode }) {
+export default function DayMonthBar({ viewMode, setViewMode, scrollToIndexInDay }) {
 
     const selectedIndex = VIEW_MODES.indexOf(viewMode)
     // console.log(viewMode)
