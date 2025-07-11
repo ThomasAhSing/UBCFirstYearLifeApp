@@ -7,6 +7,7 @@ import {
 import { useState } from 'react';
 
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
+import { Colors } from '@/constants/Colors'
 
 const VIEW_MODES = ['Day', 'Month']
 
@@ -39,7 +40,11 @@ export default function DayMonthBar({ viewMode, setViewMode }) {
 const styles = StyleSheet.create({
     container: {
         // flex: 1,
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop: 10,
+        marginBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.lineSeperator,
     },
     text: {
         color: 'white'

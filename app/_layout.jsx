@@ -22,6 +22,7 @@ export default function RootLayout() {
     RobotoRegular: require('../assets/fonts/Roboto-Regular.ttf'),
     RobotoItalic: require('../assets/fonts/Roboto-Italic.ttf'),
     RobotoBold: require('../assets/fonts/Roboto-Bold.ttf'),
+    CourgetteRegular: require('../assets/fonts/Courgette-Regular.ttf'),
   });
 
   if (!loaded) {

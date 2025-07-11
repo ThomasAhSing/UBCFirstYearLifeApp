@@ -7,20 +7,6 @@ SplashScreen.preventAutoHideAsync();
 
 export default function Heading()  {
 
-  const [loaded, error] = useFonts({
-    'Courgette-Regular': require('../assets/fonts/Courgette-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded || error) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, error])
-
-  if (!loaded && !error) {
-    return null
-  }
-
   return (
     <View style = {styles.container}>
       <Text style = {[styles.baseText, styles.mainHeading]}>UBC</Text>
@@ -38,7 +24,7 @@ const styles = StyleSheet.create({
   },
   baseText: {
     color: 'white',
-    fontFamily: 'Courgette-Regular',
+    fontFamily: 'CourgetteRegular',
   },
   mainHeading: {
     fontSize: 30,

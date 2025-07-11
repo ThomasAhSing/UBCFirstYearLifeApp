@@ -24,7 +24,7 @@ const eventsByDate = {
 
 export default function EventsScreen() {
 
-  
+
   // const todayDateString = new Date().toISOString().split('T')[0]; // e.g. "2025-07-08"
   // PDT
   const todayDateString = DateTime.now().setZone('America/Los_Angeles').toFormat('yyyy-MM-dd');
@@ -34,18 +34,19 @@ export default function EventsScreen() {
   const [dateString, setDateString] = useState(todayDateString)
   return (
     <ScreenWrapper>
-      {/* <Heading/> */}
+      <Heading />
       <View style={styles.dayMonthBar}>
-        <DayMonthBar  viewMode={viewMode} setViewMode={setViewMode} />
+        <DayMonthBar viewMode={viewMode} setViewMode={setViewMode} />
       </View>
-      {viewMode === "Month" &&
-      <MonthScreen 
-      viewMode={viewMode} setViewMode={setViewMode}
-      dateString={dateString} setDateString={setDateString}
-      />}
+      <View style={{ flex : 1 }}>
+        {viewMode === "Month" &&
+          <MonthScreen
+            viewMode={viewMode} setViewMode={setViewMode}
+            dateString={dateString} setDateString={setDateString}
+          />}
 
-      {viewMode === "Day" && <DayScreen dateString={"2025-07-10"}/>}
-      
+        {viewMode === "Day" && <DayScreen dateString={todayDateString} />}
+      </View>
     </ScreenWrapper>
   );
 }
