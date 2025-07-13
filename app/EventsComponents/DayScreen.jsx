@@ -1,11 +1,11 @@
 // external imports 
 import { StyleSheet, Text, View, FlatList } from "react-native";
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 import eventsData from '@/data/events.json'
 import postData from '@/data/posts/all_posts.json'
-import Sidecar from "@/app/Sidecar"
 import Post from "@/app/Post"
+import { DateTime } from 'luxon';
 
 
 
@@ -19,18 +19,21 @@ const eventsByDate = {
   '2025-07-29': 13,
 };
 
-export default function DayScreen({ dateString, flatListRef }) {
+const todayDateString = DateTime.now().setZone('America/Los_Angeles').toFormat('yyyy-MM-dd');
+export default function DayScreen({ dateString, singleDay = false }) {
 
 
-  const eventsOfMonthFlatListData = buildFlatEventsOfMonth(dateString)
-
-  const [viewMode, setViewMode] = useState("Month")
+  let eventsOfMonthFlatListData = undefined
+  if (singleDay) {
+    eventsOfMonthFlatListData = buildFlatSingleDay(dateString)
+  } else {
+    eventsOfMonthFlatListData = buildFlatNextEventDays(dateString)
+  }
 
 
   return (
     <View style={styles.container}>
       <FlatList
-        ref = {flatListRef}
         data={eventsOfMonthFlatListData}
         renderItem={({ item }) => {
           if (item.type === "header") {
@@ -57,48 +60,104 @@ export default function DayScreen({ dateString, flatListRef }) {
   );
 }
 
-function buildFlatEventsOfMonth(dateString) {
-  const [year, month] = dateString.split('-');
-  const daysInMonth = new Date(year, month, 0).getDate(); // month is 1-based here
-  const result = [];
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dayString = String(day).padStart(2, '0');
-    const fullDate = `${year}-${month}-${dayString}`
-    const shortcodes = eventsData[fullDate] || []
-    if (shortcodes.length === 0) {
-      if (fullDate === dateString) {
-        result.push({
-          type: "header",
-          date: fullDate,
-          noEvents: true,
-        })
-      }
-    } else {
+
+function buildFlatNextEventDays(dateString, maxDays = 30, requiredDaysWithEvents = 7) {
+  const result = [];
+  const startDate = DateTime.fromISO(dateString).setZone('America/Los_Angeles');
+
+  let eventDaysFound = 0;
+
+  for (let i = 0; i < maxDays; i++) {
+    const current = startDate.plus({ days: i });
+    const fullDate = current.toFormat('yyyy-MM-dd');
+    const shortcodes = eventsData[fullDate] || [];
+
+    if (shortcodes.length > 0) {
       result.push({
         type: "header",
         date: fullDate,
         noEvents: false,
-      })
-      const posts = shortcodes.map(shortcode => postData[shortcode])
+      });
+
+      const posts = shortcodes
+        .map(shortcode => postData[shortcode])
+        .filter(post => !!post);
+
       posts.sort((a, b) =>
         new Date(a.dateTimeOfEvent) - new Date(b.dateTimeOfEvent)
       );
-      posts.forEach((post) => {
+
+      posts.forEach(post => {
         result.push({
           type: "post",
           date: fullDate,
           postData: post,
-        })
+        });
+      });
+
+      // ✅ Only count days with events *after* today
+      if (i > 0) {
+        eventDaysFound++;
+      }
+
+    } else if (i === 0) {
+      // ✅ Today has no events — add noEvents header
+      result.push({
+        type: "header",
+        date: fullDate,
+        noEvents: true,
       });
     }
 
+    if (eventDaysFound >= requiredDaysWithEvents) break;
   }
-  console.log(result)
+
+  return result;
+}
+
+function buildFlatSingleDay(dateString) {
+  const result = [];
+
+  const shortcodes = eventsData[dateString] || [];
+
+  if (shortcodes.length === 0) {
+    result.push({
+      type: "header",
+      date: dateString,
+      noEvents: true,
+    });
+  } else {
+    result.push({
+      type: "header",
+      date: dateString,
+      noEvents: false,
+    });
+
+    const posts = shortcodes
+      .map(shortcode => postData[shortcode])
+      .filter(post => !!post);
+
+    posts.sort((a, b) =>
+      new Date(a.dateTimeOfEvent) - new Date(b.dateTimeOfEvent)
+    );
+
+    posts.forEach(post => {
+      result.push({
+        type: "post",
+        date: dateString,
+        postData: post,
+      });
+    });
+  }
+
   return result;
 }
 
 function formatDateInPDT(dateString) {
+  if (dateString == todayDateString) {
+    return "Today"
+  }
   const date = new Date(dateString + 'T00:00:00'); // add time to prevent UTC offset
   const options = { timeZone: 'America/Los_Angeles', day: 'numeric', month: 'long' };
   return date.toLocaleString('en-US', options);

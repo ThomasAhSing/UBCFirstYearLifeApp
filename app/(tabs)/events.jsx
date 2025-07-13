@@ -1,6 +1,6 @@
 // external imports 
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DateTime } from 'luxon';
 
 
@@ -30,34 +30,26 @@ export default function EventsScreen() {
   const todayDateString = DateTime.now().setZone('America/Los_Angeles').toFormat('yyyy-MM-dd');
   console.log(todayDateString)
 
-  const [viewMode, setViewMode] = useState("Month")
+  const [viewMode, setViewMode] = useState("Day")
   const [dateString, setDateString] = useState(todayDateString)
 
-  const flatListRef = useRef(null);
 
-  const scrollToIndexInDay = (i) => {
-    flatListRef.current?.scrollToIndex({
-      index: i,
-      animated: true,
-      viewPosition: 0.5,
-    });
-  };
+
+
   return (
     <ScreenWrapper>
       <Heading />
       <View style={styles.dayMonthBar}>
-        <DayMonthBar viewMode={viewMode} setViewMode={setViewMode}
-        scrollToIndexInDay={scrollToIndexInDay} />
+        <DayMonthBar viewMode={viewMode} setViewMode={setViewMode}/>
       </View>
       <View style={{ flex: 1 }}>
         {viewMode === "Month" &&
           <MonthScreen
             viewMode={viewMode} setViewMode={setViewMode}
             dateString={dateString} setDateString={setDateString}
-            scrollToIndexInDay={scrollToIndexInDay}
           />}
 
-        {viewMode === "Day" && <DayScreen dateString={todayDateString} flatListRef={flatListRef}/>}
+        {viewMode === "Day" && <DayScreen dateString={todayDateString}/>}
       </View>
     </ScreenWrapper>
   );

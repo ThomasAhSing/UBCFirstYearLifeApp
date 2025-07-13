@@ -2,33 +2,36 @@
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from "react-native";
 import { useState } from "react";
 
-// project imports
-import ScreenWrapper from '../ScreenWrapper';
-import DayMonthBar from '@/app/EventsComponents/DayMonthBar'
+// project imports 
 import { Calendar, LocaleConfig, Agenda } from 'react-native-calendars';
+import eventsData from '@/data/events.json'
+import DayScreen from '@/app/EventsComponents/DayScreen'
+
 
 const eventsByDate = {
-  '2025-07-03': 3,
-  '2025-07-10': 1,
-  '2025-07-27': 10,
-  '2025-07-28': 10,
-  '2025-07-29': 13,
+  '2025-07-13': 2,
+  '2025-07-16': 2,
 };
 
-export default function MonthScreen({viewMode, setViewMode, dateString, setDateString, scrollToIndexInDay}) {
+export default function MonthScreen({ dateString }) {
 
   // const today = new Date().toISOString().split('T')[0]; // e.g. "2025-07-08"
   const windowWidth = Dimensions.get('window').width
   const dayButtonWidth = Math.floor(windowWidth / 8)
   const [selected, setSelected] = useState('')
+  const [overlayDate, setOverlayDate] = useState(null);
 
-  const onPress = () => {
-    
+
+  const onPress = (dateString) => {
+    const shortcodes = eventsData[dateString]
+    if (shortcodes.length === 0) {
+      return
+    }
   }
   return (
     <View style={styles.container}>
-      
-      
+
+
       <Calendar
         style={{
           borderWidth: 1,
@@ -49,28 +52,34 @@ export default function MonthScreen({viewMode, setViewMode, dateString, setDateS
         dayComponent={({ date, state }) => {
           const count = eventsByDate[date.dateString];
           return (
-            <TouchableOpacity 
-            onPress = {onPress}
-            style={{ 
-              alignItems: 'center',
-              width: dayButtonWidth,
-              height: 60,
-              paddingTop: 15,
-             }}>
+            <TouchableOpacity
+              onPress={() => {
+                const shortcodes = eventsData[date.dateString] || [];
+                if (shortcodes.length > 0) {
+                  setOverlayDate(date.dateString); // this triggers the overlay view
+                }
+              }}
+              style={{
+                alignItems: 'center',
+                width: dayButtonWidth,
+                height: 60,
+                paddingTop: 15,
+              }}>
               <Text
                 style={[{
                   color: state === 'disabled' ? '#A9A9A9' : 'white',
-                }, 
-                dateString === date.dateString && {color: '#00BFFF'}
+                },
+                dateString === date.dateString && { color: '#00BFFF' }
                 ]}>
                 {date.day}
               </Text>
               {count && (
-                <Text style={{ 
+                <Text style={{
                   fontSize: 11,
-                  textAlign: 'center', 
+                  textAlign: 'center',
                   color: '#FFD700',
-                  marginTop: 12, }}>
+                  marginTop: 12,
+                }}>
                   {count} events
                 </Text>
               )}
@@ -84,6 +93,21 @@ export default function MonthScreen({viewMode, setViewMode, dateString, setDateS
           [selected]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' }
         }}
       />
+
+      {overlayDate && (
+        <View style={styles.overlay}>
+          <DayScreen
+            dateString={overlayDate}
+            singleDay={true}
+          />
+          <TouchableOpacity
+            style={styles.closeOverlay}
+            onPress={() => setOverlayDate(null)}
+          >
+            <Text style={styles.closeText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
@@ -91,5 +115,26 @@ export default function MonthScreen({viewMode, setViewMode, dateString, setDateS
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  }
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#001f3f', // dark background
+    zIndex: 10,
+    paddingTop: 50,
+  },
+
+  closeOverlay: {
+    position: 'absolute',
+    top: 30,
+    right: 20,
+    padding: 10,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 5,
+    zIndex: 11,
+  },
+
+  closeText: {
+    color: 'white',
+    fontSize: 16,
+  },
 });
