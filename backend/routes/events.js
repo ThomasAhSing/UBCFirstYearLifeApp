@@ -1,8 +1,9 @@
 const express = require('express')
 const router = express.Router();
-const Post = require('../models/Post')
+const Event = require('../models/Event')
 
 router.use(express.json())
+
 
 router.get('/', async (req, res) => {
     const limit = parseInt(req.query.limit) || 10
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
     }
 
     try {
-        const posts = await Post.find(filter).sort({ timestamp: -1 }).limit(limit)
+        const posts = await Event.find(filter).sort({ timestamp: -1 }).limit(limit)
         res.json(posts)
     } catch (err) {
         console.error(err)
@@ -28,7 +29,7 @@ router.post('/', async (req, res) => {
         if (!shortcode || !userFetchedFrom || !caption || !likes || !timestamp || !media || !profile) {
             return res.status(400).json({ error: 'Required fields missing to make psot object' });
         }
-        const newEntry = new Post({ shortcode, userFetchedFrom, caption, likes, timestamp, media, profile })
+        const newEntry = new Event({ shortcode, userFetchedFrom, caption, likes, timestamp, media, profile })
         await newEntry.save()
         return res.status(201).json("Success", newEntry);
     } catch (err) {

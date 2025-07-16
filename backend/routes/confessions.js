@@ -24,7 +24,6 @@ router.post('/', async (req, res) => {
 
   const newEntry = new Confession({ content, residence });
   await newEntry.save();
-
   res.status(201).json({ success: true, id: newEntry._id });
   } catch (err) {
     console.error('❌ POST /confessions error:', err);

@@ -16,6 +16,8 @@ app.get('/', (req, res) => {
 
 const confessionsRoute = require('./routes/confessions');
 app.use('/api/confessions', confessionsRoute);
+const postsRoute = require('./routes/posts');
+app.use('/api/posts', postsRoute);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
