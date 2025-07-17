@@ -5,36 +5,57 @@ const Event = require('../models/Event')
 router.use(express.json())
 
 
-router.get('/', async (req, res) => {
-    const limit = parseInt(req.query.limit) || 10
-    const before = req.query.before
-
-    const filter = {}
-    if (before) {
-        filter.timestamp = { $lt: new Date(before) }
+router.get('/next7days', async (req, res) => {
+    const { dateString } = req.query
+    if (!dateString) {
+        return res.status(400).json({ error: "dateString field required" })
     }
+    const fromDate = new Date(dateString)
+    const results = {}
 
-    try {
-        const posts = await Event.find(filter).sort({ timestamp: -1 }).limit(limit)
-        res.json(posts)
-    } catch (err) {
-        console.error(err)
-        res.status(500).json({ message: 'Server Error' })
+    const maxDaysToCheck = 30
+    const maxResults = 7
+    for (let i = 0; i < maxDaysToCheck && Object.keys(results).length < maxResults; i++) {
+        const checkDate = new Date(fromDate)
+        checkDate.setDate(fromDate.getDate() + i)
+
+        const dateStringKey = checkDate.toISOString().split('T')[0];
+
+        const events = await Event.find({ date: dateStringKey }).sort({ startTime: 1 })
+        if (events.length > 0) {
+            results[dateStringKey] = events
+        }
     }
+    res.json(results)
+})
+
+router.get('/singleDay', async (req, res) => {
+    const { dateString } = req.query
+    if (!dateString) {
+        return res.status(400).json({ error: "dateString field required" })
+    }
+    const results = {}
+
+    const events = await Event.find({ date: dateString }).sort({ startTime: 1 })
+    if (events.length > 0) {
+        results[dateString] = events
+    }
+    res.json(results)
 })
 
 router.post('/', async (req, res) => {
     try {
-        const { shortcode, userFetchedFrom, caption, likes, timestamp, media, profile } = req.body
-        if (!shortcode || !userFetchedFrom || !caption || !likes || !timestamp || !media || !profile) {
-            return res.status(400).json({ error: 'Required fields missing to make psot object' });
+        const { shortcode, title, date, startTime, location } = req.body
+        if (!shortcode || !title || !date || !startTime || !location) {
+            return res.status(400).json({ error: "not all required fields provided" })
         }
-        const newEntry = new Event({ shortcode, userFetchedFrom, caption, likes, timestamp, media, profile })
+
+        const newEntry = new Event({ shortcode, title, date, startTime, location })
         await newEntry.save()
-        return res.status(201).json("Success", newEntry);
+        return res.status(201).json({message: "Success", event: newEntry});
     } catch (err) {
         if (err.code === 11000) {
-            return res.status(409).json({ error: 'Post with that shortcode already exists' });
+            return res.status(409).json({ error: 'Event with that shortcode already exists' });
         }
         console.error(err)
         res.status(500).json({ error: 'Server error' });

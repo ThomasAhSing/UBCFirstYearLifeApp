@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
         }
         const newEntry = new Post({ shortcode, userFetchedFrom, caption, likes, timestamp, media, profile })
         await newEntry.save()
-        return res.status(201).json("Success", newEntry);
+        return res.status(201).json({message: "Success", event: newEntry});
     } catch (err) {
         if (err.code === 11000) {
             return res.status(409).json({ error: 'Post with that shortcode already exists' });
