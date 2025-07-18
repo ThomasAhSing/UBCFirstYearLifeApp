@@ -16,10 +16,10 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { content, residence } = req.body;
+    const { residence, content } = req.body;
 
-  if (!content || !residence) {
-    return res.status(400).json({ error: 'Content and Residence are required' });
+  if (!residence || !content) {
+    return res.status(400).json({ error: 'All fields are required' });
   }
 
   const newEntry = new Confession({ content, residence });
