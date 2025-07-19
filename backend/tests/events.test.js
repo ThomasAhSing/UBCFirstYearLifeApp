@@ -27,5 +27,29 @@ afterEach(async () => {
 })
 
 describe('Event API', () => {
-    // TEST 1: 
+    // TEST 1: POST should create a new Event
+    it('should create a new event', async () => {
+        const res = await request(app).post('/api/events').send({
+            residence: "TotemPark",
+            content: "Totem Park Sample Event 1"
+        });
+        
+        expect(res.statusCode).toBe(201); // 201 = successfully created 
+        expect(res.body.confession.residence).toBe("TotemPark");
+        expect(res.body.confession.content).toBe("Totem Park Sample Confession 1");
+
+        const inDb = await Confession.findOne({ content: "Totem Park Sample Confession 1" });
+        expect(inDb).not.toBeNull(); // The book should exist in the DB
+    })
+
+    // // TEST 2: POST should fail with missing fields
+    // it('should return 400 for missing fields', async () => {
+    //     const res = await request(app).post('/api/confessions').send({
+    //         residence: "TotemPark",
+    //         // no content
+    //     });
+
+    //     expect(res.statusCode).toBe(400)
+    //     expect(res.body.error).toBe("")
+    // })
 })

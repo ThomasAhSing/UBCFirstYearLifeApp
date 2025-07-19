@@ -27,7 +27,7 @@ afterEach(async () => {
 })
 
 describe('Event API', () => {
-    // TEST 1: POST should create a new confession
+    // TEST POST 1: POST should create a new confession
     it('should create a new confession', async () => {
         const res = await request(app).post('/api/confessions').send({
             residence: "TotemPark",
@@ -42,7 +42,7 @@ describe('Event API', () => {
         expect(inDb).not.toBeNull(); // The book should exist in the DB
     })
 
-    // TEST 2: POST should fail with missing fields
+    // TEST POST 2: POST should fail with missing fields
     it('should return 400 for missing fields', async () => {
         const res = await request(app).post('/api/confessions').send({
             residence: "TotemPark",
@@ -50,6 +50,67 @@ describe('Event API', () => {
         });
 
         expect(res.statusCode).toBe(400)
-        expect(res.body.error).toBe("")
+        expect(res.body.error).toBe("All fields are required")
+    })
+
+    // TEST Ppost-batch 1: 
+    it('should correctly move unposted confession to posted for each residence', async () => {
+        await Confession.create([
+              
+        ])
+    })
+
+    // TEST GET 1: Get all confessions for specific residence
+    it('should get all confessions for residence', async () => {
+        await Confession.create([
+            {
+                residence: "TotemPark",
+                content: "TP P1 C1",
+                submittedAt: new Date('2025-07-17T08:00:00-07:00'),
+                posted: true,
+                scheduledPostAt: new Date('2025-07-18T19:30:00-07:00'),
+                postID: 1,
+                confessionIndex: 1,
+            },
+            {
+                residence: "TotemPark",
+                content: "TP P1 C2",
+                submittedAt: new Date('2025-07-17T09:00:00-07:00'),
+                posted: true,
+                scheduledPostAt: new Date('2025-07-18T19:30:00-07:00'),
+                postID: 1,
+                confessionIndex: 2,
+            },
+            {
+                residence: "TotemPark",
+                content: "TP P2 C1",
+                submittedAt: new Date('2025-07-17T10:00:00-07:00'),
+                posted: true,
+                scheduledPostAt: new Date('2025-07-18T19:30:00-07:00'),
+                postID: 2,
+                confessionIndex: 1,
+            },
+            {   // should not be included in GET
+                residence: "TotemPark",
+                content: "sample content",
+                submittedAt: new Date('2025-07-17T10:00:00-07:00'),
+                posted: false,
+            },
+            {   // should not be included in GET
+                residence: "PlaceVanier",
+                content: "PV Confession 1",
+                submittedAt: new Date('2025-07-17T07:00:00-07:00'),
+                posted: true,
+                // later scheduled, but should not be picked since residence not same
+                scheduledPostAt: new Date('2025-07-18T20:30:00-07:00'),
+                postID: 1,
+                confessionIndex: 2,
+            },
+        ]);
+        const res = await request(app).get('/api/confessions')
+        .query({ residence: 'TotemPark'})
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.length).toBe(3);
     })
 })

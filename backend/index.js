@@ -1,7 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
+
+// Load .env only in dev/run mode, not in test
+if (require.main === module) {
+  require('dotenv').config();
+}
 
 const app = express();
 
@@ -14,6 +18,7 @@ app.get('/', (req, res) => {
   res.send('UBC First Year Life backend is live');
 });
 
+// Routes
 const confessionsRoute = require('./routes/confessions');
 app.use('/api/confessions', confessionsRoute);
 const postsRoute = require('./routes/posts');
@@ -21,16 +26,18 @@ app.use('/api/posts', postsRoute);
 const eventsRoute = require('./routes/events');
 app.use('/api/events', eventsRoute);
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('✅ MongoDB connected');
-    app.listen(process.env.PORT || 10000, () => {
-      console.log(`🚀 Server running on port ${process.env.PORT || 10000}`);
+// ⛔️ Only connect to MongoDB and start server if NOT running in test mode
+if (require.main === module) {
+  mongoose.connect(process.env.MONGO_URI)
+    .then(() => {
+      console.log('✅ MongoDB connected');
+      app.listen(process.env.PORT || 10000, () => {
+        console.log(`🚀 Server running on port ${process.env.PORT || 10000}`);
+      });
+    })
+    .catch(err => {
+      console.error('❌ MongoDB connection error:', err);
     });
-  })
-  .catch(err => {
-    console.error('❌ MongoDB connection error:', err);
-  });
+}
 
-module.exports = app;
+module.exports = app; // ✅ Export app so Supertest can use it in tests
