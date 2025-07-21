@@ -16,6 +16,25 @@ function getNextPostTime() {
 }
 
 
+router.post('/post-staged', async (req, res) => {
+  try {
+    const now = new Date();
+    const result = await Confession.updateMany(
+      { posted: false, scheduledPostAt: { $lte: now }},
+      { $set: {posted: true}}
+    )
+    res.status(200).json({
+      updatedCount: result.modifiedCount,
+      message: `${result.modifiedCount} confessions marked as posted`
+    });
+
+  } catch (err) {
+    console.error('error making staged posted', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+})
+
+
 // moved unposted confessions to posted
 router.post('/post-batch', async (req, res) => {
   try {
@@ -27,26 +46,47 @@ router.post('/post-batch', async (req, res) => {
     } = req.body;
     const summary = []
 
-
+    // TODO fix case where there are staged 
     for (const residence of RESIDENCES) {
       const unposted = await Confession.find({
         residence: residence,
         posted: false,
-        scheduledPostAt: { $exists: false }
-      }) //TODO fix psot id confessionindex 
+        // scheduledPostAt: { $exists: false }
+      })
       const unpostedCount = unposted.length
       const mostRecent = await Confession.findOne({
         residence: residence,
         scheduledPostAt: { $exists: true }
-      }).sort({ scheduledPostAt: -1, postID: -1 })
+      }).sort({ scheduledPostAt: -1, postID: -1, confessionIndex: -1})
       const daysSinceLastPost = mostRecent
         ? Math.ceil((Date.now() - new Date(mostRecent.scheduledPostAt)) / (1000 * 60 * 60 * 24))
         : Infinity;
       if (unpostedCount >= BATCH_SIZE || daysSinceLastPost >= MAX_DAYS) {
         const nextScheduledTime = getNextPostTime();
-        const confessionsToSchedule = unposted.sort((a, b) => new Date(a.submittedAt) - new Date(b.submittedAt));
-        let newPostID = mostRecent ? mostRecent.postID + 1 : 1
+        // const confessionsToSchedule = unposted.sort((a, b) => new Date(a.submittedAt) - new Date(b.submittedAt));
+        const confessionsToSchedule = await Confession.find({
+          residence: residence,
+          posted: false,
+          scheduledPostAt: { $exists: false }
+        }).sort({ submittedAt: 1 });
+        let newPostID = 1
         let confessionIndex = 1;
+        if (mostRecent) {
+          if (mostRecent.posted) {
+            newPostID = mostRecent.postID + 1
+            confessionIndex = 1
+          } else {
+            // mostRecent is staged
+            newPostID = mostRecent.postID 
+            confessionIndex = mostRecent.confessionIndex + 1;
+          }
+        }
+
+
+        if (confessionIndex > NUM_CONFESSIONS_PER_POST) {
+          newPostID++;
+          confessionIndex = 1;
+        }
         for (let i = 0; i < confessionsToSchedule.length; i++) {
           if (confessionIndex > NUM_CONFESSIONS_PER_POST) {
             newPostID++;
@@ -111,7 +151,8 @@ router.get('/', async (req, res) => {
 
   const confessions = await Confession.find({
     residence: residence,
-    scheduledPostAt: { $lte: new Date() }
+    scheduledPostAt: { $lte: new Date() },
+    posted: true
   }).sort({ postID: 1, confessionIndex: 1 })
   res.json(confessions)
 });
