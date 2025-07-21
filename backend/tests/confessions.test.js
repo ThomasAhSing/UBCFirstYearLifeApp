@@ -7,10 +7,17 @@ const Confession = require('../models/Confession');
 
 let mongoServer
 
+const BATCH_SIZE = 6
+const MAX_DAYS = 5
+const NUM_CONFESSIONS_PER_POST = 3
+const RESIDENCES = ['TotemPark', 'OrchardCommons', 'PlaceVanier']
+
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
     await mongoose.connect(uri);
+    jest.useFakeTimers(); // Freeze system time
+    jest.setSystemTime(new Date('2025-02-06T12:00:00-07:00'));
 })
 
 afterAll(async () => {
@@ -19,21 +26,22 @@ afterAll(async () => {
 
     // Stop the in-memory server
     await mongoServer.stop();
+    jest.useRealTimers(); // Restore real time after all tests
 })
 
 // clear all events in the database
-afterEach(async () => { 
-    await Confession.deleteMany() 
+afterEach(async () => {
+    await Confession.deleteMany()
 })
 
-describe('Event API', () => {
+describe('Confesison API', () => {
     // TEST POST 1: POST should create a new confession
     it('should create a new confession', async () => {
         const res = await request(app).post('/api/confessions').send({
             residence: "TotemPark",
             content: "Totem Park Sample Confession 1"
         });
-        
+
         expect(res.statusCode).toBe(201); // 201 = successfully created 
         expect(res.body.confession.residence).toBe("TotemPark");
         expect(res.body.confession.content).toBe("Totem Park Sample Confession 1");
@@ -53,12 +61,7 @@ describe('Event API', () => {
         expect(res.body.error).toBe("All fields are required")
     })
 
-    // TEST Ppost-batch 1: 
-    it('should correctly move unposted confession to posted for each residence', async () => {
-        await Confession.create([
-              
-        ])
-    })
+    //////////////////// GET TESTS ///////////////////////////
 
     // TEST GET 1: Get all confessions for specific residence
     it('should get all confessions for residence', async () => {
@@ -108,9 +111,162 @@ describe('Event API', () => {
             },
         ]);
         const res = await request(app).get('/api/confessions')
-        .query({ residence: 'TotemPark'})
+            .query({ residence: 'TotemPark' })
 
         expect(res.statusCode).toBe(200);
         expect(res.body.length).toBe(3);
+    })
+
+    //////////////////// POST-BATCH TESTS ///////////////////////////
+
+    it('first confession - INF days since last post', async () => {
+        await Confession.create([
+            {
+                residence: "TotemPark",
+                content: "TP P1 C1",
+                submittedAt: new Date('2025-01-01T08:00:00-07:00'),
+            },
+            {
+                residence: "TotemPark",
+                content: "TP P1 C2",
+                submittedAt: new Date('2025-01-01T08:00:01-07:00'),
+            },
+            {
+                residence: "TotemPark",
+                content: "TP P1 C3",
+                submittedAt: new Date('2025-01-01T08:00:02-07:00'),
+            },
+            {
+                residence: "TotemPark",
+                content: "TP P1 C4",
+                submittedAt: new Date('2025-01-01T08:00:05-07:00'),
+            },
+            {
+                residence: "TotemPark",
+                content: "TP P1 C5",
+                submittedAt: new Date('2025-01-01T08:00:04-07:00'),
+            },
+            {
+                residence: "TotemPark",
+                content: "TP P1 C6",
+                submittedAt: new Date('2025-01-01T08:00:05-07:00'),
+            },
+            {
+                residence: "OrchardCommons",
+                content: "OC P1 C1",
+                submittedAt: new Date('2025-01-01T08:00:00-07:00'),
+            },
+            {
+                residence: "PlaceVanier",
+                content: "PV P1 C1",
+                submittedAt: new Date('2025-01-01T08:00:00-07:00'),
+            },
+        ]);
+
+
+        let res = await request(app).post('/api/confessions/post-batch')
+            .send({
+                BATCH_SIZE: BATCH_SIZE,
+                MAX_DAYS: MAX_DAYS,
+                NUM_CONFESSIONS_PER_POST: NUM_CONFESSIONS_PER_POST,
+                RESIDENCES: RESIDENCES,
+            })
+
+        expect(res.statusCode).toBe(200);
+        const err = res
+        res = await request(app).get('/api/confessions/staged')
+            .query({ residence: 'TotemPark' })
+        const confessions = res.body;
+        expect(confessions.length).toBe(6);
+        expect(confessions[0].postID).toBe(2);
+        expect(confessions[0].confessionIndex).toBe(3);
+        res = await request(app).get('/api/confessions/unposted')
+            .query({ residence: 'PlaceVanier' })
+        expect(res.body.length).toBe(0)
+
+    })
+
+    it('5 day gap - no prev staged = new PostID', async () => {
+        await Confession.create([
+            {
+                residence: "PlaceVanier",
+                content: "PV P1 C1",
+                submittedAt: new Date('2025-01-01T08:00:00-07:00'),
+                posted: true,
+                scheduledPostAt: new Date('2025-01-01T20:00:00-07:00'),
+                postID: 1,
+                confessionIndex: 1,
+            },
+            {
+                residence: "PlaceVanier",
+                content: "PV P2 C1",
+                submittedAt: new Date('2025-01-29T08:00:00-07:00'),
+                posted: true,
+                scheduledPostAt: new Date('2025-02-01T20:00:00-07:00'),
+                postID: 2,
+                confessionIndex: 1,
+            },
+            {
+                residence: "PlaceVanier",
+                content: "PV P2 C2",
+                submittedAt: new Date('2025-01-29T08:00:00-07:00'),
+                posted: true,
+                scheduledPostAt: new Date('2025-02-01T20:00:00-07:00'),
+                postID: 2,
+                confessionIndex: 2,
+            },
+            {
+                // to see if another residence with higher postID throws off
+                residence: "OrchardCommons",
+                content: "PV P4 C1",
+                submittedAt: new Date('2025-01-29T08:00:00-07:00'),
+                posted: true,
+                scheduledPostAt: new Date('2025-02-01T20:00:00-07:00'),
+                postID: 4,
+                confessionIndex: 1,
+            },
+            {
+                residence: "PlaceVanier",
+                content: "PV P3 C1",
+                submittedAt: new Date('2025-02-02T08:00:00-07:00'),
+            },
+            {
+                residence: "PlaceVanier",
+                content: "PV P3 C2",
+                submittedAt: new Date('2025-02-02T08:01:00-07:00'),
+            },
+        ]);
+
+        let res = await request(app).post('/api/confessions/post-batch')
+            .send({
+                BATCH_SIZE: BATCH_SIZE,
+                MAX_DAYS: MAX_DAYS,
+                NUM_CONFESSIONS_PER_POST: NUM_CONFESSIONS_PER_POST,
+                RESIDENCES: RESIDENCES,
+            })
+        expect(res.statusCode).toBe(200);
+        res = await request(app).get('/api/confessions/staged')
+            .query({ residence: 'PlaceVvanier' })
+        const confessions = res.body;
+        expect(confessions.length).toBe(2)
+        expect(confessions[0].postID).toBe(3)
+        expect(confessions[0].confessionIndex).toBe(2)
+        expect(confessions[0].content).toBe("PV P3 C2")
+        res = await request(app).get('/api/confessions/unposted')
+            .query({ residence: 'PlaceVvanier' })
+        expect(req.body.length).toBe(0)
+    });
+
+    // it('5 day gap - prev staged exists = check if use last PostID',
+
+    // TEST postatch 2: 
+    it('no change: not enough confessions and not 5 days since last post', async () => {
+        await Confession.create([
+            {
+                residence: "OrchardCommons",
+                content: "OC P1 C1",
+                submittedAt: new Date('2025-01-01T08:00:00-07:00'),
+            },
+        ])
     })
 })
