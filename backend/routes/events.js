@@ -4,49 +4,70 @@ const Event = require('../models/Event')
 
 router.use(express.json())
 
-
 router.get('/next7days', async (req, res) => {
-    const { dateString } = req.query
+    const { dateString, maxDaysToCheck = 30, maxResults = 7 } = req.query;
     if (!dateString) {
-        return res.status(400).json({ error: "dateString field required" })
+        return res.status(400).json({ error: "dateString field required" });
     }
-    const fromDate = new Date(dateString)
-    const results = {}
+    try {
+        const fromDate = new Date(dateString);
+        const results = {};
+        const maxDays = parseInt(maxDaysToCheck);
+        const maxCount = parseInt(maxResults);
+        for (let i = 0; i < maxDays && Object.keys(results).length < maxCount; i++) {
+            const checkDate = new Date(fromDate);
+            checkDate.setDate(fromDate.getDate() + i);
 
-    const maxDaysToCheck = 30
-    const maxResults = 7
-    for (let i = 0; i < maxDaysToCheck && Object.keys(results).length < maxResults; i++) {
-        const checkDate = new Date(fromDate)
-        checkDate.setDate(fromDate.getDate() + i)
+            const dateStringKey = checkDate.toISOString().split('T')[0];
 
-        const dateStringKey = checkDate.toISOString().split('T')[0];
-
-        const events = await Event.find({ date: dateStringKey }).sort({ startTime: 1 })
-        if (events.length > 0) {
-            results[dateStringKey] = events
+            const eventsOnDay = await Event.find({ date: dateStringKey }).sort({ startTime: 1 });
+            if (eventsOnDay.length > 0) {
+                results[dateStringKey] = eventsOnDay;
+            }
         }
+        return res.status(200).json({
+            message: "Success",
+            events: results
+        });
+
+    } catch (err) {
+        console.error("Error in /next7days:", err);
+        return res.status(500).json({ error: "Server error while fetching next 7 days of events" });
     }
-    res.json(results)
-})
+});
+
 
 router.get('/singleDay', async (req, res) => {
-    const { dateString } = req.query
-    if (!dateString) {
-        return res.status(400).json({ error: "dateString field required" })
-    }
-    const results = {}
+    const { dateString } = req.query;
 
-    const events = await Event.find({ date: dateString }).sort({ startTime: 1 })
-    if (events.length > 0) {
-        results[dateString] = events
+    if (!dateString) {
+        return res.status(400).json({ error: "dateString field required" });
     }
-    res.json(results)
-})
+
+    try {
+        const events = await Event.find({ date: dateString }).sort({ startTime: 1 });
+
+        // const results = {};
+        // if (events.length > 0) {
+        //     results[dateString] = events;
+        // }
+
+        return res.status(200).json({
+            message: "Success",
+            events: events
+        });
+
+    } catch (err) {
+        console.error("Error fetching events:", err);
+        return res.status(500).json({ error: "Server error while fetching events" });
+    }
+});
+
 
 router.post('/', async (req, res) => {
     try {
         const { shortcode, title, date, startTime, location } = req.body
-        if (!shortcode || !title || !date || !startTime || !location) {
+        if (!shortcode || !date || !startTime ) {
             return res.status(400).json({ error: "not all required fields provided" })
         }
 
@@ -59,7 +80,6 @@ router.post('/', async (req, res) => {
         }
         console.error(err)
         res.status(500).json({ error: 'Server error' });
-
     }
 })
 
