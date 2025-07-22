@@ -1,21 +1,24 @@
 const express = require('express')
 const router = express.Router();
 const Post = require('../models/Post')
+const { DateTime } = require('luxon');
 
 router.use(express.json())
 
+// TODO add post method for custom upload from phone
+
 router.get('/', async (req, res) => {
-    const limit = parseInt(req.query.limit) || 10
-    const before = req.query.before
+    const DEFAULT_LIMIT = 10;
+    const limit = parseInt(req.query.limit) || DEFAULT_LIMIT;
+    const now = DateTime.now().setZone('America/Los_Angeles');
+    const beforeISO = req.query.before || now.toISO()
 
     const filter = {}
-    if (before) {
-        filter.timestamp = { $lt: new Date(before) }
-    }
+    filter.timestamp = { $lt: new Date(beforeISO) }
 
     try {
         const posts = await Post.find(filter).sort({ timestamp: -1 }).limit(limit)
-        res.json(posts)
+        res.status(200).json({ message: 'Success', posts });
     } catch (err) {
         console.error(err)
         res.status(500).json({ message: 'Server Error' })

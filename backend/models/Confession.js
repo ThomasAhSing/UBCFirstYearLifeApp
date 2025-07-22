@@ -8,7 +8,6 @@ const confessionSchema = new mongoose.Schema({
   scheduledPostAt: { type: Date },
   postID: { type: Number },
   confessionIndex: { type: Number },
-  previewImage: { type: String },
 });
 
 module.exports = mongoose.model('Confession', confessionSchema)
