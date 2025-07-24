@@ -34,7 +34,7 @@ yarn-error.*
 .env*.local
 
 # firebase
-backend/ubcfirstyearlifeapp-firebase-adminsdk-fbsvc-99dca536fd.json
+backend/firebase/ubcfirstyearlifeapp-firebase-adminsdk-fbsvc-99dca536fd.json
 
 # Scraper (backend tool)
 backend/Gallery-dl-tool/
