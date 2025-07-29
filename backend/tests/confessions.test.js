@@ -114,6 +114,7 @@ describe('Confesison API', () => {
 
         expect(res.statusCode).toBe(200);
         expect(res.body.length).toBe(3);
+        expect(res.body[0].posted).toBe(true)
     })
 
     it('doenst fetch staged', async () => {
