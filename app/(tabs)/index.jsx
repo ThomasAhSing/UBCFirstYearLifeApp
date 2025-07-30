@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 
 import Heading from '../Heading';
 import PostFlatList from '../PostFlatList';
@@ -14,6 +14,9 @@ export default function HomeScreen() {
         {/* <Text style={{color: 'white'}}>Home Screen</Text> */}
         <PostFlatList/>
     </ScreenWrapper>
+    // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    //   <Text>✅ Minimal screen works</Text>
+    // </View>
   );
 }
 

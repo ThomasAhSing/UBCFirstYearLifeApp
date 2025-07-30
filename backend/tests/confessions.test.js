@@ -34,6 +34,47 @@ afterEach(async () => {
 })
 
 describe('Confesison API', () => {
+
+    it('each field assigned correctly unposted', async () => {
+        await request(app).post('/api/confessions').send({
+            residence: "TotemPark",
+            content: "Totem Park test confession"
+        });
+        const res = await request(app).get('/api/confessions/unposted')
+        .query({ residence: 'TotemPark' })
+        const confession = res.body[0]
+        expect(confession.residence).toBe('TotemPark')
+        expect(confession.content).toBe('Totem Park test confession')
+        expect(confession.posted).toBe(false)
+        const today = new Date()
+        const todayDay = today.getDate()
+        const submittedAt = new Date(confession.submittedAt)
+        expect(submittedAt.getDate()).toBe(todayDay)
+        expect(confession.scheduledPostAt).toBe(undefined)
+        expect(confession.postID).toBe(undefined)
+        expect(confession.confessionIndex).toBe(undefined)
+    })
+
+    it('each field assigned correctly staged', async () => {
+        await request(app).post('/api/confessions').send({
+            residence: "TotemPark",
+            content: "Totem Park test confession"
+        });
+        const res = await request(app).get('/api/confessions/unposted')
+        .query({ residence: 'TotemPark' })
+        const confession = res.body[0]
+        expect(confession.residence).toBe('TotemPark')
+        expect(confession.content).toBe('Totem Park test confession')
+        expect(confession.posted).toBe(false)
+        const today = new Date()
+        const todayDay = today.getDate()
+        const submittedAt = new Date(confession.submittedAt)
+        expect(submittedAt.getDate()).toBe(todayDay)
+        expect(confession.scheduledPostAt).toBe(undefined)
+        expect(confession.postID).toBe(undefined)
+        expect(confession.confessionIndex).toBe(undefined)
+    })
+
     // TEST POST 1: POST should create a new confession
     it('should create a new confession', async () => {
         const res = await request(app).post('/api/confessions').send({

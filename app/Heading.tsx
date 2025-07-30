@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { useEffect } from 'react' 
 import { useFonts } from 'expo-font'
-import * as SplashScreen from 'expo-splash-screen';
+// import * as SplashScreen from 'expo-splash-screen';
 
-SplashScreen.preventAutoHideAsync();
+// SplashScreen.preventAutoHideAsync();
 
 export default function Heading()  {
 

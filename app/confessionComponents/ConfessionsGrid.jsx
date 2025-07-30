@@ -19,10 +19,22 @@ import BackIcon from '@/assets/icons/BackIcon'
 import PlusIcon from '@/assets/icons/PlusIcon'
 import AddConfessionScreen from './AddConfessionScreen'
 
+import axios from 'axios'
+
 // TODO implement gesture when when swipe right from left takes back from allscroller to previews
 // TODO add opening on crrect index not at start when click on preview
 export default function ConfessionsGrid({ selectedResidence }) {
   const RES_CON_DATA = confessions[selectedResidence]
+  const [postedConfessionsData, setPostedConfessionsData] = useState([])
+
+  useEffect(() => {
+      const fetchPostedConfessionsData = async () => {
+        try {
+
+        } catch )err
+      }
+  }, [residence]);
+  
   const windowWidth = Math.floor(Dimensions.get('window').width)
 
   const numCols = 3

@@ -30,15 +30,15 @@ async function uploadDummyPost() {
 }
 
 
-async function uploadDummyConfession() {
+async function uploadDummyConfession(cIndx) {
   const dummyConfession = {
-    residence: "TotemPark",
-    content: "Dummy TP P1 C7",
-    submittedAt: new Date('2025-07-17T08:00:00-07:00'),
+    residence: "OrchardCommons",
+    content: "Dummy OC P2",
+    submittedAt: new Date('2025-07-16T08:00:00-07:00'),
     posted: true,
-    scheduledPostAt: new Date('2025-07-18T19:30:00-07:00'),
-    postID: 1,
-    confessionIndex: 7,
+    scheduledPostAt: new Date('2025-07-20T19:30:00-07:00'),
+    postID: 2,
+    confessionIndex: cIndx,
   }
 
   try {
@@ -57,4 +57,7 @@ async function uploadDummyConfession() {
 
 // uploadDummyPost();
 
-uploadDummyConfession();
+uploadDummyConfession(1);
+uploadDummyConfession(2);
+uploadDummyConfession(3);
+
