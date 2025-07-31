@@ -158,7 +158,7 @@ router.get('/', async (req, res) => {
     residence: residence,
     scheduledPostAt: { $lte: new Date() },
     posted: true
-  }).sort({ postID: 1, confessionIndex: 1 })
+  }).sort({ postID: -1, confessionIndex: 1 })
   res.json(confessions)
 });
 
