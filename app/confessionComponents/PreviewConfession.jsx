@@ -31,7 +31,7 @@ export default function PreviewConfession({ confessionObj, style }) {
           marginTop: 5,
           height: '32%',
           borderTopColor: Colors.confessions[confessionObj.residence].accent,
-          borderTopWidth: 3,
+          borderTopWidth: 4,
         }]}>
           <Text style = {styles.heading}>{residence} Confessions</Text>
           <Text style = {styles.message}>{message}</Text>
@@ -39,7 +39,7 @@ export default function PreviewConfession({ confessionObj, style }) {
         </View>
         <View style = {[styles.whiteBlock,
           {
-          marginTop: 3,
+          marginTop: 4,
           height: '50%',
         }
         ]}>
@@ -62,23 +62,23 @@ const styles = StyleSheet.create({
   whiteBlock: {
     width: '88%',
     backgroundColor: 'white',
-    borderRadius: 5,
+    borderRadius: 6,
   },
   heading: {
     fontFamily: 'RobotoRegular',
-    fontSize: 5,
+    fontSize: 6,
     padding: 2, 
   },
   message: {
     fontFamily: 'RobotoRegular',
-    fontSize: 3,
+    fontSize: 4,
     paddingLeft: 2,
     paddingRight: 3,
     paddingBottom: 2,
   },
   subheading: {
     fontFamily: 'RobotoRegular',
-    fontSize: 3,
+    fontSize: 4,
     padding: 2, 
     paddingBottom: 3,
   },
