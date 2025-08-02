@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const Event = require('./models/Event')
 
 // Load .env only in dev/run mode, not in test
 if (require.main === module) {
@@ -29,8 +30,10 @@ app.use('/api/events', eventsRoute);
 // ⛔️ Only connect to MongoDB and start server if NOT running in test mode
 if (require.main === module) {
   mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
+    .then( () => {
       console.log('✅ MongoDB connected');
+      // await Event.init();
+      
       app.listen(process.env.PORT || 10000, () => {
         console.log(`🚀 Server running on port ${process.env.PORT || 10000}`);
       });
@@ -39,5 +42,7 @@ if (require.main === module) {
       console.error('❌ MongoDB connection error:', err);
     });
 }
+
+
 
 module.exports = app; // ✅ Export app so Supertest can use it in tests

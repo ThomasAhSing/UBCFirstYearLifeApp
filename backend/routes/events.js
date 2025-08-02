@@ -47,10 +47,6 @@ router.get('/singleDay', async (req, res) => {
     try {
         const events = await Event.find({ date: dateString }).sort({ startTime: 1 });
 
-        // const results = {};
-        // if (events.length > 0) {
-        //     results[dateString] = events;
-        // }
 
         return res.status(200).json({
             message: "Success",
@@ -66,17 +62,17 @@ router.get('/singleDay', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { shortcode, title, date, startTime, location } = req.body
-        if (!shortcode || !date || !startTime ) {
+        const { shortcode, title, startAt, location } = req.body
+        if (!shortcode || !startAt ) {
             return res.status(400).json({ error: "not all required fields provided" })
         }
 
-        const newEntry = new Event({ shortcode, title, date, startTime, location })
+        const newEntry = new Event({ shortcode, title, startAt, location })
         await newEntry.save()
         return res.status(201).json({message: "Success", event: newEntry});
     } catch (err) {
         if (err.code === 11000) {
-            return res.status(409).json({ error: 'Event with that shortcode already exists' });
+            return res.status(409).json({ error: 'Event with that shortcode and startAt already exists' });
         }
         console.error(err)
         res.status(500).json({ error: 'Server error' });

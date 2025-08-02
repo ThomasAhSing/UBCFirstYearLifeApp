@@ -28,11 +28,11 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { shortcode, userFetchedFrom, caption, likes, timestamp, media, profile } = req.body
+        const { shortcode, userFetchedFrom, caption, likes, timestamp, media, profile, isEvent = false } = req.body
         if (!shortcode || !userFetchedFrom || !caption || !likes || !timestamp || !media || !profile) {
             return res.status(400).json({ error: 'Required fields missing to make psot object' });
         }
-        const newEntry = new Post({ shortcode, userFetchedFrom, caption, likes, timestamp, media, profile })
+        const newEntry = new Post({ shortcode, userFetchedFrom, caption, likes, timestamp, media, profile, isEvent })
         await newEntry.save()
         return res.status(201).json({message: "Success", event: newEntry});
     } catch (err) {
