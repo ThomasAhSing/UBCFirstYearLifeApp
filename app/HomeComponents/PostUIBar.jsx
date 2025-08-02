@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
-import LikeButton from './uiButtons/LikeButton'
-import SaveButton from './uiButtons/SaveButton'
+import LikeButton from '@/app/uiButtons/LikeButton'
+import SaveButton from '@/app/uiButtons/SaveButton'
 
 export default function PostUIBar({post}) {
     return (

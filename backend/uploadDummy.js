@@ -1,17 +1,29 @@
+
+const { DateTime } = require('luxon')
 const axios = require('axios');
 
 async function uploadDummyPost() {
+
+  const timestampStr = "2025-07-07 20:35:56";
+
+  const dt = DateTime.fromFormat(timestampStr, "yyyy-MM-dd HH:mm:ss", {
+    zone: "America/Vancouver"
+  });
+
+  const timestampMongo = dt.toJSDate();
+
   const dummyPost = {
-    shortcode: "dummy123",
-    userFetchedFrom: "ubcdummy",
-    caption: "This is a dummy post for testing",
-    likes: 100,
-    timestamp: new Date().toISOString(),
+    shortcode: "DL0fhHBhkUN",
+    userFetchedFrom: "ubcwsoccer",
+    caption: "Preseason \ud83d\udd12\n\n2 trips to \ud83c\uddfa\ud83c\uddf8 and a match vs the USPORTS championship hosts!",
+    likes: 454,
+    timestamp: timestampMongo,
     media: [
-      "https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/test_upload%2Funrelated_image.jpg?alt=media&token=3b2673d0-fe9e-4181-b5fd-991c31fde402"],
+      "https://storage.googleapis.com/ubcfirstyearlifeapp.firebasestorage.app/ubcwsoccer/DL0fhHBhkUN/000.jpg"
+    ],
     profile: {
-      biography: "lakers 2026 championship",
-      profile_pic_url: "https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/test_upload%2Flebron.png?alt=media&token=cf6e5263-d3ea-4273-9c09-8ecd3276a4f6"
+      biography: "Official Instagram of UBC Women's Soccer\ud83c\udde8\ud83c\udde6\u26bd\ufe0f\n9x National Champions \ud83c\udfc6 Including 2024\n17x CanadaWest Champions \ud83c\udfc6 Including 2024",
+      profile_pic_url: "https://storage.googleapis.com/ubcfirstyearlifeapp.firebasestorage.app/ubcwsoccer/profile-picture.jpg"
     },
   };
 
@@ -55,9 +67,9 @@ async function uploadDummyConfession(cIndx) {
   }
 }
 
-// uploadDummyPost();
+uploadDummyPost();
 
-uploadDummyConfession(1);
-uploadDummyConfession(2);
-uploadDummyConfession(3);
+// uploadDummyConfession(1);
+// uploadDummyConfession(2);
+// uploadDummyConfession(3);
 

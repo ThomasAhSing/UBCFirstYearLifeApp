@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import eventsData from '@/data/events.json'
 import postData from '@/data/posts/all_posts.json'
-import Sidecar from "@/app/Sidecar";
+import Sidecar from "@/app/HomeComponents/Sidecar";
 
 // project imports
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import eventsData from '@/data/events.json'
 import postData from '@/data/posts/all_posts.json'
-import Post from "@/app/Post"
+import Post from "@/app/HomeComponents/Post"
 import { DateTime } from 'luxon';
 
 

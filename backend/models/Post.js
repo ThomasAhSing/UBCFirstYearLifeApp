@@ -15,6 +15,7 @@
         media: {type: [String], required: true,
             validate: arr => arr.length > 0},
         profile: {type: profileSchema, required: true},
+        isEvent: {type: Boolean, default: false},
     });
 
     module.exports = mongoose.model('Post', postSchema)

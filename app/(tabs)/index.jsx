@@ -1,7 +1,7 @@
 import { StyleSheet, View, Text } from 'react-native';
 
 import Heading from '../Heading';
-import PostFlatList from '../PostFlatList';
+import PostFlatList from '../HomeComponents/PostFlatList';
 import ScreenWrapper from '../ScreenWrapper';
 
 export default function HomeScreen() {

@@ -59,6 +59,6 @@ def upload_image_from_url(image_url, base_dest_filename):
 if __name__ == "__main__":
     init_firebase()
     test_url = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyPscMySS3cdcZ3YGBicFOslqPsdnYxq45XA&s"
-    filename = "default_profile_picture"
+    filename = "test_upload/ubcwsoccer/DKu7HQNhq3y/0"
     firebase_url = upload_image_from_url(test_url, filename)
     print(f"Image link: {firebase_url}")

@@ -57,9 +57,9 @@ export default function ConfessionsGrid({ selectedResidence }) {
       const fetchPostedConfessionsData = async () => {
         try {
           const res = await axios.get(`http://localhost:10000/api/confessions/posted?residence=${selectedResidence}`)
-          console.log("res data")
+          // console.log("res data")
           // console.log(res)
-          console.log(res.data)
+          // console.log(res.data)
           setPostedConfessionsData(formatFetchedData(res.data));
         } catch (err) {
           console.error('Failed to fetch posted confessions:', err);
