@@ -1,11 +1,14 @@
 // external imports 
 import { StyleSheet, Text, View, FlatList } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import eventsData from '@/data/events.json'
 import postData from '@/data/posts/all_posts.json'
 import Post from "@/app/HomeComponents/Post"
 import { DateTime } from 'luxon';
+
+import axios from 'axios'
+
 
 
 
@@ -20,21 +23,60 @@ const eventsByDate = {
 };
 
 const todayDateString = DateTime.now().setZone('America/Los_Angeles').toFormat('yyyy-MM-dd');
-export default function DayScreen({ dateString, singleDay = false }) {
 
 
-  let eventsOfMonthFlatListData = undefined
-  if (singleDay) {
-    eventsOfMonthFlatListData = buildFlatSingleDay(dateString)
-  } else {
-    eventsOfMonthFlatListData = buildFlatNextEventDays(dateString)
-  }
+function formatEventsData(fetchedEventsData = []) {
+  const options = { day: 'numeric', month: 'long', timeZone: 'America/Vancouver' };
+  const grouped = {};
+
+  fetchedEventsData.forEach(event => {
+    const date = new Date(event.startAt);
+    const formatter = new Intl.DateTimeFormat('en-CA', options);
+    const key = formatter.format(date); // e.g "15 August"
+
+    if (!grouped[key]) {
+      grouped[key] = [];
+    }
+    grouped[key].push(event);
+  });
+
+  return grouped;
+}
+
+export default function DayScreen({ todayISOString }) {
+
+
+  const [eventsData, setEventsData] = useState([])
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEventsData = async () => {
+      try {
+        const res = await axios.get("http://localhost:10000/api/events/next7days", {
+          params: {
+            fromDate: todayISOString
+          }
+        })
+        console.log("events data")
+        console.log(res)
+        console.log(res.data.events)
+        setEventsData(formatEventsData(res.data.events));
+      } catch (err) {
+        console.error('Failed to fetch posted confessions:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchEventsData();
+  }, []);
+
+  if (loading) return <Text style={{ color: 'white' }}>Loading...</Text>;
 
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={eventsOfMonthFlatListData}
+        data={eventsData}
         renderItem={({ item }) => {
           if (item.type === "header") {
             return (

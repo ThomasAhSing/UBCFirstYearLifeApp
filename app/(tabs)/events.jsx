@@ -30,6 +30,9 @@ export default function EventsScreen() {
   const todayDateString = DateTime.now().setZone('America/Los_Angeles').toFormat('yyyy-MM-dd');
   console.log(todayDateString)
 
+  const pdtMidnight = DateTime.now().setZone('America/Vancouver').startOf('day');
+  const todayISOString = pdtMidnight.toJSDate();
+
   const [viewMode, setViewMode] = useState("Day")
   const [dateString, setDateString] = useState(todayDateString)
 
@@ -40,7 +43,7 @@ export default function EventsScreen() {
     <ScreenWrapper>
       <Heading />
       <View style={styles.dayMonthBar}>
-        <DayMonthBar viewMode={viewMode} setViewMode={setViewMode}/>
+        <DayMonthBar viewMode={viewMode} setViewMode={setViewMode} />
       </View>
       <View style={{ flex: 1 }}>
         {viewMode === "Month" &&
@@ -49,7 +52,7 @@ export default function EventsScreen() {
             dateString={dateString} setDateString={setDateString}
           />}
 
-        {viewMode === "Day" && <DayScreen dateString={todayDateString}/>}
+        {viewMode === "Day" && <DayScreen todayISOString={todayISOString} />}
       </View>
     </ScreenWrapper>
   );
