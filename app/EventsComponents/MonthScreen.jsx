@@ -1,33 +1,22 @@
 // external imports 
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from "react-native";
 import { useState } from "react";
+import { DateTime } from 'luxon';
 
 // project imports 
-import { Calendar, LocaleConfig, Agenda } from 'react-native-calendars';
-import eventsData from '@/data/events.json'
+import { Calendar } from 'react-native-calendars';
 import DayScreen from '@/app/EventsComponents/DayScreen'
+import BackIcon from '@/assets/icons/BackIcon'
+import { Colors } from '@/constants/Colors';
 
 
-const eventsByDate = {
-  '2025-07-13': 2,
-  '2025-07-16': 2,
-};
+export default function MonthScreen({ monthEventsData, monthPostMap, todayISOString }) {
 
-export default function MonthScreen({ dateString }) {
-
-  // const today = new Date().toISOString().split('T')[0]; // e.g. "2025-07-08"
   const windowWidth = Dimensions.get('window').width
   const dayButtonWidth = Math.floor(windowWidth / 8)
   const [selected, setSelected] = useState('')
   const [overlayDate, setOverlayDate] = useState(null);
 
-
-  const onPress = (dateString) => {
-    const shortcodes = eventsData[dateString]
-    if (shortcodes.length === 0) {
-      return
-    }
-  }
   return (
     <View style={styles.container}>
 
@@ -50,12 +39,13 @@ export default function MonthScreen({ dateString }) {
           monthTextColor: 'white',
         }}
         dayComponent={({ date, state }) => {
-          const count = eventsByDate[date.dateString];
+          const count = date.dateString in monthEventsData ? monthEventsData[date.dateString].length : 0
           return (
             <TouchableOpacity
               onPress={() => {
-                const shortcodes = eventsData[date.dateString] || [];
-                if (shortcodes.length > 0) {
+                // const shortcodes = eventsData[date.dateString] || [];
+                // const numEvents = monthEventsData
+                if (count > 0) {
                   setOverlayDate(date.dateString); // this triggers the overlay view
                 }
               }}
@@ -69,11 +59,11 @@ export default function MonthScreen({ dateString }) {
                 style={[{
                   color: state === 'disabled' ? '#A9A9A9' : 'white',
                 },
-                dateString === date.dateString && { color: '#00BFFF' }
+                isSameDate(todayISOString, date.dateString) && { color: '#00BFFF' }
                 ]}>
                 {date.day}
               </Text>
-              {count && (
+              {count > 0 && (
                 <Text style={{
                   fontSize: 11,
                   textAlign: 'center',
@@ -96,20 +86,30 @@ export default function MonthScreen({ dateString }) {
 
       {overlayDate && (
         <View style={styles.overlay}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => setOverlayDate(null)}>
+            <BackIcon size={30} color='white' />
+          </TouchableOpacity> 
           <DayScreen
-            dateString={overlayDate}
-            singleDay={true}
+            eventsData={filterEventsDataOneDay(overlayDate, monthEventsData)} postMap={monthPostMap}
           />
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.closeOverlay}
             onPress={() => setOverlayDate(null)}
           >
             <Text style={styles.closeText}>Close</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       )}
     </View>
   );
+}
+
+function filterEventsDataOneDay(dateString, monthEventsData) {
+  if (monthEventsData.hasOwnProperty(dateString)) {
+    return { [dateString]: monthEventsData[dateString] };
+  } else {
+    return {};
+  }
 }
 
 const styles = StyleSheet.create({
@@ -117,10 +117,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#001f3f', // dark background
+    position: 'absolute',
+    backgroundColor: Colors.background,
     zIndex: 10,
-    paddingTop: 50,
   },
 
   closeOverlay: {
@@ -137,4 +136,16 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
+  backBtn: {
+    paddingTop: 10,
+    paddingBottom: 10,
+  }
 });
+
+
+function isSameDate(isoWithTime, dateOnlyString) {
+  const dt1 = DateTime.fromISO(isoWithTime, { zone: 'America/Vancouver' }).startOf('day');
+  const dt2 = DateTime.fromISO(dateOnlyString, { zone: 'America/Vancouver' }).startOf('day');
+
+  return dt1.hasSame(dt2, 'day');
+}

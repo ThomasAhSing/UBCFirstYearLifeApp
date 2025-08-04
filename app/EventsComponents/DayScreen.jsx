@@ -1,219 +1,60 @@
 // external imports 
 import { StyleSheet, Text, View, FlatList } from "react-native";
-import { useState, useEffect } from "react";
-
-import eventsData from '@/data/events.json'
-import postData from '@/data/posts/all_posts.json'
-import Post from "@/app/HomeComponents/Post"
 import { DateTime } from 'luxon';
 
-import axios from 'axios'
-
-
-
-
 // project imports
-
-const eventsByDate = {
-  '2025-07-03': 3,
-  '2025-07-10': 1,
-  '2025-07-27': 10,
-  '2025-07-28': 10,
-  '2025-07-29': 13,
-};
-
-const todayDateString = DateTime.now().setZone('America/Los_Angeles').toFormat('yyyy-MM-dd');
+import Post from "@/app/HomeComponents/Post"
 
 
-function formatEventsData(fetchedEventsData = []) {
-  const options = { day: 'numeric', month: 'long', timeZone: 'America/Vancouver' };
-  const grouped = {};
-
-  fetchedEventsData.forEach(event => {
-    const date = new Date(event.startAt);
-    const formatter = new Intl.DateTimeFormat('en-CA', options);
-    const key = formatter.format(date); // e.g "15 August"
-
-    if (!grouped[key]) {
-      grouped[key] = [];
-    }
-    grouped[key].push(event);
-  });
-
-  return grouped;
-}
-
-export default function DayScreen({ todayISOString }) {
 
 
-  const [eventsData, setEventsData] = useState([])
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchEventsData = async () => {
-      try {
-        const res = await axios.get("http://localhost:10000/api/events/next7days", {
-          params: {
-            fromDate: todayISOString
-          }
-        })
-        console.log("events data")
-        console.log(res)
-        console.log(res.data.events)
-        setEventsData(formatEventsData(res.data.events));
-      } catch (err) {
-        console.error('Failed to fetch posted confessions:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchEventsData();
-  }, []);
-
-  if (loading) return <Text style={{ color: 'white' }}>Loading...</Text>;
-
+export default function DayScreen({ eventsData, postMap }) {
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={eventsData}
-        renderItem={({ item }) => {
-          if (item.type === "header") {
-            return (
-              <View style={styles.dateHeadingContainer}>
-                <Text style={styles.dateHeading}>{formatDateInPDT(item.date)}</Text>
-                {item.noEvents &&
-                  <Text style={styles.noEventsToday}>Currently no events today. Scroll to see future events.</Text>}
-              </View>
-
-            )
-          } else if (item.type === "post") {
-            return (
-              <View>
-                <Text style={styles.timeText}>{formatTimeInPDT(item.postData.dateTimeOfEvent)}</Text>
-                <Post post={item.postData} />
-              </View>
-
-            )
-          }
+        data={Object.keys(eventsData)}
+        renderItem={({ item: date }) => {
+          return (
+            <View>
+              <Text style={styles.dateHeading}>{formatDatestringToTitle(date)}</Text>
+              <FlatList
+                data={eventsData[date]}
+                renderItem={({ item: eventObj }) => {
+                  return (
+                    <View>
+                      <Text style={styles.timeText}>{formatEventTimePDT(eventObj.startAt)}</Text>
+                      <Post post={postMap[eventObj.shortcode]} />
+                    </View>
+                  )
+                }}
+              />
+            </View>
+          )
         }}
       />
     </View>
-  );
+  )
 }
 
-
-
-function buildFlatNextEventDays(dateString, maxDays = 30, requiredDaysWithEvents = 7) {
-  const result = [];
-  const startDate = DateTime.fromISO(dateString).setZone('America/Los_Angeles');
-
-  let eventDaysFound = 0;
-
-  for (let i = 0; i < maxDays; i++) {
-    const current = startDate.plus({ days: i });
-    const fullDate = current.toFormat('yyyy-MM-dd');
-    const shortcodes = eventsData[fullDate] || [];
-
-    if (shortcodes.length > 0) {
-      result.push({
-        type: "header",
-        date: fullDate,
-        noEvents: false,
-      });
-
-      const posts = shortcodes
-        .map(shortcode => postData[shortcode])
-        .filter(post => !!post);
-
-      posts.sort((a, b) =>
-        new Date(a.dateTimeOfEvent) - new Date(b.dateTimeOfEvent)
-      );
-
-      posts.forEach(post => {
-        result.push({
-          type: "post",
-          date: fullDate,
-          postData: post,
-        });
-      });
-
-      // ✅ Only count days with events *after* today
-      if (i > 0) {
-        eventDaysFound++;
-      }
-
-    } else if (i === 0) {
-      // ✅ Today has no events — add noEvents header
-      result.push({
-        type: "header",
-        date: fullDate,
-        noEvents: true,
-      });
-    }
-
-    if (eventDaysFound >= requiredDaysWithEvents) break;
-  }
-
-  return result;
+// "2025-07-08" -> 8 July
+function formatDatestringToTitle(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-CA', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'America/Vancouver'
+  }); // e.g. "8 July"
 }
 
-function buildFlatSingleDay(dateString) {
-  const result = [];
-
-  const shortcodes = eventsData[dateString] || [];
-
-  if (shortcodes.length === 0) {
-    result.push({
-      type: "header",
-      date: dateString,
-      noEvents: true,
-    });
-  } else {
-    result.push({
-      type: "header",
-      date: dateString,
-      noEvents: false,
-    });
-
-    const posts = shortcodes
-      .map(shortcode => postData[shortcode])
-      .filter(post => !!post);
-
-    posts.sort((a, b) =>
-      new Date(a.dateTimeOfEvent) - new Date(b.dateTimeOfEvent)
-    );
-
-    posts.forEach(post => {
-      result.push({
-        type: "post",
-        date: dateString,
-        postData: post,
-      });
-    });
-  }
-
-  return result;
+// ISO String to 9 A.M.
+function formatEventTimePDT(startAt) {
+  return DateTime.fromISO(startAt, { zone: 'America/Vancouver' })
+    .toFormat("h a")
+    .replace("AM", "A.M.")
+    .replace("PM", "P.M.");
 }
 
-function formatDateInPDT(dateString) {
-  if (dateString == todayDateString) {
-    return "Today"
-  }
-  const date = new Date(dateString + 'T00:00:00'); // add time to prevent UTC offset
-  const options = { timeZone: 'America/Los_Angeles', day: 'numeric', month: 'long' };
-  return date.toLocaleString('en-US', options);
-}
-
-function formatTimeInPDT(dateTimeString) {
-  const date = new Date(dateTimeString);
-  return date.toLocaleTimeString('en-US', {
-    timeZone: 'America/Los_Angeles',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  });
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -227,12 +68,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontFamily: 'CourgetteRegular',
     fontSize: 25,
-    // paddingLeft: 15,
-  },
-  noEventsToday: {
-    color: 'white',
-    fontSize: 17,
-    // paddingLeft: 15,
+    paddingLeft: 15,
   },
   timeText: {
     color: 'white',

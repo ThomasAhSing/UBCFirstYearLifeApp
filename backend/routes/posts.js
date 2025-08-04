@@ -26,6 +26,19 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.get('/:shortcode', async (req, res) => {
+  try {
+    const post = await Post.findOne({ shortcode: req.params.shortcode });
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    res.status(200).json(post);
+  } catch (err) {
+    console.error('Error fetching post by shortcode:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 router.post('/', async (req, res) => {
     try {
         const { shortcode, userFetchedFrom, caption, likes, timestamp, media, profile, isEvent = false } = req.body

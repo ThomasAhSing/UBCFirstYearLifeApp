@@ -4,7 +4,7 @@ const axios = require('axios');
 
 async function uploadDummyPost() {
 
-  const timestampStr = "2025-05-14 19:04:27";
+  const timestampStr = "2025-07-21 22:48:12";
 
   const dt = DateTime.fromFormat(timestampStr, "yyyy-MM-dd HH:mm:ss", {
     zone: "America/Vancouver"
@@ -13,19 +13,19 @@ async function uploadDummyPost() {
   const timestampMongo = dt.toJSDate();
 
   const dummyPost = {
-    shortcode: "DJpSH0oSmpr",
-    userFetchedFrom: "officialubcfootball",
-    caption: "OUR 2025 SCHEDULE IS OUT \u203c\ufe0f\ud83e\udd85\n\nMark your calendars. Bring the noise. We\u2019re ready. \ud83d\ude24\n\n#GoBirdsGo | #UBCF",
-    likes: 335,
+    shortcode: "DMYxyCEMNz4",
+    userFetchedFrom: "ubcrec",
+    caption: "\ud83c\udfc0\u26bd UBC Rec is hiring Intramural Officials! \ud83c\udfd0\ud83c\udfd2\nLove sports? We're looking for officials for our upcoming intramural leagues!\n\n\ud83d\udcf2 Click the link in bio to see open positions and apply today!\n\n #ubc #ubcrec",
+    likes: 87,
     timestamp: timestampMongo,
     media: [
-      "https://storage.googleapis.com/ubcfirstyearlifeapp.firebasestorage.app/officialubcfootball/DJpSH0oSmpr/000.jpg"
+      "https://storage.googleapis.com/ubcfirstyearlifeapp.firebasestorage.app/ubcrec/DMYxyCEMNz4/000.jpg"
     ],
     profile: {
-      biography: "",
-      profile_pic_url: "https://storage.googleapis.com/ubcfirstyearlifeapp.firebasestorage.app/default_profile_picture.jpg"
+      biography: "Getting UBC moving through health, wellness, & recreational sport since 1967.\nWebsite \u2199\ufe0f",
+      profile_pic_url: "https://storage.googleapis.com/ubcfirstyearlifeapp.firebasestorage.app/ubcrec/profile-picture.jpg"
     },
-    isEvent: true,
+    isEvent: false,
   };
 
   try {
@@ -71,7 +71,7 @@ async function uploadDummyConfession(cIndx) {
 
 async function uploadDummyEvent() {
 
-  const startAtStr = "2025-10-17 18:00:00";
+  const startAtStr = "2025-08-01 10:00:00";
 
   const dt = DateTime.fromFormat(startAtStr, "yyyy-MM-dd HH:mm:ss", {
     zone: "America/Vancouver"
@@ -80,10 +80,10 @@ async function uploadDummyEvent() {
   const startAtMongo = dt.toJSDate();
 
   const dummyEvent = {
-    shortcode: "DJpSH0oSmpr",
-    title: "UBC Tbirds Football Game vs Huskies",
+    shortcode: "DM0lsyxtlRw",
+    title: "UBC Rec Auguest Events / Activities",
     startAt: startAtMongo,
-    location: "UBC Home Football Field",
+    location: "UBC",
   }
 
   try {
@@ -100,11 +100,11 @@ async function uploadDummyEvent() {
   }
 }
 
-// uploadDummyPost();
+uploadDummyPost();
 
 // uploadDummyConfession(1);
 // uploadDummyConfession(2);
 // uploadDummyConfession(3);
 
-uploadDummyEvent();
+// uploadDummyEvent();
 

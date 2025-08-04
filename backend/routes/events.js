@@ -7,7 +7,7 @@ const { DateTime } = require('luxon');
 router.use(express.json())
 
 // TODO retest event api
-router.get('/next7days', async (req, res) => {
+router.get('/', async (req, res) => {
   let { fromDate, maxDaysToCheck = 90, maxResults = 7 } = req.query;
 
   try {
