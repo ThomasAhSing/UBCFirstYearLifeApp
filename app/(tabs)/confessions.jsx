@@ -1,5 +1,5 @@
 // external imports
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { useState } from 'react'
 
 import { Colors } from '@/constants/Colors';
@@ -13,49 +13,42 @@ import ScreenWrapper from "../ScreenWrapper";
 import Heading from "../Heading"
 import ConfessionsOptionsBar from '../confessionComponents/ConfessionsOptionsBar';
 import ConfessionsGrid from '../confessionComponents/ConfessionsGrid';
-import AllConfessionsScroller from '../confessionComponents/AllConfessionsScroller'
-import PlusIcon from '@/assets/icons/PlusIcon'
-
-// export const confessionImageMap = {
-//   "TotemPark": {
-//     1: require('@/data/confessions/previewImages/totem_park_cid1_pid1.png'),
-//     2: require('@/data/confessions/previewImages/totem_park_cid6_pid2.png'),
-//     3: require('@/data/confessions/previewImages/totem_park_cid11_pid3.png'),
-//     4: require('@/data/confessions/previewImages/totem_park_cid16_pid4.png'),
-//     5: require('@/data/confessions/previewImages/totem_park_cid55_pid5.png'),
-//   },
-//   "OrchardCommons": {
-//     1: require('@/data/confessions/previewImages/orchard_commons_cid21_pid1.png'),
-//     2: require('@/data/confessions/previewImages/orchard_commons_cid26_pid2.png'),
-//     3: require('@/data/confessions/previewImages/orchard_commons_cid31_pid3.png'),
-//     4: require('@/data/confessions/previewImages/orchard_commons_cid36_pid4.png'),
-//     5: require('@/data/confessions/previewImages/orchard_commons_cid57_pid5.png'),
-//   },
-//   "PlaceVanier": {
-//     1: require('@/data/confessions/previewImages/place_vanier_cid41_pid1.png'),
-//     2: require('@/data/confessions/previewImages/place_vanier_cid46_pid2.png'),
-//     3: require('@/data/confessions/previewImages/place_vanier_cid51_pid3.png'),
-//     4: require('@/data/confessions/previewImages/place_vanier_cid59_pid4.png'),
-//   },
-// };
+import { DataContext } from '@/context/DataContext';
+import { useContext, useEffect } from 'react';
 
 
 export default function ConfessionsScreen() {
+  const {
+    postedConfessionsDataLoaded,
+    postedConfessionsDataLoading,
+    loadAllPostedConfessions
+  } = useContext(DataContext);
+
   const [selectedResidence, setSelectedResidence] = useState("TotemPark")
-  // const [allConfessionsScrollerVisible, setAllConfessionsScrollerVisible] = useState(false)
+
+  useEffect(() => {
+    if (!postedConfessionsDataLoaded && !postedConfessionsDataLoading) {
+      loadAllPostedConfessions()
+    }
+  }, []);
+
+  if (postedConfessionsDataLoading) {
+    return <Text style={{ paddingTop: 50, paddingLeft: 50, flex: 1, color: 'white', backgroundColor: Colors.background }}>Loading confessions...</Text>;
+  }
+
+  if (!postedConfessionsDataLoaded) {
+    return <Text style={{ paddingTop: 50, paddingLeft: 50, flex: 1, color: 'white', backgroundColor: Colors.background }}>Failed to load confessions from server...</Text>;
+  }
 
   return (
     <ScreenWrapper>
-      <Heading/>
-      <ConfessionsOptionsBar 
-      style={styles.optionsBar}
-      selectedResidence={selectedResidence} 
-      setSelectedResidence={setSelectedResidence}
+      <Heading />
+      <ConfessionsOptionsBar
+        style={styles.optionsBar}
+        selectedResidence={selectedResidence}
+        setSelectedResidence={setSelectedResidence}
       />
-      {/* <TouchableOpacity style={styles.addButton}>
-        <PlusIcon size={30} color='white'/>
-      </TouchableOpacity> */}
-      <ConfessionsGrid selectedResidence={selectedResidence} setSelectedResidence={setSelectedResidence}/>
+      <ConfessionsGrid selectedResidence={selectedResidence} setSelectedResidence={setSelectedResidence} />
     </ScreenWrapper>
   );
 }

@@ -4,7 +4,7 @@ const axios = require('axios');
 
 async function uploadDummyPost() {
 
-  const timestampStr = "2025-07-21 22:48:12";
+  const timestampStr = "2025-07-09 19:16:07";
 
   const dt = DateTime.fromFormat(timestampStr, "yyyy-MM-dd HH:mm:ss", {
     zone: "America/Vancouver"
@@ -13,19 +13,19 @@ async function uploadDummyPost() {
   const timestampMongo = dt.toJSDate();
 
   const dummyPost = {
-    shortcode: "DMYxyCEMNz4",
-    userFetchedFrom: "ubcrec",
-    caption: "\ud83c\udfc0\u26bd UBC Rec is hiring Intramural Officials! \ud83c\udfd0\ud83c\udfd2\nLove sports? We're looking for officials for our upcoming intramural leagues!\n\n\ud83d\udcf2 Click the link in bio to see open positions and apply today!\n\n #ubc #ubcrec",
-    likes: 87,
+    shortcode: "DL5f-NESZBp",
+    userFetchedFrom: "ubcmmhc",
+    caption: "Join us in volunteering to feed the homeless in downtown Vancouver. We hope to see you there!\n\nPlease feel free to reach out to with any questions. \n\nThe sign up form is in our linktree in bio.",
+    likes: 10,
     timestamp: timestampMongo,
     media: [
       "https://storage.googleapis.com/ubcfirstyearlifeapp.firebasestorage.app/ubcrec/DMYxyCEMNz4/000.jpg"
     ],
     profile: {
-      biography: "Getting UBC moving through health, wellness, & recreational sport since 1967.\nWebsite \u2199\ufe0f",
-      profile_pic_url: "https://storage.googleapis.com/ubcfirstyearlifeapp.firebasestorage.app/ubcrec/profile-picture.jpg"
+      biography: "",
+      profile_pic_url: "https://storage.googleapis.com/ubcfirstyearlifeapp.firebasestorage.app/default_profile_picture.jpg"
     },
-    isEvent: false,
+    isEvent: true,
   };
 
   try {
@@ -71,7 +71,7 @@ async function uploadDummyConfession(cIndx) {
 
 async function uploadDummyEvent() {
 
-  const startAtStr = "2025-08-01 10:00:00";
+  const startAtStr = "2025-09-12 13:00:00";
 
   const dt = DateTime.fromFormat(startAtStr, "yyyy-MM-dd HH:mm:ss", {
     zone: "America/Vancouver"
@@ -80,10 +80,10 @@ async function uploadDummyEvent() {
   const startAtMongo = dt.toJSDate();
 
   const dummyEvent = {
-    shortcode: "DM0lsyxtlRw",
-    title: "UBC Rec Auguest Events / Activities",
+    shortcode: "DL5f-NESZBp",
+    title: "Volunteering at Guru Nanak's Free Kitchen",
     startAt: startAtMongo,
-    location: "UBC",
+    location: "Downtown Eastside",
   }
 
   try {
@@ -100,11 +100,11 @@ async function uploadDummyEvent() {
   }
 }
 
-uploadDummyPost();
+// uploadDummyPost();
 
 // uploadDummyConfession(1);
 // uploadDummyConfession(2);
 // uploadDummyConfession(3);
 
-// uploadDummyEvent();
+uploadDummyEvent();
 

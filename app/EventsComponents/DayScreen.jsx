@@ -1,30 +1,54 @@
 // external imports 
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import { DateTime } from 'luxon';
+import { useContext } from "react";
 
 // project imports
 import Post from "@/app/HomeComponents/Post"
+import { DataContext } from '@/context/DataContext';
+import { Colors } from '@/constants/Colors';
 
 
+// if dateString is provided DayScreen is generated with only events from that day
+export default function DayScreen({ dateString, monthEventsData, monthPostMap }) {
+  console.log("monthEventsData")
+  console.log(monthEventsData)
+  let {
+    dayEventsData, dayPostMap
+  } = useContext(DataContext);
 
+  if (dateString) {
+    if (!monthEventsData || !monthPostMap) {
+      return (
+        <Text
+          style={{
+            color: 'white',
+            backgroundColor: Colors.background,
+            paddingLeft: 10
+          }}>
+          No events on this day</Text>
+      )
 
-export default function DayScreen({ eventsData, postMap }) {
+    }
+    dayEventsData = filterEventsDataOneDay(dateString, monthEventsData);
+    dayPostMap = monthPostMap;
+  }
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={Object.keys(eventsData)}
+        data={Object.keys(dayEventsData)}
         renderItem={({ item: date }) => {
           return (
             <View>
               <Text style={styles.dateHeading}>{formatDatestringToTitle(date)}</Text>
               <FlatList
-                data={eventsData[date]}
+                data={dayEventsData[date]}
                 renderItem={({ item: eventObj }) => {
                   return (
                     <View>
                       <Text style={styles.timeText}>{formatEventTimePDT(eventObj.startAt)}</Text>
-                      <Post post={postMap[eventObj.shortcode]} />
+                      <Post post={dayPostMap[eventObj.shortcode]} />
                     </View>
                   )
                 }}
@@ -39,12 +63,12 @@ export default function DayScreen({ eventsData, postMap }) {
 
 // "2025-07-08" -> 8 July
 function formatDatestringToTitle(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-CA', {
-    day: 'numeric',
-    month: 'long',
-    timeZone: 'America/Vancouver'
-  }); // e.g. "8 July"
+  const [year, month, day] = dateString.split('-');
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  return `${parseInt(day, 10)} ${monthNames[parseInt(month, 10) - 1]}`;
 }
 
 // ISO String to 9 A.M.
@@ -55,6 +79,13 @@ function formatEventTimePDT(startAt) {
     .replace("PM", "P.M.");
 }
 
+function filterEventsDataOneDay(dateString, monthEventsData) {
+  if (monthEventsData.hasOwnProperty(dateString)) {
+    return { [dateString]: monthEventsData[dateString] };
+  } else {
+    return {};
+  }
+}
 
 const styles = StyleSheet.create({
   container: {

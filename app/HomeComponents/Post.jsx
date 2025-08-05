@@ -5,6 +5,7 @@ import PostUIBar from './PostUIBar';
 
 
 // TODO add caption
+// TODO add double tap image to like 
 
 export default function Post({ post }) {
   const fileNameKey = post.profile.profile_pic_url

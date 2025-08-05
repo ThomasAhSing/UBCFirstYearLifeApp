@@ -125,12 +125,8 @@ router.post('/post-batch', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-  console.log('🔥 HIT /api/confessions POST route'); 
-  console.log('Received req.body:', req.body);
-  console.log('typeof posted:', typeof req.body.posted);
   try {
     const { residence, content, submittedAt, posted, scheduledPostAt, postID, confessionIndex } = req.body;
-    // const posted = req.body.posted === 'true' || req.body.posted === true ? true : false;
 
 
     if (!residence || !content) {

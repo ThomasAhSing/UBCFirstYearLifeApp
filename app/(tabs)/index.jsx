@@ -1,22 +1,29 @@
 import { StyleSheet, View, Text } from 'react-native';
+import { DataContext } from '@/context/DataContext';
 
 import Heading from '../Heading';
 import PostFlatList from '../HomeComponents/PostFlatList';
 import ScreenWrapper from '../ScreenWrapper';
+import { useContext } from 'react';
 
 export default function HomeScreen() {
 
-// TODO add double tap image to like 
+
+  const {postDataLoaded} = useContext(DataContext)
+
+  if (!postDataLoaded) return (
+    <ScreenWrapper>
+        <Heading/>
+        <Text style={{ color: "white" }}>Loading home...</Text>
+    </ScreenWrapper>
+  )
 
   return (
     <ScreenWrapper>
         <Heading/>
-        {/* <Text style={{color: 'white'}}>Home Screen</Text> */}
         <PostFlatList/>
     </ScreenWrapper>
-    // <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    //   <Text>✅ Minimal screen works</Text>
-    // </View>
+
   );
 }
 

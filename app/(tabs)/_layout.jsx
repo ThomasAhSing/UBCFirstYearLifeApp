@@ -1,7 +1,7 @@
 // external imports
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform, StyleSheet, FlatList } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 // project import 
 import { HapticTab } from '@/components/HapticTab';
@@ -12,14 +12,14 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 
 // icon imports 
-import HomeFilled from '../../assets/icons/HomeFilled'
-import HomeOutline from '../../assets/icons/HomeOutline'
-import ConfessionFilled from '../../assets/icons/ConfessionsFld'
-import ConfessionOutline from  '../../assets/icons/ConfessionsOtln'
-import EventFilled from  '../../assets/icons/EventFilled'
-import EventOutline from  '../../assets/icons/EventOutline'
-import JumpStartFilled from  '../../assets/icons/JumpStartFilled'
-import JumpStartOutline from  '../../assets/icons/JumpStartOutline'
+import HomeFilled from '@/assets/icons/HomeFilled'
+import HomeOutline from '@/assets/icons/HomeOutline'
+import ConfessionFilled from '@/assets/icons/ConfessionsFld'
+import ConfessionOutline from  '@/assets/icons/ConfessionsOtln'
+import EventFilled from  '@/assets/icons/EventFilled'
+import EventOutline from  '@/assets/icons/EventOutline'
+import JumpStartFilled from  '@/assets/icons/JumpStartFilled'
+import JumpStartOutline from  '@/assets/icons/JumpStartOutline'
 
 
 export default function TabLayout() {

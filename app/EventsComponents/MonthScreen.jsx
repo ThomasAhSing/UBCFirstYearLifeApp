@@ -1,6 +1,6 @@
 // external imports 
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from "react-native";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { DateTime } from 'luxon';
 
 // project imports 
@@ -8,9 +8,15 @@ import { Calendar } from 'react-native-calendars';
 import DayScreen from '@/app/EventsComponents/DayScreen'
 import BackIcon from '@/assets/icons/BackIcon'
 import { Colors } from '@/constants/Colors';
+import { DataContext } from '@/context/DataContext';
 
 
-export default function MonthScreen({ monthEventsData, monthPostMap, todayISOString }) {
+export default function MonthScreen() {
+
+  const {
+    monthEventsData, monthPostMap,
+    todayISOString
+  } = useContext(DataContext);
 
   const windowWidth = Dimensions.get('window').width
   const dayButtonWidth = Math.floor(windowWidth / 8)
@@ -38,7 +44,8 @@ export default function MonthScreen({ monthEventsData, monthPostMap, todayISOStr
           textDisabledColor: 'gray',
           monthTextColor: 'white',
         }}
-        dayComponent={({ date, state }) => {
+        dayComponent={({ date, state }) => { // NOTE: date is in UTC
+          // console.log(date)
           const count = date.dateString in monthEventsData ? monthEventsData[date.dateString].length : 0
           return (
             <TouchableOpacity
@@ -88,48 +95,46 @@ export default function MonthScreen({ monthEventsData, monthPostMap, todayISOStr
         <View style={styles.overlay}>
           <TouchableOpacity style={styles.backBtn} onPress={() => setOverlayDate(null)}>
             <BackIcon size={30} color='white' />
-          </TouchableOpacity> 
+          </TouchableOpacity>
           <DayScreen
-            eventsData={filterEventsDataOneDay(overlayDate, monthEventsData)} postMap={monthPostMap}
+            dateString = {overlayDate}
+            monthEventsData = {monthEventsData}
+            monthPostMap = {monthPostMap}
           />
-          {/* <TouchableOpacity
-            style={styles.closeOverlay}
-            onPress={() => setOverlayDate(null)}
-          >
-            <Text style={styles.closeText}>Close</Text>
-          </TouchableOpacity> */}
         </View>
       )}
     </View>
   );
 }
 
-function filterEventsDataOneDay(dateString, monthEventsData) {
-  if (monthEventsData.hasOwnProperty(dateString)) {
-    return { [dateString]: monthEventsData[dateString] };
-  } else {
-    return {};
+function adjustCalendarDateToVancouver(dateStringUTC) {
+  // Current time in Vancouver
+  const nowVancouver = DateTime.now().setZone("America/Vancouver");
+
+  // Calendar date at Vancouver midnight
+  const calDateVancouverMidnight = DateTime
+    .fromISO(dateStringUTC, { zone: "utc" })  // midnight UTC for that day
+    .setZone("America/Vancouver")             // shift to Vancouver timezone
+    .startOf("day");
+
+  // If now is before Vancouver midnight of that day → use previous day
+  if (nowVancouver < calDateVancouverMidnight) {
+    return calDateVancouverMidnight.minus({ days: 1 }).toFormat("yyyy-MM-dd");
   }
+
+  return calDateVancouverMidnight.toFormat("yyyy-MM-dd");
 }
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   overlay: {
-    position: 'absolute',
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: Colors.background,
     zIndex: 10,
-  },
-
-  closeOverlay: {
-    position: 'absolute',
-    top: 30,
-    right: 20,
-    padding: 10,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 5,
-    zIndex: 11,
+    flex: 1,
   },
 
   closeText: {

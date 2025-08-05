@@ -2,19 +2,18 @@
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { DataProvider } from '@/context/DataContext';
 
 // project imports
-import Heading from './Heading'
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 
 export default function RootLayout() {
   // const styles = getStyles()
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
+  const [fontsLoaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     InterRegular: require('../assets/fonts/Inter_18pt-Regular.ttf'),
     InterMedium: require('../assets/fonts/Inter_18pt-Medium.ttf'),
@@ -25,23 +24,23 @@ export default function RootLayout() {
     CourgetteRegular: require('../assets/fonts/Courgette-Regular.ttf'),
   });
 
-  if (!loaded) {
+  if (!fontsLoaded) {
     // Async font loading only occurs in development.
     return null;
   }
 
-// TODO add colors to a file so single source of color change
+  // TODO add colors to a file so single source of color change
 
   return (
     <SafeAreaProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        {/* <SafeAreaView style = {styles.container}> */}
+        <DataProvider>
           <Stack >
-            
+
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
           </Stack>
-        {/* </SafeAreaView> */}
+        </DataProvider>
         <StatusBar style="auto" />
       </ThemeProvider>
     </SafeAreaProvider>
