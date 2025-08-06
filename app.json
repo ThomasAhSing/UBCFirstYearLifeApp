@@ -34,6 +34,12 @@
           "backgroundColor": "#ffffff"
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses photos to let admin upload photos for posts. ADMIN USE ONLY. Permission to access photos will not be asked to user"
+        }
+      ],
       "expo-font",
       "expo-web-browser"
     ],

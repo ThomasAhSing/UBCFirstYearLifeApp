@@ -43,3 +43,6 @@ backend/Gallery-dl-tool/
 *.tsbuildinfo
 
 app-example
+
+# env
+.env

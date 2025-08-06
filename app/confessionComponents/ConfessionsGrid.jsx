@@ -18,8 +18,6 @@ import PreviewConfession from './PreviewConfession'
 import { DataContext } from '@/context/DataContext';
 import { useContext } from 'react';
 
-import axios from 'axios'
-
 // TODO implement gesture when when swipe right from left takes back from allscroller to previews
 // TODO add opening on crrect index not at start when click on preview
 

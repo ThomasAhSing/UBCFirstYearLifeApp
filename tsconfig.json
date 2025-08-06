@@ -12,7 +12,9 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.jsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-, "app/(tabs)/confessions.jsx", "app/(tabs)/index.jsx", "app/(tabs)/_layout.jsx", "assets/icons/HeartOutline.js"  ]
+    "app/(tabs)/confessions.jsx",
+    "app/(tabs)/index.jsx",
+    "app/(tabs)/_layout.jsx",
+    "assets/icons/HeartOutline.js"
+  ]
 }
