@@ -1,35 +1,32 @@
-import { View, Text, StyleSheet, Button, FlatList, TextInput } from 'react-native'
+import { View, Text, StyleSheet, Button, FlatList, TextInput, Pressable, TouchableOpacity } from 'react-native'
 import { useRouter } from 'expo-router';
 import { useContext, useState } from 'react';
 import { DataContext } from '@/context/DataContext';
-import CheckBox from '@react-native-community/checkbox';
+// import CheckBox from '@react-native-community/checkbox';
 
 import Heading from '@/app/Heading';
 import Post from '@/app/HomeComponents/Post'
 import ScreenWrapper from '@/app/ScreenWrapper';
+import axios from 'axios';
+import DateTimeInput from '@/app/admin/DateTimeInput'
+import UploadEvent from '@/app/admin/uploadEvent'
+
+
 
 
 export default function MarkEvents() {
-    const router = useRouter();
-    const [selectedMap, setSelectedMap] = useState({}); // { shortcode: boolean }
-
-    const toggleSelection = (shortcode, newValue) => {
-        setSelectedMap(prev => ({
-            ...prev,
-            [shortcode]: newValue
-        }));
-        console.log(shortcode, selectedMap[shortcode])
-    };
-
     const {
         postData,
         postDataLoaded
     } = useContext(DataContext);
 
+    const router = useRouter();
+
     if (!postDataLoaded) return (
         <ScreenWrapper bgColor='black'>
             <Heading />
             <Text style={{ color: "white" }}>Loading home...</Text>
+            <DateTimeInput />
         </ScreenWrapper>
     )
 
@@ -43,30 +40,35 @@ export default function MarkEvents() {
             </View>
 
             <FlatList
-
                 // style={styles.container}
                 data={postData}
                 renderItem={({ item }) => {
                     return (
                         <View>
                             <Post post={item} />
-                            <CheckBox
-                                value={selectedMap[item.shortcode] || false}
-                                onValueChange={(newValue) => toggleSelection(item.shortcode, newValue)}
-                                tintColors={{ true: '#2196F3', false: '#aaa' }}
-                            />
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Type here..."
-                                placeholderTextColor="#888"
-                            // value={name}
-                            // onChangeText={setName} // update state whenever the text changes
-                            />
+
+
+                            <TouchableOpacity
+                                style={styles.uploadEventBtn}
+                                onPress={() =>
+                                    router.push({
+                                        pathname: '/admin/uploadEvent', // regular file, not [shortcode].tsx
+                                        params: {
+                                            post: JSON.stringify(item), // must be string
+                                        },
+                                    })
+                                }
+                            >
+                                <Text style={{ color: 'lightblue' }}>Mark as Event</Text>
+                            </TouchableOpacity>
+                            {/* <DateTimeInput /> */}
                         </View>
 
                     )
                 }}
             />
+            {/* <UploadEvent/> */}
+
 
         </ScreenWrapper>
 
@@ -101,6 +103,18 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 6,
         padding: 10,
-        marginBottom: 16
+        color: 'white'
+        // marginBottom: 16
     },
+    eventButton: {
+        width: 100,
+        borderRadius: 5,
+        padding: 10
+    },
+    uploadEventBtn: {
+        backgroundColor: 'orange',
+        width: 200,
+        borderRadius: 5,
+        padding: 10,
+    }
 });
