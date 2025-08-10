@@ -19,6 +19,9 @@ app.get('/', (req, res) => {
   res.send('UBC First Year Life backend is live');
 });
 
+// health
+app.get('/health', (_, res) => res.send('ok'));
+
 // Routes
 const confessionsRoute = require('./routes/confessions');
 app.use('/api/confessions', confessionsRoute);
