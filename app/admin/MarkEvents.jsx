@@ -7,9 +7,7 @@ import { DataContext } from '@/context/DataContext';
 import Heading from '@/app/Heading';
 import Post from '@/app/HomeComponents/Post'
 import ScreenWrapper from '@/app/ScreenWrapper';
-import axios from 'axios';
 import DateTimeInput from '@/app/admin/DateTimeInput'
-import UploadEvent from '@/app/admin/uploadEvent'
 
 
 
@@ -43,6 +41,7 @@ export default function MarkEvents() {
                 // style={styles.container}
                 data={postData}
                 renderItem={({ item }) => {
+                    if (item.isEvent) return null;
                     return (
                         <View>
                             <Post post={item} />
@@ -59,7 +58,7 @@ export default function MarkEvents() {
                                     })
                                 }
                             >
-                                <Text style={{ color: 'lightblue' }}>Mark as Event</Text>
+                                <Text style={{ color: 'blue' }}>Mark as Event</Text>
                             </TouchableOpacity>
                             {/* <DateTimeInput /> */}
                         </View>

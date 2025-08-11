@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Dimensions, FlatList, Image, StyleSheet, View } from 'react-native'
-import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
-import { imageMap } from './Post'
 
 export default function Sidecar({ post }) { // media is 
     const screenWidth = Dimensions.get('window').width

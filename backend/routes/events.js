@@ -44,45 +44,45 @@ router.get('/', async (req, res) => {
 
 
 router.get('/singleDay', async (req, res) => {
-    const { dateString } = req.query;
+  const { dateString } = req.query;
 
-    if (!dateString) {
-        return res.status(400).json({ error: "dateString field required" });
-    }
+  if (!dateString) {
+    return res.status(400).json({ error: "dateString field required" });
+  }
 
-    try {
-        const events = await Event.find({ date: dateString }).sort({ startTime: 1 });
+  try {
+    const events = await Event.find({ date: dateString }).sort({ startTime: 1 });
 
 
-        return res.status(200).json({
-            message: "Success",
-            events: events
-        });
+    return res.status(200).json({
+      message: "Success",
+      events: events
+    });
 
-    } catch (err) {
-        console.error("Error fetching events:", err);
-        return res.status(500).json({ error: "Server error while fetching events" });
-    }
+  } catch (err) {
+    console.error("Error fetching events:", err);
+    return res.status(500).json({ error: "Server error while fetching events" });
+  }
 });
 
 
 router.post('/', async (req, res) => {
-    try {
-        const { shortcode, title, startAt, location } = req.body
-        if (!shortcode || !startAt) {
-            return res.status(400).json({ error: "not all required fields provided" })
-        }
-
-        const newEntry = new Event({ shortcode, title, startAt, location })
-        await newEntry.save()
-        return res.status(201).json({ message: "Success", event: newEntry });
-    } catch (err) {
-        if (err.code === 11000) {
-            return res.status(409).json({ error: 'Event with that shortcode and startAt already exists' });
-        }
-        console.error(err)
-        res.status(500).json({ error: 'Server error' });
+  try {
+    const { shortcode, title, startAt, location } = req.body
+    if (!shortcode || !startAt) {
+      return res.status(400).json({ error: "not all required fields provided" })
     }
+
+    const newEntry = new Event({ shortcode, title, startAt, location })
+    await newEntry.save()
+    return res.status(201).json({ message: "Success", event: newEntry });
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({ error: 'Event with that shortcode and startAt already exists' });
+    }
+    console.error(err)
+    res.status(500).json({ error: 'Server error' });
+  }
 })
 
 module.exports = router

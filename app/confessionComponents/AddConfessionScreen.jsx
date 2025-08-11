@@ -3,13 +3,15 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native'
 import { useState } from 'react'
 import { Dropdown } from 'react-native-element-dropdown';
 import ResidenceIcon from '@/assets/icons/ResidenceIcon'
 import { Colors } from '@/constants/Colors';
 import axios from 'axios';
+import { api } from '@/context/DataContext'
 
 const data = [
   { label: 'Totem Park', residence: 'TotemPark' },
@@ -31,10 +33,14 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
   const submitConfession = async () => {
     console.log("submitted confession")
     try {
-      const dayEventsRes = await axios.post("http://localhost:10000/api/confessions", {
+      const dayEventsRes = await api.post("/api/confessions", {
         residence: residence,
         content: text,
       });
+      onChangeText('');
+      setHeight(40);
+      setResidence(null); // back to placeholder “Select Residence”
+      Alert.alert('Success', 'Your confession was submitted');
     } catch (err) {
       if (err.response) {
         console.error("❌ Confession upload, Server error:", err.response.data);

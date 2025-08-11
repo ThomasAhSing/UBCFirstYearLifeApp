@@ -4,6 +4,12 @@ import { DateTime } from 'luxon';
 
 // TODO make loading component
 export const DataContext = createContext();
+console.log(process.env.EXPO_PUBLIC_API_BASE_URL)
+const API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:10000"
+export const api = axios.create({
+  baseURL: API_BASE,
+  timeout: 10000,
+});
 
 export const DataProvider = ({ children }) => {
     const pdtMidnight = DateTime.now().setZone('America/Vancouver').startOf('day');
@@ -38,8 +44,8 @@ export const DataProvider = ({ children }) => {
 
             const results = await Promise.all(
                 residences.map(residence =>
-                    axios
-                        .get(`http://localhost:10000/api/confessions/posted?residence=${residence}`)
+                    api
+                        .get(`/api/confessions/posted?residence=${residence}`)
                         .then(res => ({
                             residence,
                             data: formatFetchedData(res.data)
@@ -64,7 +70,7 @@ export const DataProvider = ({ children }) => {
     const loadDayEvents = async () => {
         setDayEventsDataLoading(true);
         try {
-            const dayEventsRes = await axios.get("http://localhost:10000/api/events", {
+            const dayEventsRes = await api.get("/api/events", {
                 params: { fromDate: todayISOString }
             });
             setDayEventsData(formatEventsData(dayEventsRes.data.events));
@@ -72,7 +78,7 @@ export const DataProvider = ({ children }) => {
             const dayShortcodes = dayEventsRes.data.events.map(event => event.shortcode);
             const dayPostResponses = await Promise.all(
                 dayShortcodes.map(sc =>
-                    axios.get(`http://localhost:10000/api/posts/${sc}`).then(res => res.data)
+                    api.get(`/api/posts/${sc}`).then(res => res.data)
                 )
             );
 
@@ -92,7 +98,7 @@ export const DataProvider = ({ children }) => {
     const loadMonthEvents = async () => {
         setMonthEventsDataLoading(true);
         try {
-            const monthEventsRes = await axios.get("http://localhost:10000/api/events", {
+            const monthEventsRes = await api.get("/api/events", {
                 params: {
                     fromDate: subtractOneMonthISOStringPDT(todayISOString),
                     maxDaysToCheck: 90,
@@ -104,7 +110,7 @@ export const DataProvider = ({ children }) => {
             const monthShortcodes = monthEventsRes.data.events.map(event => event.shortcode);
             const monthPostResponses = await Promise.all(
                 monthShortcodes.map(sc =>
-                    axios.get(`http://localhost:10000/api/posts/${sc}`).then(res => res.data)
+                    api.get(`/api/posts/${sc}`).then(res => res.data)
                 )
             );
 
@@ -124,7 +130,7 @@ export const DataProvider = ({ children }) => {
     useEffect(() => {
         const loadInitialPosts = async () => {
             try {
-                const postRes = await axios.get("http://localhost:10000/api/posts");
+                const postRes = await api.get("/api/posts");
                 console.log(postRes.data.posts);
                 setPostData(postRes.data.posts);
                 setPostDataLoaded(true);
@@ -180,30 +186,30 @@ function formatFetchedData(fetchedConfessions = []) {
 }
 
 function formatEventsData(fetchedEventsData = []) {
-  const grouped = {};
+    const grouped = {};
 
-  fetchedEventsData.forEach(event => {
-    const date = new Date(event.startAt);
+    fetchedEventsData.forEach(event => {
+        const date = new Date(event.startAt);
 
-    const key = date.toLocaleDateString('en-CA', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      timeZone: 'America/Vancouver'  // ensures correct PDT date
-    }); // e.g. "2025-07-08"
+        const key = date.toLocaleDateString('en-CA', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            timeZone: 'America/Vancouver'  // ensures correct PDT date
+        }); // e.g. "2025-07-08"
 
-    if (!grouped[key]) {
-      grouped[key] = [];
-    }
-    grouped[key].push(event);
-  });
+        if (!grouped[key]) {
+            grouped[key] = [];
+        }
+        grouped[key].push(event);
+    });
 
-  return grouped;
+    return grouped;
 }
 
 function subtractOneMonthISOStringPDT(isoString) {
-  return DateTime
-    .fromISO(isoString, { zone: 'America/Vancouver' }) // interpret in PDT
-    .minus({ months: 1 })
-    .toISO(); // returns ISO string in UTC (Z)
+    return DateTime
+        .fromISO(isoString, { zone: 'America/Vancouver' }) // interpret in PDT
+        .minus({ months: 1 })
+        .toISO(); // returns ISO string in UTC (Z)
 }
