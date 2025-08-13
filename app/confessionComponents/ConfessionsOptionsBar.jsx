@@ -5,8 +5,6 @@ import { TouchableOpacity, StyleSheet, Text, View } from 'react-native'
 
 import { Colors } from "@/constants/Colors"
 
-// TODO abstract each button int a ResBtn components and simplify stying, fix so that not blakc text text color is accent color
-// or background color
  
 export default function ConfessionsOptionsBar({selectedResidence, setSelectedResidence}) {
 

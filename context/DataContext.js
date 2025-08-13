@@ -131,7 +131,7 @@ export const DataProvider = ({ children }) => {
         const loadInitialPosts = async () => {
             try {
                 const postRes = await api.get("/api/posts");
-                console.log(postRes.data.posts);
+                // console.log(postRes.data.posts);
                 setPostData(postRes.data.posts);
                 setPostDataLoaded(true);
             } catch (err) {

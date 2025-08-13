@@ -36,7 +36,6 @@ export default function Sidecar({ post }) { // media is
         setCurrentIndex(index)
         // console.log(currentIndex)
     }
-    // TODO fix when one picture dot doesnt appear
     return (
         <View>
             <FlatList

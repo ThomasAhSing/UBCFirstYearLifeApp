@@ -29,6 +29,7 @@ const postsRoute = require('./routes/posts');
 app.use('/api/posts', postsRoute);
 const eventsRoute = require('./routes/events');
 app.use('/api/events', eventsRoute);
+app.use(require('./shareRoutes'));
 
 // ⛔️ Only connect to MongoDB and start server if NOT running in test mode
 if (require.main === module) {

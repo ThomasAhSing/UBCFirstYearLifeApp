@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BookmarkOutline from '@/assets/icons/BookmarkOutline'
 import BookmarkFilled from '@/assets/icons/BookmarkFilled'
 
-export default function SaveButton({ shortcode }) {
+export default function SaveButton({ style, shortcode }) {
   const [bookmarked, setBookmarked] = useState(false)
 
 
@@ -62,9 +62,14 @@ export default function SaveButton({ shortcode }) {
 
   return (
     <TouchableOpacity
+    style={style}
       onPress={onPress}>
       {bookmarked ? <BookmarkFilled color="#F5BB44" /> : <BookmarkOutline color="white" />}
     </TouchableOpacity>
   )
 
 }
+
+const styles = StyleSheet.create({
+  
+});

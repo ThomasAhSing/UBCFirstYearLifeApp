@@ -1,4 +1,4 @@
-TODO implement share function
+implement share function
 
 imageGenerator.py (3 cases) - all handle in backend
 Case 1: preview for posts in Confessions tabs

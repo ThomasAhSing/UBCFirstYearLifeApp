@@ -11,8 +11,6 @@ import { Colors } from '@/constants/Colors';
 
 // if dateString is provided DayScreen is generated with only events from that day
 export default function DayScreen({ dateString, monthEventsData, monthPostMap }) {
-  console.log("monthEventsData")
-  console.log(monthEventsData)
   let {
     dayEventsData, dayPostMap
   } = useContext(DataContext);

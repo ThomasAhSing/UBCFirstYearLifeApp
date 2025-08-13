@@ -5,7 +5,6 @@ import PostUIBar from './PostUIBar';
 
 
 
-// TODO add caption
 // TODO add double tap image to like 
 
 export default function Post({ post }) {
@@ -26,7 +25,7 @@ export default function Post({ post }) {
         <Text style={styles.username}>{post.userFetchedFrom}</Text>
       </View>
       <Sidecar post={post} />
-      <PostUIBar post={post} />
+      <PostUIBar mode="posts" post={post} />
       {/* <Text style={styles.caption}>
         <Text style={styles.captionUsername}>{post.userFetchedFrom}</Text>
         {post.caption}

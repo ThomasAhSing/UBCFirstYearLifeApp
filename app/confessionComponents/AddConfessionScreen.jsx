@@ -21,7 +21,6 @@ const data = [
 
 
 
-// TODO abstarct post with like abr and everythong to take a sidecar 
 // TODO add gestures to close keybaord
 
 export default function AddConfessionScreen({ RES_CON_DATA }) {
@@ -31,7 +30,6 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
   const [errorMessage, setErrorMessage] = useState("")
 
   const submitConfession = async () => {
-    console.log("submitted confession")
     try {
       const dayEventsRes = await api.post("/api/confessions", {
         residence: residence,
@@ -63,7 +61,6 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
     submitConfession()
   }
 
-  // console.log(residence)
   return (
     <View style={styles.container}>
       <Dropdown

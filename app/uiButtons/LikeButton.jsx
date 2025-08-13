@@ -4,10 +4,10 @@ import HeartOutline from '@/assets/icons/HeartOutline'
 import HeartFilled from '@/assets/icons/HeartFilled'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function LikeButton({ shortcode }) {
+export default function LikeButton({ style, shortcode }) {
   const [liked, setLiked] = useState(false)
 
-// TODO increase like count 
+  // TODO increase like count 
 
   const onPress = () => {
     const newLiked = !liked
@@ -63,6 +63,7 @@ export default function LikeButton({ shortcode }) {
 
   return (
     <TouchableOpacity
+      style={style}
       onPress={onPress}>
       {liked ? <HeartFilled color="red" /> : <HeartOutline color="white" />}
     </TouchableOpacity>

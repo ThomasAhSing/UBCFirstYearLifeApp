@@ -4,24 +4,28 @@ import {
   FlatList,
   Dimensions,
   Image,
+  View
 } from 'react-native'
+import PostUIBar from '@/app/HomeComponents/PostUIBar';
 
 
 import ConfessionsPost from "./ConfessionsPost"
 
 export default function AllConfessionsScroller({ RES_CON_DATA }) {
-    return (
-        <FlatList
-                data={RES_CON_DATA}
-                renderItem={({item}) => (
-                    // <ConfessionsPost confessions = {item.confessions}/>
-                    <ConfessionsPost confessions = {item}/>
-                    
-                )}
-            
-            />
-    )
-    
+  return (
+    <FlatList
+      data={RES_CON_DATA}
+      renderItem={({ item }) => (
+        // <ConfessionsPost confessions = {item.confessions}/>
+        <View>
+          <ConfessionsPost confessions={item} />
+        </View>
+
+      )}
+
+    />
+  )
+
 
 }
 

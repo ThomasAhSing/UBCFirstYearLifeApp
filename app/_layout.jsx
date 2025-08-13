@@ -29,7 +29,6 @@ export default function RootLayout() {
     return null;
   }
 
-  // TODO add colors to a file so single source of color change
 
   return (
     <SafeAreaProvider>

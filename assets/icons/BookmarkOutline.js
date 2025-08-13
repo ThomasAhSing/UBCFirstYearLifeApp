@@ -9,7 +9,7 @@ function BookmarkOutline({size = 24, ...props}) {
       height={size}
       fill="none"
       viewBox="0 0 24 24"
-      strokeWidth={1.5}
+      strokeWidth={1.75}
       stroke="currentColor"
       className="size-6"
       {...props}

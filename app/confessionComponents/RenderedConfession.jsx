@@ -34,8 +34,6 @@ export default function RenderedConfession({ confessionObj }) {
   const message = "Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person."
   const anonymous  = "All confessions are anonymous."
   const postSize = Dimensions.get('window').width;
-  console.log(confessionObj.submittedAt)
-  console.log((typeof confessionObj.submittedAt))
   const residence = confessionObj.residence.replace(/([a-z])([A-Z])/g, '$1 $2')
     return (
       <View style={
@@ -113,6 +111,7 @@ const styles = StyleSheet.create({
     paddingRight: 7,
   },
   submittedAtText: {
-    color: 'gray'
+    color: 'gray',
+    fontFamily: 'RobotoItalic',
   },
 })

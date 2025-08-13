@@ -19,7 +19,6 @@ import { DataContext } from '@/context/DataContext';
 import { useContext } from 'react';
 
 // TODO implement gesture when when swipe right from left takes back from allscroller to previews
-// TODO add opening on crrect index not at start when click on preview
 
 export default function ConfessionsGrid({ selectedResidence }) {
   const {
@@ -86,8 +85,8 @@ export default function ConfessionsGrid({ selectedResidence }) {
 
       {screen==="allConfessionsScroller" && (
           <View style={styles.modal}>
-          <TouchableOpacity onPress={toggleAllConfessionsScroller}>
-            <BackIcon size={30} color='white'/>
+          <TouchableOpacity style={{width: 40}} onPress={toggleAllConfessionsScroller}>
+            <BackIcon  size={30} color='white'/>
           </TouchableOpacity>
           <AllConfessionsScroller style={styles.allConfessionsScroller} RES_CON_DATA={postedConfessionsByResidence[selectedResidence]}/>
         </View>

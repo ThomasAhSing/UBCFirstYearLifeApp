@@ -31,8 +31,7 @@ export default function UploadEvent() {
             // await api.post
             const shortcode = parsedPost.shortcode;
 
-            console.log(shortcode)
-            console.log(date)
+    
             await api.post('/api/events', {
                 shortcode,
                 startAt: luxonDate.toISO(),

@@ -93,7 +93,7 @@ export default function TabLayout() {
           } 
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="jumpStart"
         options={{
           title: 'Jump Start',
@@ -105,7 +105,7 @@ export default function TabLayout() {
             }
           } 
         }}
-      />
+      /> */}
     </Tabs>
   );
 }
