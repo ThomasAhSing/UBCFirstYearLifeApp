@@ -4,13 +4,16 @@ import RenderedConfession from './RenderedConfession';
 import PostUIBar from '@/app/HomeComponents/PostUIBar';
 
 // confession is group of confession of same postID
-export default function ConfessionsSidecar({ confessions = [] }) {
+export default function ConfessionsPost({ confessions = [] }) {
   const postSize = Dimensions.get('window').width;
   const listRef = useRef(null);
 
-  // derive group identifiers from the first confession (if any)
-  const groupResidence = confessions[0]?.residence ?? '';
-  const groupPostId    = confessions[0]?.postId ?? '';
+  // derive a stable group key from the first item (for resets)
+  const first = confessions[0] || {};
+  const groupResidence = first.residence ?? first.Residence ?? first.res ?? '';
+  const groupPostId    = String(
+    first.postId ?? first.postID ?? first.post_id ?? first.id ?? ''
+  );
   const groupKey       = `${groupResidence}:${groupPostId}`;
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -33,7 +36,6 @@ export default function ConfessionsSidecar({ confessions = [] }) {
   // Single source of truth: index from scroll offset
   const onScroll = useCallback((e) => {
     const x = e.nativeEvent.contentOffset.x;
-    // add half page before flooring to snap to the nearest page mid-scroll
     const idx = Math.max(0, Math.min(confessions.length - 1, Math.floor((x + postSize / 2) / postSize)));
     if (idx !== currentIndex) setCurrentIndex(idx);
   }, [confessions.length, postSize, currentIndex]);
@@ -45,26 +47,21 @@ export default function ConfessionsSidecar({ confessions = [] }) {
   };
 
   const current = confessions[currentIndex] || {};
-// console.log(current)
-// console.log(current.confessionIndex)
-// console.log(current.content)
 
   return (
     <View key={groupKey}>
       <FlatList
-        key={groupKey} // fresh list per group (prevents stale index/dots)
+        key={groupKey}
         ref={listRef}
         data={confessions}
         horizontal
         pagingEnabled
-        // deterministic snapping + stable index math
         snapToInterval={postSize}
         snapToAlignment="start"
         decelerationRate="fast"
         showsHorizontalScrollIndicator={false}
         keyExtractor={(_, i) => String(i)}
         getItemLayout={(_, i) => ({ length: postSize, offset: postSize * i, index: i })}
-        // Ensure each page is EXACTLY the screen width so idx math is correct
         renderItem={({ item }) => (
           <View style={{ width: postSize, height: postSize }}>
             <RenderedConfession confessionObj={item} />
@@ -73,7 +70,6 @@ export default function ConfessionsSidecar({ confessions = [] }) {
         onScroll={onScroll}
         scrollEventThrottle={16}
         onScrollToIndexFailed={onScrollToIndexFailed}
-        // extraData ensures a re-render when group/index changes
         extraData={`${groupKey}:${currentIndex}`}
         style={{ width: postSize, height: postSize }}
       />
@@ -86,14 +82,12 @@ export default function ConfessionsSidecar({ confessions = [] }) {
           ))}
         </View>
       )}
+
       {/* UIBar for THIS group + THIS confession index */}
       <PostUIBar
         mode="confessions"
-        residence={groupResidence}
-        postId={groupPostId}
         ci={currentIndex}
-        content={current.content || ''}
-        confession={current}
+        confession={current}    // ✅ just pass the object
       />
     </View>
   );

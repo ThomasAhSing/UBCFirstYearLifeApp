@@ -6,7 +6,6 @@ import {
   Image,
   View
 } from 'react-native'
-import PostUIBar from '@/app/HomeComponents/PostUIBar';
 
 
 import ConfessionsPost from "./ConfessionsPost"

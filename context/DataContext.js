@@ -57,9 +57,10 @@ export const DataProvider = ({ children }) => {
             for (const { residence, data } of results) {
                 newData[residence] = data;
             }
-
+            
             setPostedConfessionsByResidence(newData);
             setPostedConfessionsDataLoaded(true);
+            // console.log(newData)
         } catch (err) {
             console.error('Failed to load posted confessions:', err);
         } finally {
