@@ -19,22 +19,19 @@ const RES_COLORS = {
 
 // ---------- helpers ----------
 const esc = (s='') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const trim = (s='', n=200) => { const t=String(s).replace(/\s+/g,' ').trim(); return t.length>n?t.slice(0,n-1)+'…':t; };
 const qci  = (ci) => (Number.isFinite(ci) ? `?ci=${ci}` : '');
-const dots = (len=0, active=0) =>
-  Array.from({length: Math.max(0,len)}, (_,i)=> `<span class="dot ${i===active?'active':''}"></span>`).join('');
 const colorForResidence = (r='') => RES_COLORS[r] || RES_COLORS.TotemPark;
 
 // ---------- base CSS ----------
 const CSS = `
 :root{
-  --bg:${PAGE_BG};        /* page background (navy) */
-  --card:#10253b;         /* main card */
-  --border:#173E63;       /* thin navy border */
-  --teal:#c8efe8;         /* overridden per-residence */
-  --tealTop:#0f8a7c;      /* overridden per-residence */
-  --paper:#ffffff;        /* confession card */
-  --text:#0b1a2a;         /* dark text on white */
+  --bg:${PAGE_BG};
+  --card:#10253b;
+  --border:#173E63;
+  --teal:#c8efe8;      /* overridden per-residence */
+  --tealTop:#0f8a7c;   /* overridden per-residence */
+  --paper:#ffffff;
+  --text:#0b1a2a;
   --muted:#3c586f;
   --muted2:#bcd7f4;
   --gold:#F5D054;
@@ -44,8 +41,7 @@ const CSS = `
 body{margin:0;background:var(--bg);color:#fff;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
 .wrap{max-width:860px;margin:0 auto;padding:28px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.title{font-weight:800;font-size:32px;margin:0 0 6px}
-.desc{opacity:.92;margin:0 0 16px}
+.title{font-weight:800;font-size:32px;margin:0}
 
 /* buttons / badges / footer */
 .btnRow{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
@@ -60,16 +56,15 @@ a.primary{background:#2c69a5;color:#fff;border-color:transparent}
 .track{display:flex;transition:transform .25s ease}
 .slide{min-width:100%;padding:0;display:flex;align-items:center;justify-content:center}
 .slideInner{width:100%;max-width:760px;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--teal)}
-.whiteBlock{width:88%;background:#fff;border-radius:10px; color: var(--text);} /* ensure dark text */
+.whiteBlock{width:88%;background:#fff;border-radius:10px;color:var(--text)}
 .blockHeader{margin-top:28px;height:32%;border-top:10px solid var(--tealTop)}
 .blockBody{margin-top:15px;height:50%}
-.heading{font-weight:800;font-size:20px;padding:7px; color: var(--text);}
-.message{font-size:14px;padding:0 7px 5px 7px; color: var(--text);}
-.subheading{font-weight:600;font-size:16px;padding:7px 7px 10px 7px; color: var(--text);}
-.anon{font-style:italic;font-size:14px;padding:0 7px; color: var(--text);}
+.heading{font-weight:800;font-size:20px;padding:7px;color:var(--text)}
+.message{font-size:14px;padding:0 7px 5px 7px;color:var(--text)}
+.subheading{font-weight:600;font-size:16px;padding:7px 7px 10px 7px;color:var(--text)}
 .submittedRow{width:100%;display:flex;justify-content:flex-end;margin-top:4px}
-.submittedRow span{font-style:italic;color:gray;font-size:12px;padding-right:6%;}
-.dotsRow{display:flex;gap:6px;justify-content:center;margin:14px 0 0}
+.submittedRow span{font-style:italic;color:gray;font-size:12px;padding-right:6%}
+.dotsRow{display:flex;gap:6px;justify-content:center;margin:10px 0 0}
 .dot{width:6px;height:6px;border-radius:999px;background:var(--goldDim)}
 .dot.active{background:var(--gold)}
 .navBtn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.35);border:none;color:#fff;border-radius:10px;padding:8px 10px;cursor:pointer}
@@ -111,6 +106,13 @@ function humanResidence(res) {
   if (!res) return '';
   return String(res).replace(/([a-z])([A-Z])/g, '$1 $2');
 }
+function buildDots(len, active) {
+  if (!len || len < 2) return '';
+  let s = '<div class="dotsRow">';
+  for (let i = 0; i < len; i++) s += '<span class="dot' + (i===active?' active':'') + '"></span>';
+  s += '</div>';
+  return s;
+}
 function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''}) {
   try {
     const mount = document.getElementById('carouselMount');
@@ -132,16 +134,13 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
 
     const slideHTMLFromCard = (card) => {
       const title = humanResidence(residence) + ' Confessions';
-      const message = 'Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person.';
-      const anon = 'All confessions are anonymous.';
+      const message = 'Submit your own anonymous confession on the UBC First Year Life App';
       const submitted = formatConfessionTimeISO(card.submittedAt);
-
       return \`
         <div class="slideInner">
           <div class="whiteBlock blockHeader">
             <div class="heading">\${title}</div>
             <div class="message">\${message}</div>
-            <div class="anon">\${anon}</div>
           </div>
           <div class="whiteBlock blockBody">
             <div class="subheading">Insert Confession Below</div>
@@ -169,7 +168,6 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
           <div class="whiteBlock blockHeader">
             <div class="heading">\${humanResidence(residence)} Confessions</div>
             <div class="message">Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person.</div>
-            <div class="anon">All confessions are anonymous.</div>
           </div>
           <div class="whiteBlock blockBody">
             <div class="subheading">Insert Confession Below</div>
@@ -181,12 +179,15 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
     }
 
     htmlSlides.forEach(h => track.appendChild(makeSlideEl(h)));
+    mount.appendChild(container);
+
+    // --- dots directly UNDER the carousel
+    const dotsMount = document.getElementById('dotsMount');
+    if (dotsMount) dotsMount.innerHTML = buildDots(htmlSlides.length, startIndex);
 
     const prev = document.createElement('button'); prev.className='navBtn navPrev'; prev.textContent='‹';
     const next = document.createElement('button'); next.className='navBtn navNext'; next.textContent='›';
     container.appendChild(prev); container.appendChild(next);
-
-    mount.appendChild(container);
 
     let idx = Math.max(0, Math.min(startIndex, htmlSlides.length - 1));
     const setIdx = (i) => {
@@ -213,9 +214,8 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
 }
 `;
 
-// ---------- HTML renderers ----------
-function renderBase({ title, desc, deep, web, innerHTML, overrides={} }) {
-  // overrides: { teal, tealTop } injected per page
+// ---------- HTML base ----------
+function renderBase({ title, deep, web, innerHTML, overrides={} }) {
   const rootOverride = `
     <style>
       :root{
@@ -229,7 +229,6 @@ function renderBase({ title, desc, deep, web, innerHTML, overrides={} }) {
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${esc(title)}</title>
 <meta property="og:title" content="${esc(title)}">
-<meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${esc(web)}">
 <meta name="twitter:card" content="summary">
 <style>${CSS}</style>
@@ -239,9 +238,10 @@ ${rootOverride}
   <div class="wrap">
     <div class="card">
       <div class="title">${esc(title)}</div>
-      <div class="desc">${esc(desc)}</div>
 
       ${innerHTML}
+
+      <div id="dotsMount"></div>
 
       <div class="btnRow">
         <a class="btn primary" id="openApp" href="${esc(deep)}">Open in the app</a>
@@ -261,33 +261,29 @@ ${rootOverride}
 }
 
 function onlyCarouselInner() {
-  return `
-    <div id="carouselMount"></div>
-  `;
+  return `<div id="carouselMount"></div>`;
 }
 
 // ---------- routes ----------
+
+// Confessions share page
 router.get('/cg/:residence/:postId', (req, res) => {
   const { residence, postId } = req.params;
   const ci   = Number(req.query.ci) || 0;
   const lenQ = Number(req.query.len);
-  const pv   = trim(req.query.pv || '');
-
   let imgs = [], slides = [], cards = [];
   try { if (req.query.imgs)   imgs   = JSON.parse(req.query.imgs); }   catch {}
   try { if (req.query.slides) slides = JSON.parse(req.query.slides); } catch {}
   try { if (req.query.cards)  cards  = JSON.parse(req.query.cards); }  catch {}
 
   const deep = `${APP_SCHEME}cg/${encodeURIComponent(residence)}/${encodeURIComponent(postId)}${qci(ci)}`;
-  const web  = `${WEB_BASE}/cg/${encodeURIComponent(residence)}/${encodeURIComponent(postId)}${qci(ci)}${pv?`&pv=${encodeURIComponent(pv)}`:''}`;
+  const web  = `${WEB_BASE}/cg/${encodeURIComponent(residence)}/${encodeURIComponent(postId)}${qci(ci)}`;
 
   const col = colorForResidence(residence);
-  const innerHTML = onlyCarouselInner();
-
   const html = renderBase({
-    title: 'Download UBC First Year Life to see more confessions',
-    desc:  'Open in the app for the full experience.',
-    deep, web, innerHTML,
+    title: 'Download UBC First Year Life for more confessions, news and events',
+    deep, web,
+    innerHTML: onlyCarouselInner(),
     overrides: { teal: col.background, tealTop: col.accent }
   });
 
@@ -299,39 +295,28 @@ router.get('/cg/:residence/:postId', (req, res) => {
         var slides=${JSON.stringify(slides)};
         var cards=${JSON.stringify(cards)};
         var len=${Number.isFinite(lenQ)?lenQ:(imgs.length||slides.length||cards.length||0)};
-        if(len>1 && !document.querySelector('.dotsRow')){
-          var dotsWrap=document.createElement('div');
-          dotsWrap.className='dotsRow';
-          for(var i=0;i<len;i++){
-            var d=document.createElement('span'); d.className='dot'+(i===ci?' active':'');
-            dotsWrap.appendChild(d);
-          }
-          document.querySelector('.card').appendChild(dotsWrap);
-        }
         buildCarousel({ imgs: imgs, cards: cards, slides: slides, startIndex: ci, residence: ${JSON.stringify(residence)} });
       })();
     </script>`;
   res.type('html').send(html.replace('</body></html>', boot + '\n</body></html>'));
 });
 
+// Posts share page (images)
 router.get('/p/:shortcode', (req, res) => {
   const { shortcode } = req.params;
   const ci   = Number(req.query.ci) || 0;
   const lenQ = Number(req.query.len);
-  const pv   = trim(req.query.pv || '');
-
-  let imgs = [], slides = [];
-  try { if (req.query.imgs)   imgs   = JSON.parse(req.query.imgs); }   catch {}
-  try { if (req.query.slides) slides = JSON.parse(req.query.slides); } catch {}
+  let imgs = [];
+  try { if (req.query.imgs) imgs = JSON.parse(req.query.imgs); } catch {}
 
   const deep = `${APP_SCHEME}post/${encodeURIComponent(shortcode)}${qci(ci)}`;
-  const web  = `${WEB_BASE}/p/${encodeURIComponent(shortcode)}${qci(ci)}${pv?`&pv=${encodeURIComponent(pv)}`:''}`;
+  const web  = `${WEB_BASE}/p/${encodeURIComponent(shortcode)}${qci(ci)}`;
 
-  const innerHTML = onlyCarouselInner();
+  // reuse Totem palette by default
   const html = renderBase({
-    title: 'Download UBC First Year Life to see more confessions',
-    desc:  'Open in the app for the full experience.',
-    deep, web, innerHTML,
+    title: 'Download UBC First Year Life to see more posts',
+    deep, web,
+    innerHTML: onlyCarouselInner(),
     overrides: { teal: RES_COLORS.TotemPark.background, tealTop: RES_COLORS.TotemPark.accent }
   });
 
@@ -340,18 +325,8 @@ router.get('/p/:shortcode', (req, res) => {
       (function(){
         var ci=${Number.isFinite(ci)?ci:0};
         var imgs=${JSON.stringify(imgs)};
-        var slides=${JSON.stringify(slides)};
-        var len=${Number.isFinite(lenQ)?lenQ:(imgs.length||slides.length||0)};
-        if(len>1 && !document.querySelector('.dotsRow')){
-          var dotsWrap=document.createElement('div');
-          dotsWrap.className='dotsRow';
-          for(var i=0;i<len;i++){
-            var d=document.createElement('span'); d.className='dot'+(i===ci?' active':'');
-            dotsWrap.appendChild(d);
-          }
-          document.querySelector('.card').appendChild(dotsWrap);
-        }
-        buildCarousel({ imgs: imgs, slides: slides, startIndex: ci, residence: 'TotemPark' });
+        var len=${Number.isFinite(lenQ)?lenQ:(imgs.length||0)};
+        buildCarousel({ imgs: imgs, startIndex: ci, residence: 'TotemPark' });
       })();
     </script>`;
   res.type('html').send(html.replace('</body></html>', boot + '\n</body></html>'));

@@ -23,7 +23,7 @@ const confUrls = (residence, postId, ci) => ({
   web : `${WEB_BASE}/cg/${enc(residence)}/${enc(postId)}${q(ci)}`,
 });
 
-// normalize ids/content from a confession object
+// normalize for confessions
 const getConfessionBasics = (c = {}) => ({
   residence: c.residence ?? c.Residence ?? c.res ?? '',
   postId: String(c.postID ?? c.postId ?? c.post_id ?? c.id ?? ''),
@@ -33,7 +33,7 @@ const getConfessionBasics = (c = {}) => ({
 
 /**
  * Props:
- *  mode="posts"        + { shortcode, ci?, preview? }
+ *  mode="posts"        + { shortcode, ci?, images? | post?.media? }
  *  mode="confessions"  + { confessions: Confession[], ci?: number }
  */
 export default function ShareButton(props) {
@@ -45,15 +45,31 @@ export default function ShareButton(props) {
     let urls, text = '';
 
     if (props.mode === 'posts') {
-      if (!props.shortcode) {
+      const shortcode = props.shortcode ?? props.post?.shortcode;
+      if (!shortcode) {
         console.warn('[ShareButton] Missing shortcode for post share');
         return Alert.alert('Share unavailable', 'Missing shortcode for this post.');
       }
-      urls = postUrls(props.shortcode, ci);
-      text = trim(props.preview || '');
+      urls = postUrls(shortcode, ci);
+
+      // collect images for the sidecar (prefer explicit prop, fallback to post.media)
+      const imgs = Array.isArray(props.images)
+        ? props.images
+        : Array.isArray(props.post?.media) ? props.post.media : [];
+
+      const extras = new URLSearchParams();
+      if (imgs.length) {
+        extras.set('len', String(imgs.length));
+        extras.set('imgs', JSON.stringify(imgs));
+      }
+      if (extras.toString()) {
+        urls.web += (urls.web.includes('?') ? '&' : '?') + extras.toString();
+      }
+      text = trim(props.preview || props.post?.caption || '');
     } else {
+      // CONFESSIONS
       const list = Array.isArray(props.confessions) ? props.confessions : [];
-      if (list.length === 0) {
+      if (!list.length) {
         console.warn('[ShareButton] Empty confession list');
         return Alert.alert('Share unavailable', 'No confessions to share.');
       }
@@ -70,7 +86,6 @@ export default function ShareButton(props) {
       urls = confUrls(residence, postId, ci);
       text = trim(content);
 
-      // Pack minimal data so the web page can render RN-like slides
       const cards = list.map(c => {
         const b = getConfessionBasics(c);
         return { content: String(b.content || ''), submittedAt: b.submittedAt || '' };
@@ -79,10 +94,6 @@ export default function ShareButton(props) {
       const extras = new URLSearchParams();
       extras.set('len', String(list.length));
       extras.set('cards', JSON.stringify(cards));
-
-      // (Optional) include short preview text
-      // extras.set('pv', text);
-
       urls.web += (urls.web.includes('?') ? '&' : '?') + extras.toString();
     }
 
