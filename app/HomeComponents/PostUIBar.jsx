@@ -50,15 +50,12 @@ export default function PostUIBar(props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.left}>
+      {/* <View style={styles.left}> */}
         {mode === 'posts' ? (
           <>
             <LikeButton
-              mode="posts"
-              shortcode={props.post.shortcode}
-              initialCount={props.post.likes ?? 0}
-              showCount
-              style={styles.btn}
+              mode={mode}
+              post = {props.post}
             />
 
             <ShareButton
@@ -77,11 +74,7 @@ export default function PostUIBar(props) {
               <>
                 <LikeButton
                   mode="confessions"
-                  residence={residence}
-                  postId={postId}
-                  initialCount={initialLikes}
-                  showCount
-                  style={styles.btn}
+                  confession={props.confessions[0]}
                 />
 
                 <ShareButton
@@ -94,11 +87,11 @@ export default function PostUIBar(props) {
             );
           })()
         )}
-      </View>
+      {/* </View> */}
 
-      {mode === 'posts'
+      {/* {mode === 'posts'
         ? <SaveButton style={styles.saveButton} shortcode={props.post.shortcode} />
-        : <View />}
+        : <View />} */}
     </View>
   );
 }
@@ -111,6 +104,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   left: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  btn: { paddingLeft: 15 },
+  btn: { paddingLeft: 15, paddingRight: 15 },
   saveButton: { paddingRight: 15 },
 });

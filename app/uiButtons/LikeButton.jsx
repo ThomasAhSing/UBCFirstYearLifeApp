@@ -1,72 +1,95 @@
-import { useEffect, useState } from 'react'
-import { StyleSheet, TouchableOpacity } from 'react-native'
-import HeartOutline from '@/assets/icons/HeartOutline'
-import HeartFilled from '@/assets/icons/HeartFilled'
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import HeartOutline from '@/assets/icons/HeartOutline';
+import HeartFilled from '@/assets/icons/HeartFilled';
 
-export default function LikeButton({ style, shortcode }) {
-  const [liked, setLiked] = useState(false)
+/**
+ * Props:
+ *   mode: 'posts' | 'confessions'
+ *   // posts:
+ *   post?: { shortcode?: string }
+ *   // confessions:
+ *   confession?: object
+ *   confessions?: object[]   // if provided, first item used to derive residence/postID
+ *   style?: any
+ *
+ * Storage:
+ *   posts -> key = post.shortcode
+ *   confessions -> key = `conf:${residence}:${postId}`
+ *   value shape kept as { liked: boolean, bookmarked?: boolean }
+ */
+export default function LikeButton(props) {
+  const { mode = 'posts', post, confession, confessions, style } = props;
 
-  // TODO increase like count 
+  // choose one confession object if in confessions mode
+  const pickConf = () => {
+    if (confession && typeof confession === 'object') return confession;
+    if (Array.isArray(confessions) && confessions.length) return confessions[0];
+    return null;
+  };
 
-  const onPress = () => {
-    const newLiked = !liked
-    setLiked(newLiked)
-    const saveLiked = async () => {
-      try {
-        const jsonValueGet = await AsyncStorage.getItem(shortcode);
-        let data = jsonValueGet != null ? JSON.parse(jsonValueGet) : null;
-        if (data != null) {
-          // previosuly stored
-          data.liked = newLiked
-        } else {
-          // not previosuly stored
-          data = {
-            "liked": newLiked,
-            "bookmarked": false,
-          }
-        }
+  // derive storage key
+  const storageKey = useMemo(() => {
+    if (mode === 'posts') {
+      const sc = String(post?.shortcode ?? '').trim();
+      return sc; // legacy posts key (shared with SaveButton)
+    }
+    // confessions group key
+    const c = pickConf() || {};
+    const residence = String(c.residence ?? c.Residence ?? c.res ?? '').trim();
+    const postId = String(c.postID ?? c.postId ?? c.post_id ?? c.id ?? '').trim();
+    return residence && postId ? `conf:${residence}:${postId}` : '';
+  }, [mode, post, confession, confessions]);
 
-        try {
-          const jsonValueSet = JSON.stringify(data);
-          await AsyncStorage.setItem(shortcode, jsonValueSet);
-        } catch (e) {
-          // saving 
-          console.log("error saving")
-        }
+  const [liked, setLiked] = useState(false);
 
-      } catch (e) {
-        // error reading value
-        console.log("error reading", e)
+  const readStore = useCallback(async (key) => {
+    try {
+      const raw = await AsyncStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }, []);
 
-      }
-    };
-    saveLiked()
-  }
+  const writeStore = useCallback(async (key, nextLiked) => {
+    try {
+      const existing = (await readStore(key)) || {};
+      const payload = { ...existing, liked: !!nextLiked };
+      await AsyncStorage.setItem(key, JSON.stringify(payload));
+    } catch {
+      // ignore
+    }
+  }, [readStore]);
 
+  // load liked state on mount / key change
   useEffect(() => {
-    const getLiked = async () => {
-      setLiked(false)
-      try {
-        const jsonValue = await AsyncStorage.getItem(shortcode);
-        const data = jsonValue != null ? JSON.parse(jsonValue) : null;
-        if (data?.liked) {
-          setLiked(true)
-        }
-      } catch (e) {
-        // error reading value
+    let canceled = false;
+    (async () => {
+      if (!storageKey) {
+        setLiked(false);
+        return;
       }
-    };
-    getLiked()
-  }, [shortcode])
+      const data = await readStore(storageKey);
+      if (!canceled) setLiked(!!data?.liked);
+    })();
+    return () => { canceled = true; };
+  }, [storageKey, readStore]);
 
+  const onPress = useCallback(async () => {
+    const next = !liked;
+    setLiked(next);
+    if (storageKey) await writeStore(storageKey, next);
+  }, [liked, storageKey, writeStore]);
 
   return (
-    <TouchableOpacity
-      style={style}
-      onPress={onPress}>
+    <TouchableOpacity style={[styles.hit, style]} onPress={onPress} hitSlop={8}>
       {liked ? <HeartFilled color="red" /> : <HeartOutline color="white" />}
     </TouchableOpacity>
-  )
-
+  );
 }
+
+const styles = StyleSheet.create({
+  hit: { padding: 8, alignItems: 'center', justifyContent: 'center' },
+});
