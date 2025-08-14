@@ -87,7 +87,7 @@ export default function ConfessionsPost({ confessions = [] }) {
       <PostUIBar
         mode="confessions"
         ci={currentIndex}
-        confession={current}    // ✅ just pass the object
+        confessions={confessions}    // ✅ just pass the object
       />
     </View>
   );

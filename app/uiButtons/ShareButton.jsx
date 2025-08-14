@@ -5,7 +5,7 @@ import ShareIcon from '@/assets/icons/ShareIcon';
 // --- Env & helpers ----------------------------------------------------------
 const WEB_BASE = (process.env.EXPO_PUBLIC_WEB_BASE_URL || process.env.EXPO_PUBLIC_API_BASE_URL || '')
   .replace(/\/+$/, '');
-const APP_SCHEME = ((process.env.EXPO_PUBLIC_APP_SCHEME || 'ubcfirstyearlifeapp') + '://'); // your scheme
+const APP_SCHEME = ((process.env.EXPO_PUBLIC_APP_SCHEME || 'ubcfirstyearlifeapp') + '://');
 
 const enc  = (s) => encodeURIComponent(String(s ?? ''));
 const trim = (s, n = 140) => {
@@ -23,45 +23,68 @@ const confUrls = (residence, postId, ci) => ({
   web : `${WEB_BASE}/cg/${enc(residence)}/${enc(postId)}${q(ci)}`,
 });
 
+// normalize ids/content from a confession object
+const getConfessionBasics = (c = {}) => ({
+  residence: c.residence ?? c.Residence ?? c.res ?? '',
+  postId: String(c.postID ?? c.postId ?? c.post_id ?? c.id ?? ''),
+  content: c.content ?? c.text ?? '',
+  submittedAt: c.submittedAt ?? c.createdAt ?? ''
+});
+
 /**
  * Props:
- *  mode="posts"        + { shortcode, ci? }
- *  mode="confessions"  + { ci, confession }   // ← only these two
+ *  mode="posts"        + { shortcode, ci?, preview? }
+ *  mode="confessions"  + { confessions: Confession[], ci?: number }
  */
 export default function ShareButton(props) {
   const onPress = useCallback(async () => {
-    // support either props.ci or props.index
     const ci = Number.isFinite(props.ci)
       ? props.ci
-      : (Number.isFinite(props.index) ? props.index : undefined);
+      : (Number.isFinite(props.index) ? props.index : 0);
 
-    let urls;
+    let urls, text = '';
+
     if (props.mode === 'posts') {
       if (!props.shortcode) {
         console.warn('[ShareButton] Missing shortcode for post share');
         return Alert.alert('Share unavailable', 'Missing shortcode for this post.');
       }
       urls = postUrls(props.shortcode, ci);
+      text = trim(props.preview || '');
     } else {
-      // derive from the confession object ONLY
-      const c = props.confession || {};
-      const residence = c.residence ?? c.Residence ?? c.res ?? '';
-      // your data uses postID (capital D) — normalize to string
-      const postId = String(c.postID ?? c.postId ?? c.post_id ?? c.id ?? '');
-
-      if (!residence || !postId) {
-        console.warn('[ShareButton] Missing group ids', { residence, postId, ci, confession: c });
-        return Alert.alert('Share unavailable', 'Missing residence or postId for this confession.');
+      const list = Array.isArray(props.confessions) ? props.confessions : [];
+      if (list.length === 0) {
+        console.warn('[ShareButton] Empty confession list');
+        return Alert.alert('Share unavailable', 'No confessions to share.');
       }
-      urls = confUrls(residence, postId, ci);
-    }
 
-    // preview text: prefer confession.content, then .text
-    const text = trim(
-      props.confession?.content ??
-      props.confession?.text ??
-      ''
-    );
+      const { residence, postId } = getConfessionBasics(list[0]);
+      if (!residence || !postId) {
+        console.warn('[ShareButton] Missing group ids', { residence, postId });
+        return Alert.alert('Share unavailable', 'Missing residence or postId for this confession group.');
+      }
+
+      const sel = list[Math.min(Math.max(ci, 0), list.length - 1)] || list[0];
+      const { content } = getConfessionBasics(sel);
+
+      urls = confUrls(residence, postId, ci);
+      text = trim(content);
+
+      // Pack minimal data so the share page can render RN-like slides
+      const cards = list.map(c => {
+        const b = getConfessionBasics(c);
+        return { content: String(b.content || ''), submittedAt: b.submittedAt || '' };
+      });
+
+      const extras = new URLSearchParams();
+      extras.set('len', String(list.length));
+      extras.set('cards', JSON.stringify(cards));
+
+      // You can optionally pass a short preview too (pv=)
+      // extras.set('pv', text);
+
+      urls.web += (urls.web.includes('?') ? '&' : '?') + extras.toString();
+    }
 
     try {
       if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.share) {

@@ -11,16 +11,42 @@ import SaveButton from '@/app/uiButtons/SaveButton';
  *    - post: { shortcode, likes, caption, confessions? }
  *
  *  mode="confessions"
- *    - residence: string
- *    - postId: string
- *    - ci: number                 // current confession index (0-based)
- *    - content: string               // current confession content (for share preview)
- *    - likes?: number             // shared like count for the group
- *    - confession?: object        // (optional) full confession object at ci
- *    - onLikesUpdate?: (n)=>void  // (optional) update shared count in parent
+ *    - confessions: Array<Confession>  // all share residence + postID
+ *    - ci?: number                     // index to focus (defaults to 0)
+ *    - confessionIndex?: number        // index of confession to move to front
  */
 export default function PostUIBar(props) {
   const { mode } = props;
+
+  // helper to pull shared ids from first confession
+  const getIdsFromList = (list = []) => {
+    const c = list[0] || {};
+    const residence = c.residence ?? c.Residence ?? c.res ?? '';
+    const postId = String(c.postID ?? c.postId ?? c.post_id ?? c.id ?? '');
+    return { residence, postId };
+  };
+
+  // derive an initial like count from the list (fallbacks included)
+  const getInitialLikeCount = (list = []) => {
+    const c = list[0] || {};
+    return (
+      c.groupLikes ??
+      c.likesGroup ??
+      c.likes ??
+      0
+    );
+  };
+
+  // --- Reorder list so confessionIndex element comes first ---
+  const reorderedConfessions = React.useMemo(() => {
+    if (mode !== 'confessions' || !Array.isArray(props.confessions)) return props.confessions;
+    const idx = Number.isFinite(props.confessionIndex) ? props.confessionIndex : -1;
+    if (idx < 0 || idx >= props.confessions.length) return props.confessions;
+
+    const arr = [...props.confessions];
+    const [target] = arr.splice(idx, 1);
+    return [target, ...arr];
+  }, [props.confessions, props.confessionIndex, mode]);
 
   return (
     <View style={styles.container}>
@@ -39,37 +65,41 @@ export default function PostUIBar(props) {
               mode="posts"
               shortcode={props.post.shortcode}
               preview={props.post.caption || (props.post.confessions?.[0]?.content || '')}
-              // previewImageUrl={props.post.images?.[0]} // <- optional if you have one
               style={styles.btn}
             />
           </>
         ) : (
-          <>
-            <LikeButton
-              mode="confessions"
-              residence={props.residence}
-              postId={props.postId}
-              // index={props.ci ?? 0} // <- not needed for group likes; keep only if your LikeButton still expects it
-              initialCount={props.likes ?? 0}
-              onCountChange={props.onLikesUpdate}
-              showCount
-              style={styles.btn}
-            />
+          (() => {
+            const ci = Number.isFinite(props.ci) ? props.ci : 0;
+            const { residence, postId } = getIdsFromList(reorderedConfessions);
+            const initialLikes = getInitialLikeCount(reorderedConfessions);
 
-            <ShareButton
-              mode="confessions"
-              residence={props.residence}
-              postId={props.postId}
-              ci={props.ci ?? 0}                               // open at this confession
-              preview={props.content || props.confession?.content || ''}
-              confession={props.confession}                    // pass through for future image use
-              style={styles.btn}
-            />
-          </>
+            return (
+              <>
+                <LikeButton
+                  mode="confessions"
+                  residence={residence}
+                  postId={postId}
+                  initialCount={initialLikes}
+                  showCount
+                  style={styles.btn}
+                />
+
+                <ShareButton
+                  mode="confessions"
+                  confessions={reorderedConfessions}
+                  ci={ci}
+                  style={styles.btn}
+                />
+              </>
+            );
+          })()
         )}
       </View>
 
-      {mode === 'posts' ? <SaveButton style={styles.saveButton} shortcode={props.post.shortcode} /> : <View />}
+      {mode === 'posts'
+        ? <SaveButton style={styles.saveButton} shortcode={props.post.shortcode} />
+        : <View />}
     </View>
   );
 }
@@ -83,8 +113,5 @@ const styles = StyleSheet.create({
   },
   left: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   btn: { paddingLeft: 15 },
-  saveButton: {
-    paddingRight: 15
-  }
+  saveButton: { paddingRight: 15 },
 });
-
