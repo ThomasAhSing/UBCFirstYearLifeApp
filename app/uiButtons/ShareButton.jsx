@@ -70,7 +70,7 @@ export default function ShareButton(props) {
       urls = confUrls(residence, postId, ci);
       text = trim(content);
 
-      // Pack minimal data so the share page can render RN-like slides
+      // Pack minimal data so the web page can render RN-like slides
       const cards = list.map(c => {
         const b = getConfessionBasics(c);
         return { content: String(b.content || ''), submittedAt: b.submittedAt || '' };
@@ -80,7 +80,7 @@ export default function ShareButton(props) {
       extras.set('len', String(list.length));
       extras.set('cards', JSON.stringify(cards));
 
-      // You can optionally pass a short preview too (pv=)
+      // (Optional) include short preview text
       // extras.set('pv', text);
 
       urls.web += (urls.web.includes('?') ? '&' : '?') + extras.toString();
