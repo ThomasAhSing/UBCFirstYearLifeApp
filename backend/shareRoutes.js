@@ -134,7 +134,7 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
 
     const slideHTMLFromCard = (card) => {
       const title = humanResidence(residence) + ' Confessions';
-      const message = 'Submit your own anonymous confession on the UBC First Year Life App';
+      const message = 'Submit your anonymous confession on the UBC First Year Life App';
       const submitted = formatConfessionTimeISO(card.submittedAt);
       return \`
         <div class="slideInner">
@@ -314,7 +314,7 @@ router.get('/p/:shortcode', (req, res) => {
 
   // reuse Totem palette by default
   const html = renderBase({
-    title: 'Download UBC First Year Life to see more posts',
+    title: 'Download UBC First Year Life for more posts, events and confessions',
     deep, web,
     innerHTML: onlyCarouselInner(),
     overrides: { teal: RES_COLORS.TotemPark.background, tealTop: RES_COLORS.TotemPark.accent }

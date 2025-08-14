@@ -45,6 +45,8 @@ export default function ShareButton(props) {
     let urls, text = '';
 
     if (props.mode === 'posts') {
+      console.log("post")
+      console.log(props.post)
       const shortcode = props.shortcode ?? props.post?.shortcode;
       if (!shortcode) {
         console.warn('[ShareButton] Missing shortcode for post share');

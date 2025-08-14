@@ -63,8 +63,7 @@ export default function PostUIBar(props) {
 
             <ShareButton
               mode="posts"
-              shortcode={props.post.shortcode}
-              preview={props.post.caption || (props.post.confessions?.[0]?.content || '')}
+              post={props.post}
               style={styles.btn}
             />
           </>
