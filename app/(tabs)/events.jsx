@@ -18,7 +18,7 @@ export default function EventsScreen() {
     loadDayEvents, loadMonthEvents
   } = useContext(DataContext);
 
-  const [viewMode, setViewMode] = useState("Day")
+  const [viewMode, setViewMode] = useState("Month")
 
   useEffect(() => {
     if (!dayEventsDataLoaded && !dayEventsDataLoading) {

@@ -53,8 +53,11 @@ a.primary{background:#2c69a5;color:#fff;border-color:transparent}
 
 /* --- carousel + slide layout --- */
 .carousel{position:relative;margin-top:14px;overflow:hidden;border-radius:12px;border:1px solid rgba(0,0,0,.08);background:var(--teal)}
+.carousel.plain{background:transparent;border:none}             /* <-- posts: no green bg/border */
 .track{display:flex;transition:transform .25s ease}
 .slide{min-width:100%;padding:0;display:flex;align-items:center;justify-content:center}
+
+/* confession look */
 .slideInner{width:100%;max-width:760px;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--teal)}
 .whiteBlock{width:88%;background:#fff;border-radius:10px;color:var(--text)}
 .blockHeader{margin-top:28px;height:32%;border-top:10px solid var(--tealTop)}
@@ -64,6 +67,11 @@ a.primary{background:#2c69a5;color:#fff;border-color:transparent}
 .subheading{font-weight:600;font-size:16px;padding:7px 7px 10px 7px;color:var(--text)}
 .submittedRow{width:100%;display:flex;justify-content:flex-end;margin-top:4px}
 .submittedRow span{font-style:italic;color:gray;font-size:12px;padding-right:6%}
+
+/* posts look (plain images, still square) */
+.plainInner{width:100%;max-width:760px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:transparent}
+.mediaImg{display:block;max-width:100%;max-height:100%;object-fit:contain;border-radius:12px}
+
 .dotsRow{display:flex;gap:6px;justify-content:center;margin:10px 0 0}
 .dot{width:6px;height:6px;border-radius:999px;background:var(--goldDim)}
 .dot.active{background:var(--gold)}
@@ -113,13 +121,13 @@ function buildDots(len, active) {
   s += '</div>';
   return s;
 }
-function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''}) {
+function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence='', plainImages=false}) {
   try {
     const mount = document.getElementById('carouselMount');
     if (!mount) return;
 
     const container = document.createElement('div');
-    container.className = 'carousel';
+    container.className = 'carousel' + (plainImages ? ' plain' : '');
 
     const track = document.createElement('div');
     track.className = 'track';
@@ -134,7 +142,7 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
 
     const slideHTMLFromCard = (card) => {
       const title = humanResidence(residence) + ' Confessions';
-      const message = 'Submit your anonymous confession on the UBC First Year Life App';
+      const message = 'Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person.';
       const submitted = formatConfessionTimeISO(card.submittedAt);
       return \`
         <div class="slideInner">
@@ -152,7 +160,15 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
     };
 
     let htmlSlides = [];
-    if (imgs.length) {
+    if (imgs.length && plainImages) {
+      // POSTS: plain images, no teal background
+      htmlSlides = imgs.map(src => \`
+        <div class="plainInner">
+          <img class="mediaImg" alt="slide" src="\${src}" />
+        </div>
+      \`);
+    } else if (imgs.length) {
+      // images but using confession look (not used for posts anymore)
       htmlSlides = imgs.map(src => \`
         <div class="slideInner">
           <div class="whiteBlock blockBody" style="height:88%;display:flex;align-items:center;justify-content:center;">
@@ -181,7 +197,7 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
     htmlSlides.forEach(h => track.appendChild(makeSlideEl(h)));
     mount.appendChild(container);
 
-    // --- dots directly UNDER the carousel
+    // dots directly under the carousel
     const dotsMount = document.getElementById('dotsMount');
     if (dotsMount) dotsMount.innerHTML = buildDots(htmlSlides.length, startIndex);
 
@@ -266,7 +282,7 @@ function onlyCarouselInner() {
 
 // ---------- routes ----------
 
-// Confessions share page
+// Confessions share page (teal background slide style)
 router.get('/cg/:residence/:postId', (req, res) => {
   const { residence, postId } = req.params;
   const ci   = Number(req.query.ci) || 0;
@@ -295,13 +311,13 @@ router.get('/cg/:residence/:postId', (req, res) => {
         var slides=${JSON.stringify(slides)};
         var cards=${JSON.stringify(cards)};
         var len=${Number.isFinite(lenQ)?lenQ:(imgs.length||slides.length||cards.length||0)};
-        buildCarousel({ imgs: imgs, cards: cards, slides: slides, startIndex: ci, residence: ${JSON.stringify(residence)} });
+        buildCarousel({ imgs: imgs, cards: cards, slides: slides, startIndex: ci, residence: ${JSON.stringify(residence)}, plainImages: false });
       })();
     </script>`;
   res.type('html').send(html.replace('</body></html>', boot + '\n</body></html>'));
 });
 
-// Posts share page (images)
+// Posts share page (plain image slides, NO green background)
 router.get('/p/:shortcode', (req, res) => {
   const { shortcode } = req.params;
   const ci   = Number(req.query.ci) || 0;
@@ -312,12 +328,12 @@ router.get('/p/:shortcode', (req, res) => {
   const deep = `${APP_SCHEME}post/${encodeURIComponent(shortcode)}${qci(ci)}`;
   const web  = `${WEB_BASE}/p/${encodeURIComponent(shortcode)}${qci(ci)}`;
 
-  // reuse Totem palette by default
   const html = renderBase({
-    title: 'Download UBC First Year Life for more posts, events and confessions',
+    title: 'Download UBC First Year Life to see more posts',
     deep, web,
     innerHTML: onlyCarouselInner(),
-    overrides: { teal: RES_COLORS.TotemPark.background, tealTop: RES_COLORS.TotemPark.accent }
+    // palette here won't matter because .carousel.plain removes bg/border
+    overrides: { teal: 'transparent', tealTop: 'transparent' }
   });
 
   const boot = `
@@ -326,7 +342,7 @@ router.get('/p/:shortcode', (req, res) => {
         var ci=${Number.isFinite(ci)?ci:0};
         var imgs=${JSON.stringify(imgs)};
         var len=${Number.isFinite(lenQ)?lenQ:(imgs.length||0)};
-        buildCarousel({ imgs: imgs, startIndex: ci, residence: 'TotemPark' });
+        buildCarousel({ imgs: imgs, startIndex: ci, residence: '', plainImages: true });
       })();
     </script>`;
   res.type('html').send(html.replace('</body></html>', boot + '\n</body></html>'));
