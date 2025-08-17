@@ -3,6 +3,7 @@ import { View, Text, Pressable, Alert, StyleSheet, Modal, Button, TextInput } fr
 // import { ADMIN_PASSCODE } from '@env';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
+import SettingsButton from '@/app/uiButtons/SettingsButton';
 
 
 
@@ -46,6 +47,7 @@ export default function Heading() {
         <Text style={[styles.baseText, styles.mainHeading]}>UBC</Text>
         <Text style={[styles.baseText, styles.subHeading]}>first year life</Text>
       </Pressable>
+      <SettingsButton style={styles.settingsIcon} />
       <Modal visible={modalVisible} transparent={true} animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -69,8 +71,12 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: "space-between",
     borderBottomColor: "#173E63",
     borderBottomWidth: 1,
+  },
+  settingsIcon: {
+    marginRight: 10,
   },
   pressable: {
     flexDirection: 'row',
