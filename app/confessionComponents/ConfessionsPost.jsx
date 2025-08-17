@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Dimensions, FlatList, StyleSheet, View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'; // ✅ NEW
-import { toggleLikedByKey } from '@/app/lib/likes'; // same as before
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { toggleLikedByKey } from '@/app/lib/likes';
 import RenderedConfession from './RenderedConfession';
 import PostUIBar from '@/app/HomeComponents/PostUIBar';
 
@@ -9,6 +9,7 @@ export default function ConfessionsPost({ confessions = [] }) {
   const postSize = Dimensions.get('window').width;
   const listRef = useRef(null);
 
+  // derive a stable group key from the first item (for resets)
   const first = confessions[0] || {};
   const groupResidence = first.residence ?? first.Residence ?? first.res ?? '';
   const groupPostId    = String(first.postId ?? first.postID ?? first.post_id ?? first.id ?? '');
@@ -16,6 +17,7 @@ export default function ConfessionsPost({ confessions = [] }) {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Reset index & scroll whenever group changes
   useEffect(() => {
     setCurrentIndex(0);
     const t = setTimeout(() => {
@@ -24,6 +26,7 @@ export default function ConfessionsPost({ confessions = [] }) {
     return () => clearTimeout(t);
   }, [groupKey]);
 
+  // Clamp index if list shrinks
   useEffect(() => {
     if (!confessions.length) { setCurrentIndex(0); return; }
     if (currentIndex > confessions.length - 1) setCurrentIndex(confessions.length - 1);
@@ -41,14 +44,13 @@ export default function ConfessionsPost({ confessions = [] }) {
     }, 0);
   };
 
-  const current = confessions[currentIndex] || {};
-
+  // double-tap like (group-level key)
   const onDoubleTap = useCallback(async () => {
     if (!groupResidence || !groupPostId) return;
     await toggleLikedByKey(`conf:${groupResidence}:${groupPostId}`);
   }, [groupResidence, groupPostId]);
 
-  // ✅ New gesture (double tap on list area)
+  // Gesture: double tap anywhere on the FlatList area
   const doubleTap = useMemo(
     () =>
       Gesture.Tap()
@@ -61,35 +63,38 @@ export default function ConfessionsPost({ confessions = [] }) {
 
   return (
     <View key={groupKey}>
-      {/* ✅ Wrap list with GestureDetector */}
-      <GestureDetector gesture={doubleTap}>
-        <View>
-          <FlatList
-            key={groupKey}
-            ref={listRef}
-            data={confessions}
-            horizontal
-            pagingEnabled
-            snapToInterval={postSize}
-            snapToAlignment="start"
-            decelerationRate="fast"
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(_, i) => String(i)}
-            getItemLayout={(_, i) => ({ length: postSize, offset: postSize * i, index: i })}
-            renderItem={({ item }) => (
-              <View style={{ width: postSize, height: postSize }}>
-                <RenderedConfession confessionObj={item} />
-              </View>
-            )}
-            onScroll={onScroll}
-            scrollEventThrottle={16}
-            onScrollToIndexFailed={onScrollToIndexFailed}
-            extraData={`${groupKey}:${currentIndex}`}
-            style={{ width: postSize, height: postSize }}
-          />
-        </View>
-      </GestureDetector>
+      {/* Only the carousel area is under the gesture detector */}
+      {/* <GestureHandlerRootView style={{ width: postSize, height: postSize, alignSelf: 'stretch' }}> */}
+        {/* <GestureDetector gesture={doubleTap}> */}
+          {/* <View> */}
+            <FlatList
+              key={groupKey}
+              ref={listRef}
+              data={confessions}
+              horizontal
+              pagingEnabled
+              snapToInterval={postSize}
+              snapToAlignment="start"
+              decelerationRate="fast"
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(_, i) => String(i)}
+              getItemLayout={(_, i) => ({ length: postSize, offset: postSize * i, index: i })}
+              renderItem={({ item }) => (
+                <View style={{ width: postSize, height: postSize }}>
+                  <RenderedConfession confessionObj={item} />
+                </View>
+              )}
+              onScroll={onScroll}
+              scrollEventThrottle={16}
+              onScrollToIndexFailed={onScrollToIndexFailed}
+              extraData={`${groupKey}:${currentIndex}`}
+              style={{ width: postSize, height: postSize }}
+            />
+          {/* </View> */}
+        {/* </GestureDetector> */}
+      {/* </GestureHandlerRootView> */}
 
+      {/* Dots and toolbar are OUTSIDE the gesture area */}
       {confessions.length > 1 && (
         <View key={`dots:${groupKey}`} style={styles.dotContainer}>
           {confessions.map((_, i) => (
@@ -121,7 +126,6 @@ const styles = StyleSheet.create({
   },
   activeDot: { backgroundColor: '#F5D054' },
 });
-
 
 
 // import React, { useEffect, useRef, useState, useCallback } from 'react';

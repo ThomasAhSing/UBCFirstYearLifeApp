@@ -197,7 +197,9 @@ export default function SettingsScreen() {
                     <Text style={{ fontWeight: '600', marginBottom: 6, color: 'white' }}>About</Text>
                     <Text style={{ color: 'white' }}>UBC First Year Life</Text>
                     <Text style={{ color: 'white' }}>For Students. By Students.</Text>
-                    <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 4 }}>
+                    <Text style={{ fontWeight: '600', marginBottom: 6, color: 'white', marginTop: 20, }}>Request a feature or report a bug:</Text>
+                    <Text style={{ color: 'white',  }}>ahsingthomas@gmail.com</Text>
+                    <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 20 }}>
                         Version {Application.nativeApplicationVersion || '1.0.0'}
                     </Text>
                 </View>

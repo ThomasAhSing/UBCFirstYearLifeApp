@@ -1,6 +1,6 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { useState, useMemo, useCallback } from 'react';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'; // ← updated API
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'; // ← updated API
 import Sidecar from './Sidecar';
 import PostUIBar from './PostUIBar';
 
@@ -44,11 +44,13 @@ export default function Post({ post }) {
       </View>
 
       {/* wrap Sidecar with double-tap */}
-      <GestureDetector gesture={doubleTapGesture}>
-        <View>
-          <Sidecar post={post} />
-        </View>
-      </GestureDetector>
+      {/* <GestureHandlerRootView> */}
+        {/* <GestureDetector gesture={doubleTapGesture}> */}
+          <View>
+            <Sidecar post={post} />
+          </View>
+        {/* </GestureDetector> */}
+      {/* </GestureHandlerRootView>  */}
 
       <PostUIBar mode="posts" post={post} />
       <Text

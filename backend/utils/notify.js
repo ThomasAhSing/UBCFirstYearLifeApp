@@ -3,6 +3,10 @@ const { Expo } = require('expo-server-sdk');
 const expo = new Expo();
 
 async function sendPushToAll(tokens, payload) {
+  if (process.env.PUSH_DRY_RUN === 'true') {
+    console.log('[PUSH_DRY_RUN]', { count: tokens.length, message });
+    return;
+  }
   const messages = tokens
     .filter(Expo.isExpoPushToken)
     .map(to => ({ to, sound: 'default', title: payload.title, body: payload.body, data: payload.data }));

@@ -11,6 +11,12 @@ if (require.main === module) {
   require('dotenv').config();
 }
 
+// ⬅️ ADDED: fail fast if someone set dry run in production by mistake
+if (process.env.NODE_ENV === 'production' && process.env.PUSH_DRY_RUN === 'true') {
+  console.error('Refusing to start: PUSH_DRY_RUN=true in production');
+  process.exit(1);
+}
+
 const app = express();
 
 // Middleware
@@ -41,19 +47,37 @@ app.use('/push', require('./routes/push'));
 const conditionallyStage = require('./jobs/conditionallyStage'); // stages tonight's posts if needed
 const postAndNotify = require('./jobs/postAndNotify');           // flips to posted & sends push
 
+// ⬅️ ADDED: dev-only admin endpoints so you can test without cron
+if (process.env.NODE_ENV !== 'production') {
+  app.post('/admin/stage-now', async (req, res) => {
+    try { await conditionallyStage(); res.json({ ok: true }); }
+    catch (e) { console.error(e); res.status(500).json({ ok: false, error: e.message }); }
+  });
+
+  app.post('/admin/post-now', async (req, res) => {
+    try { await postAndNotify(); res.json({ ok: true }); }
+    catch (e) { console.error(e); res.status(500).json({ ok: false, error: e.message }); }
+  });
+}
+
 function startSchedulers() {
-  // Every 10 minutes: decide whether to stage tonight (safe to run multiple times)
-  cron.schedule('*/10 * * * *', () => {
+  // Stage once + backup
+  cron.schedule('0 18 * * *', () => {         // 6:00 PM PT
     conditionallyStage().catch(err => console.error('[cron] conditionallyStage error:', err));
   }, { timezone: PT });
 
-  // Every minute: if time has arrived, post & push (idempotent)
+  cron.schedule('30 18 * * *', () => {        // 6:30 PM PT backup
+    conditionallyStage().catch(err => console.error('[cron] conditionallyStage error:', err));
+  }, { timezone: PT });
+
+  // Flip staged -> posted & push when time arrives
   cron.schedule('* * * * *', () => {
     postAndNotify().catch(err => console.error('[cron] postAndNotify error:', err));
   }, { timezone: PT });
 
   console.log('⏰ Cron schedulers started');
 }
+
 
 // ⛔️ Only connect to MongoDB and start server if NOT running in test mode
 if (require.main === module) {
@@ -99,7 +123,7 @@ if (require.main === module) {
     });
 }
 
-module.exports = app; // ✅ Export app so Supertest can use it in tests
+module.exports = app;
 
 // const express = require('express');
 // const mongoose = require('mongoose');

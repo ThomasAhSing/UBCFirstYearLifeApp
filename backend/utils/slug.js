@@ -1,4 +1,4 @@
-// utils/slug.js ensure generated urls are safe
+// normalizes residence names to URL safe url
 function slug(s) {
   return (s || 'unknown')
     .toLowerCase()

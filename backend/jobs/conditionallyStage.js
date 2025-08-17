@@ -1,4 +1,4 @@
-// jobs/conditionallyStart.js
+// jobs/conditionallyStage.js
 const { DateTime } = require('luxon');
 const Confession = require('../models/Confession');
 const { tonight7pmUTC, dateKeyFor, isBefore7pmLocal, startOfTodayUTC, endOfTodayUTC } = require('../utils/time');
@@ -10,7 +10,7 @@ const DAYS_THRESHOLD  = Number(process.env.DAYS_THRESHOLD  || 5);   // drop if >
 const COUNT_THRESHOLD = Number(process.env.COUNT_THRESHOLD || 30);  // OR if >= X unposted
 const MAX_PER_POST    = Number(process.env.MAX_PER_POST    || 10);  // chunk size per residence
 
-module.exports = async function conditionallyStart() {
+module.exports = async function conditionallyStage() {
   // 1) Should we drop tonight?
   const last = await Confession.findOne({ state: 'posted' }).sort({ postedAt: -1 }).lean();
   const daysSince = last

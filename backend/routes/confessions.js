@@ -5,9 +5,10 @@ const router = express.Router();
 const Confession = require('../models/Confession')
 router.use(express.json())
 
-function getNextPostTime() {
+// return whether 7pm of same day if it is before 7pm, or return 7pm of next day
+function getNextPostTime() { 
   const now = DateTime.now().setZone('America/Los_Angeles');
-  let target = now.set({ hour: 20, minute: 0, second: 0, millisecond: 0 });
+  let target = now.set({ hour: 19, minute: 0, second: 0, millisecond: 0 });
   // move to next day if past desired time
   if (now > target) {
     target = target.plus({ days: 1 });
@@ -15,6 +16,39 @@ function getNextPostTime() {
   return target.toJSDate();
 }
 
+router.post('/', async (req, res) => {
+  try {
+    const { residence, content, submittedAt, posted, scheduledPostAt, postID, confessionIndex } = req.body;
+
+
+    if (!residence || !content) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const newEntry = new Confession({ residence, content, submittedAt, posted, scheduledPostAt, postID, confessionIndex });
+    await newEntry.save();
+    res.status(201).json({
+      success: true,
+      confession: newEntry,
+      id: newEntry._id
+    });
+
+  } catch (err) {
+    console.error('❌ POST /confessions error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+})
+
+router.get('/', async (req, res) => {
+  const { residence } = req.query
+
+  const confessions = await Confession.find({
+    residence: residence,
+    scheduledPostAt: { $lte: new Date() },
+    posted: true
+  }).sort({ postID: -1, confessionIndex: 1 })
+  res.json(confessions)
+});
 
 router.post('/post-staged', async (req, res) => {
   try {
@@ -123,40 +157,6 @@ router.post('/post-batch', async (req, res) => {
     })
   }
 })
-
-router.post('/', async (req, res) => {
-  try {
-    const { residence, content, submittedAt, posted, scheduledPostAt, postID, confessionIndex } = req.body;
-
-
-    if (!residence || !content) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
-
-    const newEntry = new Confession({ residence, content, submittedAt, posted, scheduledPostAt, postID, confessionIndex });
-    await newEntry.save();
-    res.status(201).json({
-      success: true,
-      confession: newEntry,
-      id: newEntry._id
-    });
-
-  } catch (err) {
-    console.error('❌ POST /confessions error:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-})
-
-router.get('/', async (req, res) => {
-  const { residence } = req.query
-
-  const confessions = await Confession.find({
-    residence: residence,
-    scheduledPostAt: { $lte: new Date() },
-    posted: true
-  }).sort({ postID: -1, confessionIndex: 1 })
-  res.json(confessions)
-});
 
 
 // get funcitons for testing

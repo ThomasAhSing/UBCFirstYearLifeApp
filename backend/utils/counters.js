@@ -1,4 +1,4 @@
-// utils/counters.js
+// generate date, residence sequence for postIDs YYYY-MM-DD-res-01
 const Counter = require('../models/Counter'); // {_id: "YYYY-MM-DD:res-slug", seq: Number}
 
 async function getNextSeq(dateKey, resSlug) {

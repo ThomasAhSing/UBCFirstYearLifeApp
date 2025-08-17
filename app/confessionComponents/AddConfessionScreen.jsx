@@ -142,8 +142,6 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
 
                 <Text style={styles.errorMessage}>{errorMessage}</Text>
               </View>
-
-              <Text style={styles.errorMessage}>{errorMessage}</Text>
             </View>
           </ScrollView>
         </TouchableWithoutFeedback>

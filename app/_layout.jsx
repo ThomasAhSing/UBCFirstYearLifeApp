@@ -5,6 +5,9 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DataProvider } from '@/context/DataContext';
+// import 'react-native-gesture-handler';
+// import 'react-native-reanimated';
+// import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // project imports
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -31,18 +34,20 @@ export default function RootLayout() {
 
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <DataProvider>
-          <Stack >
+    // <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <DataProvider>
+            <Stack >
 
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-        </DataProvider>
-        <StatusBar style="auto" />
-      </ThemeProvider>
-    </SafeAreaProvider>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+          </DataProvider>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    // </GestureHandlerRootView>
   );
 }
 
