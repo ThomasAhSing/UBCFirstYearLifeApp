@@ -5,28 +5,31 @@ import Heading from '../Heading';
 import PostFlatList from '../HomeComponents/PostFlatList';
 import ScreenWrapper from '../ScreenWrapper';
 import { useContext } from 'react';
+import AnimateOpen from '@/app/AnimateOpen';
 
 export default function HomeScreen() {
 
 
-  const {postDataLoaded} = useContext(DataContext)
+  const { postDataLoaded } = useContext(DataContext)
 
   if (!postDataLoaded) return (
     <ScreenWrapper>
-        <Heading/>
-        <Text style={{ color: "white" }}>Loading home...</Text>
+      <Heading />
+      <Text style={{ color: "white" }}>Loading home...</Text>
     </ScreenWrapper>
   )
 
   return (
-    <ScreenWrapper>
-        <Heading/>
-        <PostFlatList/>
-    </ScreenWrapper>
+    <AnimateOpen>
+      <ScreenWrapper>
+        <Heading />
+        <PostFlatList />
+      </ScreenWrapper>
+    </AnimateOpen>
 
   );
 }
 
 const styles = StyleSheet.create({
-  
+
 });

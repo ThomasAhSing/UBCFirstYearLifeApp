@@ -1,21 +1,15 @@
 // external imports
 import { StyleSheet, Text } from 'react-native';
-import { useState } from 'react'
-
+import { useState, useEffect, useContext } from 'react'
 import { Colors } from '@/constants/Colors';
-
-
-
-// TODO, add popup telling user what confessions is when they first open
 
 // project imports
 import ScreenWrapper from "../ScreenWrapper";
-import Heading from "../Heading"
+import Heading from "@/app/Heading"
 import ConfessionsOptionsBar from '../confessionComponents/ConfessionsOptionsBar';
 import ConfessionsGrid from '../confessionComponents/ConfessionsGrid';
 import { DataContext } from '@/context/DataContext';
-import { useContext, useEffect } from 'react';
-
+import AnimateOpen from '@/app/AnimateOpen';
 
 export default function ConfessionsScreen() {
   const {
@@ -24,32 +18,49 @@ export default function ConfessionsScreen() {
     loadAllPostedConfessions
   } = useContext(DataContext);
 
-  const [selectedResidence, setSelectedResidence] = useState("TotemPark")
+  const [selectedResidence, setSelectedResidence] = useState("TotemPark");
 
+  // ✅ Always run hooks, no early returns before this
   useEffect(() => {
     if (!postedConfessionsDataLoaded && !postedConfessionsDataLoading) {
-      loadAllPostedConfessions()
+      loadAllPostedConfessions();
     }
-  }, []);
+  }, [postedConfessionsDataLoaded, postedConfessionsDataLoading, loadAllPostedConfessions]);
 
-  if (postedConfessionsDataLoading) {
-    return <Text style={{ paddingTop: 50, paddingLeft: 50, flex: 1, color: 'white', backgroundColor: Colors.background }}>Loading confessions...</Text>;
-  }
 
-  if (!postedConfessionsDataLoaded) {
-    return <Text style={{ paddingTop: 50, paddingLeft: 50, flex: 1, color: 'white', backgroundColor: Colors.background }}>Failed to load confessions from server...</Text>;
-  }
 
+  // ✅ Single return; branch inside
   return (
-    <ScreenWrapper>
-      <Heading />
-      <ConfessionsOptionsBar
-        style={styles.optionsBar}
-        selectedResidence={selectedResidence}
-        setSelectedResidence={setSelectedResidence}
-      />
-      <ConfessionsGrid selectedResidence={selectedResidence} setSelectedResidence={setSelectedResidence} />
-    </ScreenWrapper>
+    <AnimateOpen>
+      <ScreenWrapper>
+        {postedConfessionsDataLoading && (
+          <Text style={{ paddingTop: 50, paddingLeft: 50, flex: 1, color: 'white', backgroundColor: Colors.background }}>
+            Loading confessions...
+          </Text>
+        )}
+
+        {!postedConfessionsDataLoading && !postedConfessionsDataLoaded && (
+          <Text style={{ paddingTop: 50, paddingLeft: 50, flex: 1, color: 'white', backgroundColor: Colors.background }}>
+            Failed to load confessions from server...
+          </Text>
+        )}
+
+        {postedConfessionsDataLoaded && (
+          <>
+            <Heading />
+            <ConfessionsOptionsBar
+              style={styles.optionsBar}
+              selectedResidence={selectedResidence}
+              setSelectedResidence={setSelectedResidence}
+            />
+            <ConfessionsGrid
+              selectedResidence={selectedResidence}
+              setSelectedResidence={setSelectedResidence}
+            />
+          </>
+        )}
+      </ScreenWrapper>
+    </AnimateOpen>
   );
 }
 

@@ -22,12 +22,6 @@ export default function Sidecar({ post }) { // media is
             })
     }, [post.media[0]])
 
-    // const firstMedia = imageMap[post.media[0].image_url]
-    // const { width: firstWidth, height: firstHeight } = resolveAssetSource(firstMedia);
-    // const imgWidth = screenWidth;
-    // const aspectRatio = firstHeight / firstWidth; 
-    // const imgHeight = imgWidth * aspectRatio;
-
     const [currentIndex, setCurrentIndex] = useState(0)
 
     const handleScroll = (event) => {

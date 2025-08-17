@@ -26,24 +26,20 @@ export default function Post({ post }) {
       </View>
       <Sidecar post={post} />
       <PostUIBar mode="posts" post={post} />
-      {/* <Text style={styles.caption}>
-        <Text style={styles.captionUsername}>{post.userFetchedFrom}</Text>
-        {post.caption}
-      </Text> */}
-      <Text style={styles.caption}>
+      <Text
+        style={styles.caption}
+        numberOfLines={expanded ? undefined : 2}
+        ellipsizeMode="tail"
+        onPress={() => !expanded && setExpanded(true)}
+        suppressHighlighting
+      >
         <Text style={styles.captionUsername}>{post.userFetchedFrom} </Text>
-        <Text
-          numberOfLines={expanded ? undefined : 2}
-          ellipsizeMode="clip"
-        >
-          {post.caption}
-        </Text>
-        {!expanded && post.caption.length > 0 && (
-          <Text style={styles.more} onPress={() => setExpanded(true)}>
-            ... more
-          </Text>
+        {post.caption}
+        {!expanded && post.caption?.length > 0 && (
+          <Text style={styles.more}> … more</Text>
         )}
       </Text>
+
 
     </View>
   );

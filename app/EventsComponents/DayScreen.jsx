@@ -7,7 +7,7 @@ import { useContext } from "react";
 import Post from "@/app/HomeComponents/Post"
 import { DataContext } from '@/context/DataContext';
 import { Colors } from '@/constants/Colors';
-
+import AnimateOpen from '@/app/AnimateOpen';
 
 // if dateString is provided DayScreen is generated with only events from that day
 export default function DayScreen({ dateString, monthEventsData, monthPostMap }) {
@@ -33,29 +33,31 @@ export default function DayScreen({ dateString, monthEventsData, monthPostMap })
   }
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={Object.keys(dayEventsData)}
-        renderItem={({ item: date }) => {
-          return (
-            <View>
-              <Text style={styles.dateHeading}>{formatDatestringToTitle(date)}</Text>
-              <FlatList
-                data={dayEventsData[date]}
-                renderItem={({ item: eventObj }) => {
-                  return (
-                    <View>
-                      <Text style={styles.timeText}>{formatEventTimePDT(eventObj.startAt)}</Text>
-                      <Post post={dayPostMap[eventObj.shortcode]} />
-                    </View>
-                  )
-                }}
-              />
-            </View>
-          )
-        }}
-      />
-    </View>
+    <AnimateOpen>
+      <View style={styles.container}>
+        <FlatList
+          data={Object.keys(dayEventsData)}
+          renderItem={({ item: date }) => {
+            return (
+              <View>
+                <Text style={styles.dateHeading}>{formatDatestringToTitle(date)}</Text>
+                <FlatList
+                  data={dayEventsData[date]}
+                  renderItem={({ item: eventObj }) => {
+                    return (
+                      <View>
+                        <Text style={styles.timeText}>{formatEventTimePDT(eventObj.startAt)}</Text>
+                        <Post post={dayPostMap[eventObj.shortcode]} />
+                      </View>
+                    )
+                  }}
+                />
+              </View>
+            )
+          }}
+        />
+      </View>
+    </AnimateOpen>
   )
 }
 

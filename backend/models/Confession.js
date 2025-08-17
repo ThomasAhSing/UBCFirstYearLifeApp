@@ -1,13 +1,29 @@
 const mongoose = require('mongoose')
 
 const confessionSchema = new mongoose.Schema({
-  residence: { type: String, required: true },
-  content: { type: String, required: true },
-  submittedAt: { type: Date, default: Date.now },
-  posted: { type: Boolean, default: false },
-  scheduledPostAt: { type: Date },
-  postID: { type: Number },
+  state: {
+    type: String,
+    enum: ['unposted', 'staged', 'posted'],
+    default: 'unposted',
+  },
+  postID: { type: String },
   confessionIndex: { type: Number },
+  residence: { type: String, required: true },
+  submittedAt: { type: Date, default: Date.now },
+  postedAt: { type: Date },
+  content: { type: String, required: true },
 });
+
+// 1) Posted feed per residence: find({ residence, state:'posted' }).sort({ postedAt:-1 })
+confessionSchema.index({ residence: 1, state: 1, postedAt: -1 });
+
+// 2) Per-post fetch & item order. Partial so it only applies once postID exists.
+confessionSchema.index(
+  { postID: 1, residence: 1, confessionIndex: 1 },
+  { unique: true, partialFilterExpression: { postID: { $exists: true } } }
+);
+
+// 3) (Optional) Unposted admin/queue per residence ordered by submission time
+confessionSchema.index({ residence: 1, state: 1, submittedAt: 1 });
 
 module.exports = mongoose.model('Confession', confessionSchema)

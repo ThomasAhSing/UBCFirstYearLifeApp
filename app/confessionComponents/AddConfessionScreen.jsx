@@ -4,14 +4,20 @@ import {
   Text,
   View,
   TextInput,
-  Alert
+  Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from 'react-native'
+
 import { useState } from 'react'
 import { Dropdown } from 'react-native-element-dropdown';
 import ResidenceIcon from '@/assets/icons/ResidenceIcon'
 import { Colors } from '@/constants/Colors';
-import axios from 'axios';
 import { api } from '@/context/DataContext'
+import AnimateOpen from '@/app/AnimateOpen';
 
 const data = [
   { label: 'Totem Park', residence: 'TotemPark' },
@@ -22,11 +28,11 @@ const data = [
 
 
 // TODO add gestures to close keybaord
+const MAX_LENGTH_CONFESSION = 250
 
 export default function AddConfessionScreen({ RES_CON_DATA }) {
   const [residence, setResidence] = useState(null);
   const [text, onChangeText] = useState('')
-  const [height, setHeight] = useState(40)
   const [errorMessage, setErrorMessage] = useState("")
 
   const submitConfession = async () => {
@@ -36,7 +42,6 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
         content: text,
       });
       onChangeText('');
-      setHeight(40);
       setResidence(null); // back to placeholder “Select Residence”
       Alert.alert('Success', 'Your confession was submitted');
     } catch (err) {
@@ -61,71 +66,89 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
     submitConfession()
   }
 
+  console.log(residence)
+
+
   return (
-    <View style={styles.container}>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        iconStyle={styles.iconStyle}
-        itemContainerStyle={styles.itemContainer}
-        containerStyle={styles.dropdownContaienr}
-        itemTextStyle={styles.itemTextStyle}
-        selectedStyle={styles.selectedStyle}
-        activeColor='#1E5A8A'
-        data={data}
-        maxHeight={300}
-        labelField="label"
-        valueField="residence"
-        placeholder="Select Residence"
-        searchPlaceholder="Search..."
-        value={residence}
-        onChange={item => {
-          setResidence(item.residence);
-        }}
-        renderLeftIcon={() => (
-          <ResidenceIcon style={styles.residenceIcon} size={24} color='white' />
-        )}
-
-      />
-      <Text style={styles.subheading}>Insert Confession Below</Text>
-      <View>
-        <TextInput
-          style={[styles.confessionInput, { height }]}
-          onChangeText={onChangeText}
-          multiline={true}
-          value={text}
-          placeholder='. . . . . . . . .'
-          placeholderTextColor={'#8C9AAE'}
-          onContentSizeChange={(e) =>
-            setHeight(e.nativeEvent.contentSize.height)
-          }
-          textAlignVertical="top"
-        />
-        <View style={styles.charCounterWrapper}>
-          <Text style={styles.charCounter}>3/10</Text>
-        </View>
-      </View>
-
-      <TouchableOpacity
-        style={styles.submitBtn}
-        onPress={onPress}
+    <AnimateOpen>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
       >
-        <Text style={{
-          color: '#2C2C2C',
-          fontFamily: "RobotoBold",
-        }}>
-          Submit Confession
-        </Text>
-      </TouchableOpacity>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.container}>
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                iconStyle={styles.iconStyle}
+                itemContainerStyle={styles.itemContainer}
+                containerStyle={styles.dropdownContaienr}
+                itemTextStyle={styles.itemTextStyle}
+                selectedStyle={styles.selectedStyle}
+                activeColor='#1E5A8A'
+                data={data}
+                maxHeight={300}
+                labelField="label"
+                valueField="residence"
+                placeholder="Select Residence"
+                searchPlaceholder="Search..."
+                value={residence}
+                onChange={item => {
+                  setResidence(item.residence);
+                }}
+                renderLeftIcon={() => (
+                  <ResidenceIcon style={styles.residenceIcon} size={24} color='white' />
+                )}
 
-      <Text style={styles.note}>
-        Note: Your confession will be included in the next post, not immediately
-      </Text>
+              />
+              <Text style={styles.subheading}>Insert Confession Below</Text>
+              <View>
+                <TextInput
+                  style={styles.confessionInput}
+                  onChangeText={onChangeText}
+                  multiline={true}
+                  value={text}
+                  placeholder='. . . . . . . . .'
+                  placeholderTextColor={'#8C9AAE'}
+                  textAlignVertical="top"
+                  maxLength={MAX_LENGTH_CONFESSION}
+                />
+                <View style={styles.charCounterWrapper}>
+                  <Text style={styles.charCounter}>{text.length}/{MAX_LENGTH_CONFESSION}</Text>
+                </View>
 
-      <Text style={styles.errorMessage}>{errorMessage}</Text>
-    </View>
+                <TouchableOpacity
+                  style={styles.submitBtn}
+                  onPress={onPress}
+                >
+                  <Text style={{
+                    color: '#2C2C2C',
+                    fontFamily: "RobotoBold",
+                  }}>
+                    Submit Confession
+                  </Text>
+                </TouchableOpacity>
 
+                <Text style={styles.note}>
+                  Note: Your confession will be included in the next post, not immediately
+                </Text>
+
+                <Text style={styles.errorMessage}>{errorMessage}</Text>
+              </View>
+
+              <Text style={styles.errorMessage}>{errorMessage}</Text>
+            </View>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </AnimateOpen>
   );
 
 }
@@ -150,7 +173,7 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   residenceIcon: {
-    paddingLeft: 15,
+    paddingLeft: 50,
     marginRight: 7,
   },
   placeholderStyle: {
@@ -185,7 +208,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   confessionInput: {
-    height: 40,
+    height: 150,
     margin: 12,
     borderWidth: 1,
     padding: 15,
@@ -199,7 +222,7 @@ const styles = StyleSheet.create({
     paddingRight: 20,
   },
   charCounter: {
-
+    color: "white"
   },
   submitBtn: {
     backgroundColor: Colors.goldAccent,

@@ -17,10 +17,13 @@
   "dependencies": {
     "axios": "^1.11.0",
     "cors": "^2.8.5",
+    "date-fns-tz": "^3.2.0",
     "dotenv": "^17.2.1",
+    "expo-server-sdk": "^3.15.0",
     "express": "^5.1.0",
     "luxon": "^3.7.1",
-    "mongoose": "^8.17.1"
+    "mongoose": "^8.17.1",
+    "node-cron": "^4.2.1"
   },
   "devDependencies": {
     "jest": "^30.0.5",

@@ -9,6 +9,7 @@ import DayScreen from '@/app/EventsComponents/DayScreen'
 import BackIcon from '@/assets/icons/BackIcon'
 import { Colors } from '@/constants/Colors';
 import { DataContext } from '@/context/DataContext';
+import AnimateOpen from '@/app/AnimateOpen';
 
 
 export default function MonthScreen() {
@@ -24,86 +25,88 @@ export default function MonthScreen() {
   const [overlayDate, setOverlayDate] = useState(null);
 
   return (
-    <View style={styles.container}>
+    <AnimateOpen>
+      <View style={styles.container}>
 
 
-      <Calendar
-        style={{
-          borderWidth: 1,
-          borderColor: 'transparent',
-          height: 350,
-        }}
-        theme={{
-          backgroundColor: 'white',
-          calendarBackground: 'transparent',
-          textSectionTitleColor: 'white',
-          selectedDayBackgroundColor: 'red',
-          selectedDayTextColor: 'white',
-          todayTextColor: 'purple',
-          dayTextColor: 'white',
-          textDisabledColor: 'gray',
-          monthTextColor: 'white',
-        }}
-        dayComponent={({ date, state }) => { // NOTE: date is in UTC
-          // console.log(date)
-          const count = date.dateString in monthEventsData ? monthEventsData[date.dateString].length : 0
-          return (
-            <TouchableOpacity
-              onPress={() => {
-                // const shortcodes = eventsData[date.dateString] || [];
-                // const numEvents = monthEventsData
-                if (count > 0) {
-                  setOverlayDate(date.dateString); // this triggers the overlay view
-                }
-              }}
-              style={{
-                alignItems: 'center',
-                width: dayButtonWidth,
-                height: 60,
-                paddingTop: 15,
-              }}>
-              <Text
-                style={[{
-                  color: state === 'disabled' ? '#A9A9A9' : 'white',
-                },
-                isSameDate(todayISOString, date.dateString) && { color: '#00BFFF' }
-                ]}>
-                {date.day}
-              </Text>
-              {count > 0 && (
-                <Text style={{
-                  fontSize: 11,
-                  textAlign: 'center',
-                  color: '#FFD700',
-                  marginTop: 12,
+        <Calendar
+          style={{
+            borderWidth: 1,
+            borderColor: 'transparent',
+            height: 350,
+          }}
+          theme={{
+            backgroundColor: 'white',
+            calendarBackground: 'transparent',
+            textSectionTitleColor: 'white',
+            selectedDayBackgroundColor: 'red',
+            selectedDayTextColor: 'white',
+            todayTextColor: 'purple',
+            dayTextColor: 'white',
+            textDisabledColor: 'gray',
+            monthTextColor: 'white',
+          }}
+          dayComponent={({ date, state }) => { // NOTE: date is in UTC
+            // console.log(date)
+            const count = date.dateString in monthEventsData ? monthEventsData[date.dateString].length : 0
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  // const shortcodes = eventsData[date.dateString] || [];
+                  // const numEvents = monthEventsData
+                  if (count > 0) {
+                    setOverlayDate(date.dateString); // this triggers the overlay view
+                  }
+                }}
+                style={{
+                  alignItems: 'center',
+                  width: dayButtonWidth,
+                  height: 60,
+                  paddingTop: 15,
                 }}>
-                  {count} events
+                <Text
+                  style={[{
+                    color: state === 'disabled' ? '#A9A9A9' : 'white',
+                  },
+                  isSameDate(todayISOString, date.dateString) && { color: '#00BFFF' }
+                  ]}>
+                  {date.day}
                 </Text>
-              )}
-            </TouchableOpacity>
-          );
-        }}
-        onDayPress={day => {
-          setSelected(day.dateString);
-        }}
-        markedDates={{
-          [selected]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' }
-        }}
-      />
+                {count > 0 && (
+                  <Text style={{
+                    fontSize: 11,
+                    textAlign: 'center',
+                    color: '#FFD700',
+                    marginTop: 12,
+                  }}>
+                    {count} events
+                  </Text>
+                )}
+              </TouchableOpacity>
+            );
+          }}
+          onDayPress={day => {
+            setSelected(day.dateString);
+          }}
+          markedDates={{
+            [selected]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' }
+          }}
+        />
 
-      {overlayDate && (
-        <View style={styles.overlay}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => setOverlayDate(null)}>
-            <BackIcon size={30} color='white' />
-          </TouchableOpacity>
-          <DayScreen
-            dateString = {overlayDate}
-            monthEventsData = {monthEventsData}
-            monthPostMap = {monthPostMap}
-          />
-        </View>
-      )}
-    </View>
+        {overlayDate && (
+          <View style={styles.overlay}>
+            <TouchableOpacity style={styles.backBtn} onPress={() => setOverlayDate(null)}>
+              <BackIcon size={30} color='white' />
+            </TouchableOpacity>
+            <DayScreen
+              dateString={overlayDate}
+              monthEventsData={monthEventsData}
+              monthPostMap={monthPostMap}
+            />
+          </View>
+        )}
+      </View>
+    </AnimateOpen>
   );
 }
 

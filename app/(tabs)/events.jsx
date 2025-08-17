@@ -10,6 +10,7 @@ import MonthScreen from '@/app/EventsComponents/MonthScreen'
 import DayScreen from '@/app/EventsComponents/DayScreen'
 import Heading from "@/app/Heading"
 import { DataContext } from '@/context/DataContext';
+import AnimateOpen from '@/app/AnimateOpen';
 
 export default function EventsScreen() {
   const {
@@ -44,16 +45,18 @@ export default function EventsScreen() {
   }
 
   return (
-    <ScreenWrapper>
-      <Heading />
-      <View style={styles.dayMonthBar}>
-        <DayMonthBar viewMode={viewMode} setViewMode={setViewMode} />
-      </View>
-      <View style={{ flex: 1 }}>
-        {viewMode === "Month" && <MonthScreen/>}
-        {viewMode === "Day" && <DayScreen/>}
-      </View>
-    </ScreenWrapper>
+    <AnimateOpen>
+      <ScreenWrapper>
+        <Heading />
+        <View style={styles.dayMonthBar}>
+          <DayMonthBar viewMode={viewMode} setViewMode={setViewMode} />
+        </View>
+        <View style={{ flex: 1 }}>
+          {viewMode === "Month" && <MonthScreen />}
+          {viewMode === "Day" && <DayScreen />}
+        </View>
+      </ScreenWrapper>
+    </AnimateOpen>
   );
 }
 
