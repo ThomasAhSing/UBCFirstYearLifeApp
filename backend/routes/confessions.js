@@ -186,13 +186,18 @@ router.get('/staged', async (req, res) => {
 });
 
 router.get('/posted', async (req, res) => {
-  const { residence } = req.query
+  const { residence } = req.query;
+  if (!residence) return res.status(400).json({ error: 'residence is required' });
 
   const confessions = await Confession.find({
-    residence: residence,
-    posted: true
-  }).sort({ postID: -1, confessionIndex: -1 })
-  res.json(confessions)
+    residence,
+    state: 'posted',               // ← was posted: true
+  })
+    .sort({ postID: -1, confessionIndex: 1 }) // newest drop first; items in drop ascending
+    .lean();
+
+  res.json(confessions);
 });
+
 
 module.exports = router;

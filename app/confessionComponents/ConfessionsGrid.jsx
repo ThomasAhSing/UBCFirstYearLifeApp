@@ -50,6 +50,10 @@ export default function ConfessionsGrid({ selectedResidence }) {
     }
   }
 
+  
+  console.log("postedConfessionsByResidence")
+  console.log(postedConfessionsByResidence)
+
   return (
     <View style={styles.container}>
       

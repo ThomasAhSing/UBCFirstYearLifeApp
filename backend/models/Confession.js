@@ -14,13 +14,15 @@ const confessionSchema = new mongoose.Schema({
   content: { type: String, required: true },
 });
 
-// 1) Posted feed per residence: find({ residence, state:'posted' }).sort({ postedAt:-1 })
-confessionSchema.index({ residence: 1, state: 1, postedAt: -1 });
+
 
 // 2) Per-post fetch & item order. Partial so it only applies once postID exists.
 confessionSchema.index(
   { postID: 1, residence: 1, confessionIndex: 1 },
   { unique: true, partialFilterExpression: { postID: { $exists: true } } }
+);
+confessionSchema.index(
+  { residence: 1, state: 1, postID: -1, confessionIndex: 1 }
 );
 
 // 3) (Optional) Unposted admin/queue per residence ordered by submission time

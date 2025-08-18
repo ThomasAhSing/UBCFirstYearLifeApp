@@ -7,8 +7,8 @@ export const DataContext = createContext();
 console.log(process.env.EXPO_PUBLIC_API_BASE_URL)
 const API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:10000"
 export const api = axios.create({
-  baseURL: API_BASE,
-  timeout: 10000,
+    baseURL: API_BASE,
+    timeout: 10000,
 });
 
 export const DataProvider = ({ children }) => {
@@ -57,7 +57,7 @@ export const DataProvider = ({ children }) => {
             for (const { residence, data } of results) {
                 newData[residence] = data;
             }
-            
+
             setPostedConfessionsByResidence(newData);
             setPostedConfessionsDataLoaded(true);
             // console.log(newData)
@@ -164,27 +164,37 @@ export const DataProvider = ({ children }) => {
 };
 
 // helper methods
-function formatFetchedData(fetchedConfessions = []) {
-    const grouped = {};
-    for (const conf of fetchedConfessions) {
-        if (!grouped[conf.postID]) {
-            grouped[conf.postID] = [];
-        }
-        grouped[conf.postID].push(conf);
-    }
-
-    // Step 2: Sort postIDs descending
-    const sortedPostIDs = Object.keys(grouped)
-        .map(Number)
-        .sort((a, b) => b - a);
-
-    // Step 3: For each postID, sort its confessions by confessionIndex ascending
-    const result = sortedPostIDs.map(postID =>
-        grouped[postID].sort((a, b) => a.confessionIndex - b.confessionIndex)
-    );
-
-    return result;
+function formatFetchedData(fetched = []) {
+  const groups = new Map();
+  for (const c of fetched) {
+    const id = String(c.postID ?? '');
+    if (!groups.has(id)) groups.set(id, []);
+    groups.get(id).push(c); // already in confessionIndex asc order
+  }
+  return Array.from(groups.values()); // already newest->oldest by postID
 }
+
+// function formatFetchedData(fetchedConfessions = []) {
+//     const grouped = {};
+//     for (const conf of fetchedConfessions) {
+//         if (!grouped[conf.postID]) {
+//             grouped[conf.postID] = [];
+//         }
+//         grouped[conf.postID].push(conf);
+//     }
+
+//     // Step 2: Sort postIDs descending
+//     const sortedPostIDs = Object.keys(grouped)
+//         .map(Number)
+//         .sort((a, b) => b - a);
+
+//     // Step 3: For each postID, sort its confessions by confessionIndex ascending
+//     const result = sortedPostIDs.map(postID =>
+//         grouped[postID].sort((a, b) => a.confessionIndex - b.confessionIndex)
+//     );
+
+//     return result;
+// }
 
 function formatEventsData(fetchedEventsData = []) {
     const grouped = {};

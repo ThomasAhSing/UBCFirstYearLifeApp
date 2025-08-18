@@ -28,7 +28,6 @@ export default function ConfessionsScreen() {
   }, [postedConfessionsDataLoaded, postedConfessionsDataLoading, loadAllPostedConfessions]);
 
 
-
   // ✅ Single return; branch inside
   return (
     <AnimateOpen>
