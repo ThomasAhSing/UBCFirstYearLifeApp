@@ -1,29 +1,32 @@
 {
   "expo": {
-    "name": "UBCFirstYearLifeApp",
-    "slug": "UBCFirstYearLifeApp",
+    "name": "FirstYearLife",
+    "slug": "FirstYearLife",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/ubcfyla_app_icon",
-    "scheme": "ubcfirstyearlifeapp",
+    "icon": "./assets/images/ubcfyla_app_icon.png",
+    "scheme": "firstyearlife",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ahsingthomas.firstyearlife"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/ubcfyla_app_icon.png",
+        "backgroundColor": "#0C2A42"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.ahsingthomas.firstyearlife"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/ubcfyla_app_icon.png"
     },
     "plugins": [
+      "expo-notifications",
       "expo-router",
       [
         "expo-splash-screen",
