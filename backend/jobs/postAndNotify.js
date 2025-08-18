@@ -10,7 +10,7 @@ module.exports = async function postAndNotify() {
   console.log('[post] now (UTC)=', now.toISOString());
 
   try {
-    // group ready staged posts by postID
+    // group ready staged posts by postID (each postID = residence batch)
     const groups = await Confession.aggregate([
       { $match: { state: 'staged', postedAt: { $lte: now } } },
       { $group: { _id: '$postID', count: { $sum: 1 } } },
@@ -24,8 +24,10 @@ module.exports = async function postAndNotify() {
       return;
     }
 
+    let totalFlipped = 0;   // track whether anything actually moved to posted
+    let processedAny = false;
+
     for (const { _id: postID, count } of groups) {
-      // Per-group isolation: a failure here won't abort other groups
       try {
         if (!postID) {
           console.warn('[post] SKIP: encountered group with empty postID');
@@ -48,30 +50,37 @@ module.exports = async function postAndNotify() {
           { $set: { state: 'posted' } }
         );
         const flipped = flipRes?.modifiedCount ?? flipRes?.nModified ?? 0;
+        totalFlipped += flipped;
+        processedAny = true;
         console.log(`[post] flipped staged→posted for postID=${postID} | modified=${flipped}`);
 
-        // send push to all subscribed devices (defensive: treat non-array as empty)
-        const tokenDocs = await PushToken.find({ subscribed: true }).lean();
-        const tokens = Array.isArray(tokenDocs) ? tokenDocs.map(t => t.token) : [];
-        console.log(`[post] sending push to ${tokens.length} devices for postID=${postID}`);
-
-        await sendPushToAll(tokens, {
-          title: 'New confessions are live',
-          body: 'Tap to read the latest batch.',
-          data: { route: 'Confessions', postID },
-        });
-        console.log(`[post] push dispatched for postID=${postID}`);
-
-        // record that we've sent for this postID
+        // record that we've handled this postID (prevents reprocessing next minute)
         await Sent.create({ postID, sentAt: new Date() });
         console.log(`[post] recorded Sent for postID=${postID}`);
+
+        // ⛔️ NOTE: no per-residence push here anymore
       } catch (e) {
-        // Do not rethrow—continue with remaining groups
         console.error(`[post] ERROR in postID=${postID}:`, e);
       }
     }
+
+    // ✅ Single push for all residences if *anything* flipped this tick
+    if (processedAny && totalFlipped > 0) {
+      const tokenDocs = await PushToken.find({ subscribed: true }).lean();
+      const tokens = Array.isArray(tokenDocs) ? tokenDocs.map(t => t.token) : [];
+      console.log(`[post] sending ONE push to ${tokens.length} devices for all residences (flipped=${totalFlipped})`);
+
+      await sendPushToAll(tokens, {
+        title: 'New confessions are live',
+        body: 'All residences just posted. Tap to read.',
+        data: { route: 'Confessions' } // no per-residence postID now
+      });
+
+      console.log('[post] single push dispatched for all residences');
+    } else {
+      console.log('[post] nothing flipped; no push sent');
+    }
   } catch (e) {
-    // Top-level safety: log and exit this tick, cron will retry next minute
     console.error('[post] FATAL in aggregation or outer loop:', e);
   } finally {
     console.log('──────── [post] END ─────────');
