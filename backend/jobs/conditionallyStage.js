@@ -6,25 +6,35 @@ const { slug } = require('../utils/slug');
 const { getNextSeq } = require('../utils/counters');
 
 // thresholds (override via env if you like)
-const DAYS_THRESHOLD  = Number(process.env.DAYS_THRESHOLD  || 5);   // drop if >= X days since last posted
+const DAYS_THRESHOLD = Number(process.env.DAYS_THRESHOLD || 5);   // drop if >= X days since last posted
 const COUNT_THRESHOLD = Number(process.env.COUNT_THRESHOLD || 30);  // OR if >= X unposted
-const MAX_PER_POST    = Number(process.env.MAX_PER_POST    || 10);  // chunk size per residence
+const MAX_PER_POST = Number(process.env.MAX_PER_POST || 10);  // chunk size per residence
+
+console.log("DAYS_THRESHOLD")
+console.log(DAYS_THRESHOLD)
 
 module.exports = async function conditionallyStage() {
   // 1) Should we drop tonight?
   const last = await Confession.findOne({ state: 'posted' }).sort({ postedAt: -1 }).lean();
-  const daysSince = last
-    ? DateTime.fromJSDate(new Date()).diff(DateTime.fromJSDate(last.postedAt), 'days').days
+  const dropAt = tonight7pmUTC(); // JS Date for 7:00 PM PT today (you already have this util)
+
+  const daysSinceAtDrop = last
+    ? DateTime.fromJSDate(dropAt).diff(DateTime.fromJSDate(last.postedAt), 'days').days
     : Infinity;
 
-  const unpostedCount = await Confession.countDocuments({ state: 'unposted' });
-  const needsDrop = (daysSince >= DAYS_THRESHOLD) || (unpostedCount >= COUNT_THRESHOLD);
+  // use this in needsDrop:
+  const needsDrop =
+    (daysSinceAtDrop >= DAYS_THRESHOLD) || (unpostedCount >= COUNT_THRESHOLD);
+  console.log("needsDrop")
+  console.log(needsDrop)
+  console.log("isBefore7pmLocal")
+  console.log(isBefore7pmLocal)
   if (!needsDrop) return;
   if (!isBefore7pmLocal()) return; // only stage before 7pm local
 
   // 2) If anything already staged for today, do nothing (MVP behavior)
   const startUTC = startOfTodayUTC();
-  const endUTC   = endOfTodayUTC();
+  const endUTC = endOfTodayUTC();
   const already = await Confession.exists({ state: 'staged', postedAt: { $gte: startUTC, $lte: endUTC } });
   if (already) return;
 
@@ -33,7 +43,7 @@ module.exports = async function conditionallyStage() {
   if (!pick.length) return;
 
   const postedAt = tonight7pmUTC();     // JS Date in UTC for today 7pm PT
-  const dateKey  = dateKeyFor(postedAt); // "YYYY-MM-DD"
+  const dateKey = dateKeyFor(postedAt); // "YYYY-MM-DD"
 
   // 4) Group by residence and chunk
   const byRes = new Map();
@@ -50,7 +60,7 @@ module.exports = async function conditionallyStage() {
       if (!chunk.length) continue;
 
       const seq = await getNextSeq(dateKey, resSlug); // 1,2,3...
-      const postID = `${dateKey}-${resSlug}-${String(seq).padStart(2,'0')}`;
+      const postID = `${dateKey}-${resSlug}-${String(seq).padStart(2, '0')}`;
 
       chunk.forEach((doc, idx) => {
         ops.push({
@@ -60,7 +70,7 @@ module.exports = async function conditionallyStage() {
               $set: {
                 state: 'staged',
                 postID,
-                confessionIndex: idx,
+                confessionIndex: idx + 1,
                 postedAt,
                 stagedAt: new Date(),
               }

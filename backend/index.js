@@ -12,6 +12,8 @@ if (require.main === module) {
 }
 
 // ⬅️ ADDED: fail fast if someone set dry run in production by mistake
+console.log("NODE_ENV")
+console.log(process.env.NODE_ENV)
 if (process.env.NODE_ENV === 'production' && process.env.PUSH_DRY_RUN === 'true') {
   console.error('Refusing to start: PUSH_DRY_RUN=true in production');
   process.exit(1);
@@ -49,7 +51,9 @@ const postAndNotify = require('./jobs/postAndNotify');           // flips to pos
 
 // ⬅️ ADDED: dev-only admin endpoints so you can test without cron
 if (process.env.NODE_ENV !== 'production') {
+  console.log("running conditionallyStage")
   app.post('/admin/stage-now', async (req, res) => {
+    console.log('[admin] /admin/stage-now HIT');
     try { await conditionallyStage(); res.json({ ok: true }); }
     catch (e) { console.error(e); res.status(500).json({ ok: false, error: e.message }); }
   });
