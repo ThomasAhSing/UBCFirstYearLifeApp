@@ -146,7 +146,7 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
 
     const slideHTMLFromCard = (card) => {
       const title = humanResidence(residence) + ' Confessions';
-      const message = 'Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person.';
+      const message = 'Dump your intrusive thoughts, or confess anything anonymously.';
       const submitted = formatConfessionTimeISO(card.submittedAt);
       return \`
         <div class="slideInner">
