@@ -6,9 +6,9 @@ const { slug } = require('../utils/slug');
 const { getNextSeq } = require('../utils/counters');
 
 // thresholds (override via env if you like)
-const DAYS_THRESHOLD  = Number(process.env.DAYS_THRESHOLD  || 5);   // drop if >= X days since last posted
+const DAYS_THRESHOLD = Number(process.env.DAYS_THRESHOLD || 5);   // drop if >= X days since last posted
 const COUNT_THRESHOLD = Number(process.env.COUNT_THRESHOLD || 30);  // OR if >= X unposted
-const MAX_PER_POST    = Number(process.env.MAX_PER_POST    || 10);  // chunk size per residence
+const MAX_PER_POST = Number(process.env.MAX_PER_POST || 10);  // chunk size per residence
 
 console.log('[stage] env: DAYS_THRESHOLD=%s COUNT_THRESHOLD=%s MAX_PER_POST=%s',
   DAYS_THRESHOLD, COUNT_THRESHOLD, MAX_PER_POST);
@@ -28,10 +28,9 @@ module.exports = async function conditionallyStage() {
     : Infinity;
   console.log('[stage] daysSinceAtDrop=%s', Number.isFinite(daysSinceAtDrop) ? daysSinceAtDrop.toFixed(3) : 'Infinity');
 
-  // NOTE: if unpostedCount is declared elsewhere, this log won’t change behavior.
-  // typeof is safe even if it isn't declared in this file.
-  console.log('[stage] typeof unpostedCount at this point:', typeof unpostedCount);
 
+  const unpostedCount = await Confession.countDocuments({ state: 'unposted' });
+  console.log('[stage] unpostedCount=', unpostedCount);
   // use this in needsDrop:
   const needsDrop =
     (daysSinceAtDrop >= DAYS_THRESHOLD) || (unpostedCount >= COUNT_THRESHOLD);
@@ -46,7 +45,7 @@ module.exports = async function conditionallyStage() {
 
   // 2) If anything already staged for today, do nothing (MVP behavior)
   const startUTC = startOfTodayUTC();
-  const endUTC   = endOfTodayUTC();
+  const endUTC = endOfTodayUTC();
   const already = await Confession.exists({ state: 'staged', postedAt: { $gte: startUTC, $lte: endUTC } });
   console.log('[stage] already staged today?', Boolean(already));
   if (already) { console.log('[stage] SKIP: batch already staged today'); console.log('──────── [stage] END ─────────'); return; }
@@ -57,7 +56,7 @@ module.exports = async function conditionallyStage() {
   if (!pick.length) { console.log('[stage] SKIP: no unposted'); console.log('──────── [stage] END ─────────'); return; }
 
   const postedAt = tonight7pmUTC();     // JS Date in UTC for today 7pm PT
-  const dateKey  = dateKeyFor(postedAt); // "YYYY-MM-DD"
+  const dateKey = dateKeyFor(postedAt); // "YYYY-MM-DD"
   console.log('[stage] dateKey=', dateKey);
 
   // 4) Group by residence and chunk
