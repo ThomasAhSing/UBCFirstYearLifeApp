@@ -17,10 +17,6 @@ const RES_COLORS = {
   OrchardCommons:  { background: '#E8DFFB', accent: '#7A5CA0' },
 };
 
-// ---------- preview images ----------
-const OG_IMAGE_CONFESSIONS = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ConfessionSharePreview.png?alt=media&token=2897fc33-331b-4262-a938-3faf731c33da';
-const OG_IMAGE_POSTS       = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ubcfyla_app_icon.png?alt=media&token=32f2af08-3064-4315-8a5c-e1d9afa88355';
-
 // ---------- helpers ----------
 const esc = (s='') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const qci  = (ci) => (Number.isFinite(ci) ? `?ci=${ci}` : '');
@@ -56,22 +52,16 @@ a.primary{background:#2c69a5;color:#fff;border-color:transparent}
 .footer{opacity:.55;font-size:12px;margin-top:16px}
 
 /* --- carousel + slide layout --- */
-/* IMPORTANT: transparent bg so we don't see a gray/teal block before content */
-.carousel{position:relative;margin-top:14px;overflow:hidden;border-radius:12px;border:1px solid rgba(0,0,0,.08);background:transparent}
-.carousel.plain{background:transparent;border:none}
+.carousel{position:relative;margin-top:14px;overflow:hidden;border-radius:12px;border:1px solid rgba(0,0,0,.08);background:var(--teal)}
+.carousel.plain{background:transparent;border:none}             /* <-- posts: no green bg/border */
 .track{display:flex;transition:transform .25s ease}
 .slide{min-width:100%;padding:0;display:flex;align-items:center;justify-content:center}
 
-/* Square ratio fallback (works in IG/Twitter in-app webviews that lack aspect-ratio) */
-.square{position:relative;width:100%;max-width:760px}
-.square::before{content:"";display:block;padding-top:100%} /* 1:1 box */
-.square > .content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
-
 /* confession look */
-.slideInner.square > .content{background:var(--teal)}
+.slideInner{width:100%;max-width:760px;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--teal)}
 .whiteBlock{width:88%;background:#fff;border-radius:10px;color:var(--text)}
 .blockHeader{margin-top:28px;height:32%;border-top:10px solid var(--tealTop)}
-.blockBody{margin-top:15px;height:70%}
+.blockBody{margin-top:15px;height:50%}
 .heading{font-weight:800;font-size:20px;padding:7px;color:var(--text)}
 .message{font-size:14px;padding:0 7px 5px 7px;color:var(--text)}
 .subheading{font-weight:600;font-size:16px;padding:7px 7px 10px 7px;color:var(--text)}
@@ -79,7 +69,7 @@ a.primary{background:#2c69a5;color:#fff;border-color:transparent}
 .submittedRow span{font-style:italic;color:gray;font-size:12px;padding-right:6%}
 
 /* posts look (plain images, still square) */
-.plainInner.square > .content{background:transparent;align-items:center;justify-content:center}
+.plainInner{width:100%;max-width:760px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:transparent}
 .mediaImg{display:block;max-width:100%;max-height:100%;object-fit:contain;border-radius:12px}
 
 .dotsRow{display:flex;gap:6px;justify-content:center;margin:10px 0 0}
@@ -95,24 +85,15 @@ const JS = (deep) => `
 (function(){
   var deep='${deep}';
   var isAndroid = /Android/i.test(navigator.userAgent);
-  var ua = String(navigator.userAgent||'');
-  var isInstagram = /Instagram/i.test(ua);
-  var isFBInApp = /(FBAN|FBAV|FB_IAB)/i.test(ua);
-
   var openBtn = document.getElementById('openApp');
   if(openBtn){
     openBtn.addEventListener('click', function(e){
       e.preventDefault();
-      try { window.location.href = deep; } catch(_) {}
-      if (isAndroid) setTimeout(function(){ try{ window.location.href='${PLAY_URL}'; }catch(_){ } }, 1000);
+      window.location.href = deep;
+      if (isAndroid) setTimeout(function(){ window.location.href='${PLAY_URL}'; }, 1000);
     });
   }
-
-  // Avoid auto-redirect from in-app browsers like Instagram/FB webview
-  // (these often hang and show a blank/gray preview)
-  if (isAndroid && !isInstagram && !isFBInApp) {
-    setTimeout(function(){ openBtn && openBtn.click(); }, 0);
-  }
+  if (isAndroid) setTimeout(function(){ openBtn && openBtn.click(); }, 0);
 })();
 `;
 
@@ -145,9 +126,6 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
     const mount = document.getElementById('carouselMount');
     if (!mount) return;
 
-    const total = (imgs.length||0) + (cards.length||0) + (slides.length||0);
-    if (total === 0) return; // nothing to render
-
     const container = document.createElement('div');
     container.className = 'carousel' + (plainImages ? ' plain' : '');
 
@@ -164,21 +142,19 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
 
     const slideHTMLFromCard = (card) => {
       const title = humanResidence(residence) + ' Confessions';
-      const message = 'Dump your intrusive thoughts, or confess anything anonymously.';
+      const message = 'Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person.';
       const submitted = formatConfessionTimeISO(card.submittedAt);
       return \`
-        <div class="slideInner square">
-          <div class="content">
-            <div class="whiteBlock blockHeader">
-              <div class="heading">\${title}</div>
-              <div class="message">\${message}</div>
-            </div>
-            <div class="whiteBlock blockBody">
-              <div class="subheading">Insert Confession Below</div>
-              <div class="message">\${String(card.content||'').replace(/</g,'&lt;')}</div>
-            </div>
-            <div class="submittedRow"><span>\${submitted ? 'Submitted ' + submitted : ''}</span></div>
+        <div class="slideInner">
+          <div class="whiteBlock blockHeader">
+            <div class="heading">\${title}</div>
+            <div class="message">\${message}</div>
           </div>
+          <div class="whiteBlock blockBody">
+            <div class="subheading">Insert Confession Below</div>
+            <div class="message">\${String(card.content||'').replace(/</g,'&lt;')}</div>
+          </div>
+          <div class="submittedRow"><span>\${submitted ? 'Submitted ' + submitted : ''}</span></div>
         </div>
       \`;
     };
@@ -187,18 +163,16 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
     if (imgs.length && plainImages) {
       // POSTS: plain images, no teal background
       htmlSlides = imgs.map(src => \`
-        <div class="plainInner square">
-          <div class="content">
-            <img class="mediaImg" alt="slide" src="\${src}" loading="lazy" />
-          </div>
+        <div class="plainInner">
+          <img class="mediaImg" alt="slide" src="\${src}" />
         </div>
       \`);
     } else if (imgs.length) {
-      // (Not expected now, but keep safe)
+      // images but using confession look (not used for posts anymore)
       htmlSlides = imgs.map(src => \`
-        <div class="slideInner square">
-          <div class="content" style="align-items:center;justify-content:center;">
-            <img alt="slide" src="\${src}" loading="lazy" style="max-width:88%;max-height:88%;object-fit:contain;border-radius:10px;" />
+        <div class="slideInner">
+          <div class="whiteBlock blockBody" style="height:88%;display:flex;align-items:center;justify-content:center;">
+            <img alt="slide" src="\${src}" style="max-width:88%;max-height:88%;object-fit:contain;border-radius:10px;" />
           </div>
         </div>
       \`);
@@ -206,18 +180,16 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
       htmlSlides = cards.map(slideHTMLFromCard);
     } else if (slides.length) {
       htmlSlides = slides.map(text => \`
-        <div class="slideInner square">
-          <div class="content">
-            <div class="whiteBlock blockHeader">
-              <div class="heading">\${humanResidence(residence)} Confessions</div>
-              <div class="message">Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person.</div>
-            </div>
-            <div class="whiteBlock blockBody">
-              <div class="subheading">Insert Confession Below</div>
-              <div class="message">\${String(text||'').replace(/</g,'&lt;')}</div>
-            </div>
-            <div class="submittedRow"><span></span></div>
+        <div class="slideInner">
+          <div class="whiteBlock blockHeader">
+            <div class="heading">\${humanResidence(residence)} Confessions</div>
+            <div class="message">Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person.</div>
           </div>
+          <div class="whiteBlock blockBody">
+            <div class="subheading">Insert Confession Below</div>
+            <div class="message">\${String(text||'').replace(/</g,'&lt;')}</div>
+          </div>
+          <div class="submittedRow"><span></span></div>
         </div>
       \`);
     }
@@ -259,7 +231,7 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
 `;
 
 // ---------- HTML base ----------
-function renderBase({ title, deep, web, innerHTML, overrides={}, desc, image }) {
+function renderBase({ title, deep, web, innerHTML, overrides={} }) {
   const rootOverride = `
     <style>
       :root{
@@ -273,13 +245,8 @@ function renderBase({ title, deep, web, innerHTML, overrides={}, desc, image }) 
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${esc(title)}</title>
 <meta property="og:title" content="${esc(title)}">
-<meta property="og:description" content="${esc(desc || '')}">
-<meta property="og:image" content="${esc(image || '')}">
 <meta property="og:url" content="${esc(web)}">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${esc(title)}">
-<meta name="twitter:description" content="${esc(desc || '')}">
-${image ? `<meta name="twitter:image" content="${esc(image)}">` : '' }
+<meta name="twitter:card" content="summary">
 <style>${CSS}</style>
 ${rootOverride}
 </head>
@@ -287,7 +254,6 @@ ${rootOverride}
   <div class="wrap">
     <div class="card">
       <div class="title">${esc(title)}</div>
-      ${desc ? `<div style="margin-top:8px;color:#bcd7f4;font-size:15px;">${esc(desc)}</div>` : ''}
 
       ${innerHTML}
 
@@ -302,7 +268,7 @@ ${rootOverride}
         <a href="${PLAY_URL}"><img alt="Google Play" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"></a>
       </div>
 
-      <div class="footer">First Year Life - For UBC Students</div>
+      <div class="footer">UBC First Year Life</div>
     </div>
   </div>
 <script>${JS(''+deep)}</script>
@@ -331,9 +297,7 @@ router.get('/cg/:residence/:postId', (req, res) => {
 
   const col = colorForResidence(residence);
   const html = renderBase({
-    title: "Don't miss out on UBC confessions, news and events.",
-    desc: "Download First Year Life today",
-    image: OG_IMAGE_CONFESSIONS,
+    title: 'Download UBC First Year Life for more confessions, news and events',
     deep, web,
     innerHTML: onlyCarouselInner(),
     overrides: { teal: col.background, tealTop: col.accent }
@@ -365,11 +329,10 @@ router.get('/p/:shortcode', (req, res) => {
   const web  = `${WEB_BASE}/p/${encodeURIComponent(shortcode)}${qci(ci)}`;
 
   const html = renderBase({
-    title: "Don't miss out on UBC news, events and confessions",
-    desc: "Download First Year Life today",
-    image: OG_IMAGE_POSTS,
+    title: 'Download UBC First Year Life to see more posts',
     deep, web,
     innerHTML: onlyCarouselInner(),
+    // palette here won't matter because .carousel.plain removes bg/border
     overrides: { teal: 'transparent', tealTop: 'transparent' }
   });
 
