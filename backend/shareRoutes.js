@@ -61,7 +61,7 @@ a.primary{background:#2c69a5;color:#fff;border-color:transparent}
 .slideInner{width:100%;max-width:760px;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--teal)}
 .whiteBlock{width:88%;background:#fff;border-radius:10px;color:var(--text)}
 .blockHeader{margin-top:28px;height:32%;border-top:10px solid var(--tealTop)}
-.blockBody{margin-top:15px;height:50%}
+.blockBody{margin-top:15px;height:70%}
 .heading{font-weight:800;font-size:20px;padding:7px;color:var(--text)}
 .message{font-size:14px;padding:0 7px 5px 7px;color:var(--text)}
 .subheading{font-weight:600;font-size:16px;padding:7px 7px 10px 7px;color:var(--text)}
@@ -142,7 +142,7 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
 
     const slideHTMLFromCard = (card) => {
       const title = humanResidence(residence) + ' Confessions';
-      const message = 'Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person.';
+      const message = 'Dump your intrusive thoughts, or confess anything anonymously.';
       const submitted = formatConfessionTimeISO(card.submittedAt);
       return \`
         <div class="slideInner">

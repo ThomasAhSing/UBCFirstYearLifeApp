@@ -67,7 +67,7 @@ export default function ShareButton(props) {
       if (extras.toString()) {
         urls.web += (urls.web.includes('?') ? '&' : '?') + extras.toString();
       }
-      text = trim(props.preview || props.post?.caption || '');
+      text = "";
     } else {
       // CONFESSIONS
       const list = Array.isArray(props.confessions) ? props.confessions : [];
