@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 
 // ---------- config ----------
-const APP_SCHEME   = (process.env.APP_SCHEME || 'ubcfirstyearlifeapp') + '://';
+const APP_SCHEME   = (process.env.APP_SCHEME || 'firstyearlife') + '://';
 const WEB_BASE     = (process.env.WEB_BASE || 'https://ubcfirstyearlifeapp.onrender.com').replace(/\/+$/,'');
-const APPSTORE_URL = 'https://apps.apple.com/app/idYOUR_APP_ID';                  // TODO
-const PLAY_URL     = 'https://play.google.com/store/apps/details?id=YOUR.PACKAGE'; // TODO
+const APPSTORE_URL = 'https://apps.apple.com/app/idMY_APP_ID';                  // TODO
+const PLAY_URL     = 'https://play.google.com/store/apps/details?id=MY.PACKAGE'; // TODO
 
 // Page background
 const PAGE_BG = '#0C2A42';
@@ -16,6 +16,10 @@ const RES_COLORS = {
   TotemPark:       { background: '#B0E9E3', accent: '#009688' },
   OrchardCommons:  { background: '#E8DFFB', accent: '#7A5CA0' },
 };
+
+// ---------- preview images (added) ----------
+const OG_IMAGE_CONFESSIONS = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ConfessionPreview.jpeg?alt=media&token=f0a13531-c932-43a8-a458-16b416e405f2';
+const OG_IMAGE_POSTS       = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ubcfyla_app_icon.png?alt=media&token=32f2af08-3064-4315-8a5c-e1d9afa88355';
 
 // ---------- helpers ----------
 const esc = (s='') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -61,7 +65,7 @@ a.primary{background:#2c69a5;color:#fff;border-color:transparent}
 .slideInner{width:100%;max-width:760px;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--teal)}
 .whiteBlock{width:88%;background:#fff;border-radius:10px;color:var(--text)}
 .blockHeader{margin-top:28px;height:32%;border-top:10px solid var(--tealTop)}
-.blockBody{margin-top:15px;height:50%}
+.blockBody{margin-top:15px;height:60%}
 .heading{font-weight:800;font-size:20px;padding:7px;color:var(--text)}
 .message{font-size:14px;padding:0 7px 5px 7px;color:var(--text)}
 .subheading{font-weight:600;font-size:16px;padding:7px 7px 10px 7px;color:var(--text)}
@@ -231,7 +235,7 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
 `;
 
 // ---------- HTML base ----------
-function renderBase({ title, deep, web, innerHTML, overrides={} }) {
+function renderBase({ title, deep, web, innerHTML, overrides={}, desc, image }) {
   const rootOverride = `
     <style>
       :root{
@@ -245,8 +249,13 @@ function renderBase({ title, deep, web, innerHTML, overrides={} }) {
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${esc(title)}</title>
 <meta property="og:title" content="${esc(title)}">
+${desc ? `<meta property="og:description" content="${esc(desc)}">` : ''}
+${image ? `<meta property="og:image" content="${esc(image)}">` : ''}
 <meta property="og:url" content="${esc(web)}">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}">
+<meta name="twitter:title" content="${esc(title)}">
+${desc ? `<meta name="twitter:description" content="${esc(desc)}">` : ''}
+${image ? `<meta name="twitter:image" content="${esc(image)}">` : ''}
 <style>${CSS}</style>
 ${rootOverride}
 </head>
@@ -254,6 +263,7 @@ ${rootOverride}
   <div class="wrap">
     <div class="card">
       <div class="title">${esc(title)}</div>
+      ${desc ? `<div style="margin-top:8px;color:#bcd7f4;font-size:15px;">${esc(desc)}</div>` : ''}
 
       ${innerHTML}
 
@@ -298,6 +308,8 @@ router.get('/cg/:residence/:postId', (req, res) => {
   const col = colorForResidence(residence);
   const html = renderBase({
     title: 'Download UBC First Year Life for more confessions, news and events',
+    desc: 'Download First Year Life today',                // added
+    image: OG_IMAGE_CONFESSIONS,                           // added
     deep, web,
     innerHTML: onlyCarouselInner(),
     overrides: { teal: col.background, tealTop: col.accent }
@@ -330,6 +342,8 @@ router.get('/p/:shortcode', (req, res) => {
 
   const html = renderBase({
     title: 'Download UBC First Year Life to see more posts',
+    desc: 'Download First Year Life today',                // added
+    image: OG_IMAGE_POSTS,                                 // added
     deep, web,
     innerHTML: onlyCarouselInner(),
     // palette here won't matter because .carousel.plain removes bg/border
