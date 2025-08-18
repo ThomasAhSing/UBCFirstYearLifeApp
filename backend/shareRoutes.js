@@ -278,7 +278,7 @@ ${rootOverride}
         <a href="${PLAY_URL}"><img alt="Google Play" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"></a>
       </div>
 
-      <div class="footer">UBC First Year Life</div>
+      <div class="footer">First Year Life - For UBC Students</div>
     </div>
   </div>
 <script>${JS(''+deep)}</script>
