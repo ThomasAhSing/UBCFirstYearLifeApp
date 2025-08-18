@@ -65,8 +65,7 @@ export default function RenderedConfession({ confessionObj }) {
           <Text style = {styles.message}>{confessionObj.content}</Text>
         </View>
         <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-end'}}>
-          <Text style={styles.submittedAtText}>Submitted 
-            {formatConfessionTime(confessionObj.submittedAt)}</Text>
+          <Text style={styles.submittedAtText}>Submitted {formatConfessionTime(confessionObj.submittedAt)}</Text>
         </View>
       </View>
     )

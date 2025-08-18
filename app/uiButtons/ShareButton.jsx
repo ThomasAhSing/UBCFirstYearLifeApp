@@ -86,7 +86,7 @@ export default function ShareButton(props) {
       const { content } = getConfessionBasics(sel);
 
       urls = confUrls(residence, postId, ci);
-      text = trim(content);
+      text = "";
 
       const cards = list.map(c => {
         const b = getConfessionBasics(c);

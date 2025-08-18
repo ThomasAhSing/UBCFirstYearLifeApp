@@ -17,6 +17,10 @@ const RES_COLORS = {
   OrchardCommons:  { background: '#E8DFFB', accent: '#7A5CA0' },
 };
 
+// ---------- preview images (added) ----------
+const OG_IMAGE_CONFESSIONS = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ConfessionPreview.jpeg?alt=media&token=f0a13531-c932-43a8-a458-16b416e405f2';
+const OG_IMAGE_POSTS       = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ubcfyla_app_icon.png?alt=media&token=32f2af08-3064-4315-8a5c-e1d9afa88355';
+
 // ---------- helpers ----------
 const esc = (s='') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const qci  = (ci) => (Number.isFinite(ci) ? `?ci=${ci}` : '');
@@ -231,7 +235,7 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
 `;
 
 // ---------- HTML base ----------
-function renderBase({ title, deep, web, innerHTML, overrides={} }) {
+function renderBase({ title, deep, web, innerHTML, overrides={}, desc, image }) {
   const rootOverride = `
     <style>
       :root{
@@ -245,8 +249,13 @@ function renderBase({ title, deep, web, innerHTML, overrides={} }) {
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${esc(title)}</title>
 <meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(desc || '')}">
+<meta property="og:image" content="${esc(image || '')}">
 <meta property="og:url" content="${esc(web)}">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(desc || '')}">
+${image ? `<meta name="twitter:image" content="${esc(image)}">` : '' }
 <style>${CSS}</style>
 ${rootOverride}
 </head>
@@ -254,6 +263,7 @@ ${rootOverride}
   <div class="wrap">
     <div class="card">
       <div class="title">${esc(title)}</div>
+      ${desc ? `<div style="margin-top:8px;color:#bcd7f4;font-size:15px;">${esc(desc)}</div>` : ''}
 
       ${innerHTML}
 
@@ -268,7 +278,7 @@ ${rootOverride}
         <a href="${PLAY_URL}"><img alt="Google Play" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"></a>
       </div>
 
-      <div class="footer">UBC First Year Life</div>
+      <div class="footer">First Year Life - For UBC Students</div>
     </div>
   </div>
 <script>${JS(''+deep)}</script>
@@ -299,6 +309,7 @@ router.get('/cg/:residence/:postId', (req, res) => {
   const html = renderBase({
     title: "Don't miss out on UBC confessions, news and events.",
     desc: "Download First Year Life today",
+    image: OG_IMAGE_CONFESSIONS, // added
     deep, web,
     innerHTML: onlyCarouselInner(),
     overrides: { teal: col.background, tealTop: col.accent }
@@ -332,6 +343,7 @@ router.get('/p/:shortcode', (req, res) => {
   const html = renderBase({
     title: "Don't miss out on UBC news, events and confessions",
     desc: "Download First Year Life today",
+    image: OG_IMAGE_POSTS, // added
     deep, web,
     innerHTML: onlyCarouselInner(),
     // palette here won't matter because .carousel.plain removes bg/border
