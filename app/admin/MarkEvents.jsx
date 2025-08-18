@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, Button, FlatList, TextInput, Pressable, Touchab
 import { useRouter } from 'expo-router';
 import { useContext, useState } from 'react';
 import { DataContext } from '@/context/DataContext';
-// import CheckBox from '@react-native-community/checkbox';
 
 import Heading from '@/app/Heading';
 import Post from '@/app/HomeComponents/Post'

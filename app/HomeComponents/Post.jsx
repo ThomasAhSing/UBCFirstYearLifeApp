@@ -5,7 +5,7 @@ import Sidecar from './Sidecar';
 import PostUIBar from './PostUIBar';
 
 // shared like toggle (assumes likes.js from earlier)
-import { toggleLikedByKey } from '@/app/lib/likes';
+import { toggleLikedByKey } from '@/lib/likes';
 
 export default function Post({ post }) {
   const [expanded, setExpanded] = useState(false);

@@ -5,7 +5,7 @@ import HeartFilled from '@/assets/icons/HeartFilled';
 import {
   keyForPost, keyForConfession,
   getLikedByKey, toggleLikedByKey, likesEvents
-} from '@/app/lib/likes';
+} from '@/lib/likes';
 
 export default function LikeButton({ mode = 'posts', post, confession, confessions, style, onChange }) {
   const pickConf = () => {

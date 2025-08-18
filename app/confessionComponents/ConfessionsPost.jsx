@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Dimensions, FlatList, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { toggleLikedByKey } from '@/app/lib/likes';
+import { toggleLikedByKey } from '@/lib/likes';
 import RenderedConfession from './RenderedConfession';
 import PostUIBar from '@/app/HomeComponents/PostUIBar';
 

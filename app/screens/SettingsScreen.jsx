@@ -14,7 +14,7 @@ import * as Notifications from 'expo-notifications';
 import * as Application from 'expo-application';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { enablePushAsync, unsubscribePushAsync, ensureRegistered } from '../lib/notifications';
+import { enablePushAsync, unsubscribePushAsync, ensureRegistered } from '@/lib/notifications';
 
 import { Colors } from '@/constants/Colors';
 import BackIcon from '@/assets/icons/BackIcon';
@@ -195,8 +195,8 @@ export default function SettingsScreen() {
                 {/* About */}
                 <View style={{ opacity: 0.95 }}>
                     <Text style={{ fontWeight: '600', marginBottom: 6, color: 'white' }}>About</Text>
-                    <Text style={{ color: 'white' }}>UBC First Year Life</Text>
-                    <Text style={{ color: 'white' }}>For Students. By Students.</Text>
+                    <Text style={{ color: 'white' }}>First Year Life - for UBC Students</Text>
+                    {/* <Text style={{ color: 'white' }}>For Students. By Students.</Text> */}
                     <Text style={{ fontWeight: '600', marginBottom: 6, color: 'white', marginTop: 20, }}>Request a feature or report a bug:</Text>
                     <Text style={{ color: 'white',  }}>ahsingthomas@gmail.com</Text>
                     <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 20 }}>

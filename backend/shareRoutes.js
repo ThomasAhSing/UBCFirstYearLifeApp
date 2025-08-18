@@ -297,7 +297,8 @@ router.get('/cg/:residence/:postId', (req, res) => {
 
   const col = colorForResidence(residence);
   const html = renderBase({
-    title: 'Download UBC First Year Life for more confessions, news and events',
+    title: "Don't miss out on UBC confessions, news and events.",
+    desc: "Download First Year Life today",
     deep, web,
     innerHTML: onlyCarouselInner(),
     overrides: { teal: col.background, tealTop: col.accent }
@@ -329,7 +330,8 @@ router.get('/p/:shortcode', (req, res) => {
   const web  = `${WEB_BASE}/p/${encodeURIComponent(shortcode)}${qci(ci)}`;
 
   const html = renderBase({
-    title: 'Download UBC First Year Life to see more posts',
+    title: "Don't miss out on UBC news, events and confessions",
+    desc: "Download First Year Life today",
     deep, web,
     innerHTML: onlyCarouselInner(),
     // palette here won't matter because .carousel.plain removes bg/border

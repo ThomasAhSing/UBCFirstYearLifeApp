@@ -71,7 +71,7 @@ module.exports = async function postAndNotify() {
       console.log(`[post] sending ONE push to ${tokens.length} devices for all residences (flipped=${totalFlipped})`);
 
       await sendPushToAll(tokens, {
-        title: 'New confessions are live',
+        title: 'New confessions posted',
         body: 'All residences just posted. Tap to read.',
         data: { route: 'Confessions' } // no per-residence postID now
       });
