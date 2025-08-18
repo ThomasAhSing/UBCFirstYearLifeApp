@@ -14,7 +14,6 @@ import { Colors } from '@/constants/Colors'
 function formatConfessionTime(isoString) {
   const date = new Date(isoString);
 
-  // Adjust to local time (if needed, change timeZone)
   const options = {
     day: '2-digit',
     month: '2-digit',
@@ -22,15 +21,13 @@ function formatConfessionTime(isoString) {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-    timeZone: 'America/Los_Angeles', // Change if needed
+    timeZone: 'America/Los_Angeles', 
   };
 
   return date.toLocaleString('en-CA', options);
 }
 
 export default function RenderedConfession({ confessionObj }) {
-  // console.log('confobj')
-  // console.log(confessionObj.residence)
   const message = "Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person."
   const anonymous  = "All confessions are anonymous."
   const postSize = Dimensions.get('window').width;
@@ -69,15 +66,12 @@ export default function RenderedConfession({ confessionObj }) {
         </View>
       </View>
     )
-    
-
 }
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
-    // backgroundColor: Colors.background
     backgroundColor: 'red'
   }, 
   whiteBlock: {

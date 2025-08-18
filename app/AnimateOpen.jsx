@@ -8,7 +8,7 @@ export default function AnimateOpen({
   from = 0,
   to = 1,
   style,
-  backgroundColor = '#0C2A42', // your deep blue
+  backgroundColor = '#0C2A42', 
 }) {
   const opacity = useRef(new Animated.Value(from)).current;
 

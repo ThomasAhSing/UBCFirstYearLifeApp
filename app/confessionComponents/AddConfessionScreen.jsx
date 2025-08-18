@@ -25,9 +25,6 @@ const data = [
   { label: 'Place Vanier', residence: 'PlaceVanier' }
 ];
 
-
-
-// TODO add gestures to close keybaord
 const MAX_LENGTH_CONFESSION = 250
 
 export default function AddConfessionScreen({ RES_CON_DATA }) {
@@ -42,7 +39,7 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
         content: text,
       });
       onChangeText('');
-      setResidence(null); // back to placeholder “Select Residence”
+      setResidence(null);
       Alert.alert('Success', 'Your confession was submitted');
     } catch (err) {
       if (err.response) {
@@ -65,8 +62,6 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
     setErrorMessage("")
     submitConfession()
   }
-
-  console.log(residence)
 
 
   return (
@@ -154,10 +149,8 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: 'center'
   },
   dropdownContaienr: {
-    // backgroundColor: 'transparent',
     backgroundColor: '#2B4C65',
     borderWidth: 0,
     borderRadius: 10,

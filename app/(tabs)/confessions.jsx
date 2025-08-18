@@ -20,7 +20,7 @@ export default function ConfessionsScreen() {
 
   const [selectedResidence, setSelectedResidence] = useState("TotemPark");
 
-  // ✅ Always run hooks, no early returns before this
+  // Always run hooks, no early returns before this
   useEffect(() => {
     if (!postedConfessionsDataLoaded && !postedConfessionsDataLoading) {
       loadAllPostedConfessions();
@@ -28,7 +28,7 @@ export default function ConfessionsScreen() {
   }, [postedConfessionsDataLoaded, postedConfessionsDataLoading, loadAllPostedConfessions]);
 
 
-  // ✅ Single return; branch inside
+  // Single return; branch inside
   return (
     <AnimateOpen>
       <ScreenWrapper>

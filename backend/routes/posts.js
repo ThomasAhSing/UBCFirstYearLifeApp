@@ -5,9 +5,6 @@ const { DateTime } = require('luxon');
 
 router.use(express.json())
 
-// TODO add post method for custom upload from phone
-// TODO add post method to update isEvent to true for post that is event   
-
 router.get('/', async (req, res) => {
   const DEFAULT_LIMIT = 10;
   const limit = parseInt(req.query.limit) || DEFAULT_LIMIT;

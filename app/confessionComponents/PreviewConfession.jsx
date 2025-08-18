@@ -15,7 +15,6 @@ export default function PreviewConfession({ confessionObj, style }) {
   const postSize = Dimensions.get('window').width;
   const residence = confessionObj.residence.replace(/([a-z])([A-Z])/g, '$1 $2')
 
-  // 🔴 check if postedAt is within 24h
   const isNew = confessionObj.postedAt
     ? (Date.now() - new Date(confessionObj.postedAt).getTime()) < 24 * 60 * 60 * 1000
     : false;
@@ -29,7 +28,6 @@ export default function PreviewConfession({ confessionObj, style }) {
         alignItems: 'center',
       }, style]
     }>
-      {/* 🔴 NEW badge */}
       {isNew && (
         <View style={styles.newBadge}>
           <Text style={styles.newText}>NEW</Text>
@@ -95,7 +93,6 @@ const styles = StyleSheet.create({
     paddingLeft: 2,
     paddingRight: 2,
   },
-  // 🔴 styles for badge
   newBadge: {
     position: 'absolute',
     top: 6,
@@ -104,8 +101,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 2,
     borderRadius: 3,
-    zIndex: 999,      // ⬅️ ensure it sits on top (iOS & RN)
-    elevation: 8,     // ⬅️ Android stacking
+    zIndex: 999,    
+    elevation: 8,     
   },
   newText: {
     color: 'white',

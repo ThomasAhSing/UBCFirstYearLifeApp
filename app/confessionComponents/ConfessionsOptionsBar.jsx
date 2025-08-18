@@ -1,11 +1,6 @@
 import { TouchableOpacity, StyleSheet, Text, View } from 'react-native'
-// import { useEffect } from 'react'
-
-
-
 import { Colors } from "@/constants/Colors"
 
- 
 export default function ConfessionsOptionsBar({selectedResidence, setSelectedResidence}) {
 
     return (
@@ -28,11 +23,7 @@ export default function ConfessionsOptionsBar({selectedResidence, setSelectedRes
             </TouchableOpacity>
         </View>    
     )
-
-    
-
 }
-
 
 const styles = StyleSheet.create({
     container: {

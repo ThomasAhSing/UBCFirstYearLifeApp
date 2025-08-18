@@ -8,9 +8,6 @@ import Post from '@/app/HomeComponents/Post'
 import ScreenWrapper from '@/app/ScreenWrapper';
 import DateTimeInput from '@/app/admin/DateTimeInput'
 
-
-
-
 export default function MarkEvents() {
     const {
         postData,
@@ -37,7 +34,6 @@ export default function MarkEvents() {
             </View>
 
             <FlatList
-                // style={styles.container}
                 data={postData}
                 renderItem={({ item }) => {
                     if (item.isEvent) return null;
@@ -50,30 +46,26 @@ export default function MarkEvents() {
                                 style={styles.uploadEventBtn}
                                 onPress={() =>
                                     router.push({
-                                        pathname: '/admin/uploadEvent', // regular file, not [shortcode].tsx
+                                        pathname: '/admin/uploadEvent',
                                         params: {
-                                            post: JSON.stringify(item), // must be string
+                                            post: JSON.stringify(item), 
                                         },
                                     })
                                 }
                             >
                                 <Text style={{ color: 'blue' }}>Mark as Event</Text>
                             </TouchableOpacity>
-                            {/* <DateTimeInput /> */}
                         </View>
 
                     )
                 }}
             />
-            {/* <UploadEvent/> */}
 
 
         </ScreenWrapper>
 
     );
 }
-
-
 
 const styles = StyleSheet.create({
     container: {
@@ -84,9 +76,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5'
     },
     backButton: {
-        // position: 'absolute',
-        // top: 50, // adjust for your header height
-        // left: 20,
+        
     },
     button: {
         width: '80%',

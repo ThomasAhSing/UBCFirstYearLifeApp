@@ -5,8 +5,6 @@ import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import SettingsButton from '@/app/uiButtons/SettingsButton';
 
-
-
 export default function Heading() {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
@@ -44,9 +42,7 @@ export default function Heading() {
   return (
     <View style={styles.container}>
       <Pressable style={styles.pressable} onPress={handleTap}>
-        {/* <Text style={[styles.baseText, styles.mainHeading]}>UBC</Text> */}
         <Text style={[styles.baseText, styles.mainHeading]}>first year life</Text>
-        {/* <Text style={[styles.baseText, styles.subHeading]}>first year life</Text> */}
       </Pressable>
       <SettingsButton style={styles.settingsIcon} />
       <Modal visible={modalVisible} transparent={true} animationType="slide">
@@ -88,7 +84,6 @@ const styles = StyleSheet.create({
     fontFamily: 'CourgetteRegular',
   },
   mainHeading: {
-    // fontSize: 30,
     fontSize: 28,
     paddingLeft: 10,
     paddingRight: 10,

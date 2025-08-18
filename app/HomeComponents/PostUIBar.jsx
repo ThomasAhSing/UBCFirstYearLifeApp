@@ -50,7 +50,6 @@ export default function PostUIBar(props) {
 
   return (
     <View style={styles.container}>
-      {/* <View style={styles.left}> */}
         {mode === 'posts' ? (
           <>
             <LikeButton
@@ -87,11 +86,6 @@ export default function PostUIBar(props) {
             );
           })()
         )}
-      {/* </View> */}
-
-      {/* {mode === 'posts'
-        ? <SaveButton style={styles.saveButton} shortcode={props.post.shortcode} />
-        : <View />} */}
     </View>
   );
 }

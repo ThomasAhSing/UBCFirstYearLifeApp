@@ -1,3 +1,5 @@
+// Note tests are outdated
+
 // Required libraries
 const request = require('supertest');
 const mongoose = require('mongoose');

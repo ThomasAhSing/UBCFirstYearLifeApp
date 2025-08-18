@@ -5,16 +5,11 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DataProvider } from '@/context/DataContext';
-// import 'react-native-gesture-handler';
-// import 'react-native-reanimated';
-// import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
 // project imports
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 
 export default function RootLayout() {
-  // const styles = getStyles()
   const colorScheme = useColorScheme();
   const [fontsLoaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -28,13 +23,11 @@ export default function RootLayout() {
   });
 
   if (!fontsLoaded) {
-    // Async font loading only occurs in development.
     return null;
   }
 
 
   return (
-    // <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <DataProvider>
@@ -47,7 +40,6 @@ export default function RootLayout() {
           <StatusBar style="auto" />
         </ThemeProvider>
       </SafeAreaProvider>
-    // </GestureHandlerRootView>
   );
 }
 

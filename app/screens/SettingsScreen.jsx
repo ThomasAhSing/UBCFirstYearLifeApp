@@ -25,7 +25,7 @@ const EXPO_PUBLIC_API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 console.log("EXPO_PUBLIC_API_BASE_URL")
 console.log(EXPO_PUBLIC_API_BASE_URL)
 
-const ACCENT = '#3B82F6'; // blue accent (ok to swap for a gold shade if you prefer)
+const ACCENT = '#3B82F6'; 
 
 export default function SettingsScreen() {
     const router = useRouter();
@@ -34,8 +34,6 @@ export default function SettingsScreen() {
     const [subscribed, setSubscribed] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    // Header styling with custom BackIcon
-    // (Expo Router: define options inside the component)
     const HeaderLeft = () => (
         <TouchableOpacity
             onPress={() => router.back()}

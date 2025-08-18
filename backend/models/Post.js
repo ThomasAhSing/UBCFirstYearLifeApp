@@ -1,6 +1,5 @@
     const mongoose = require('mongoose')
 
-    // TODO make default profile picture a link to ubc image
     const profileSchema = new mongoose.Schema({
         biography: String,
         profile_pic_url: String

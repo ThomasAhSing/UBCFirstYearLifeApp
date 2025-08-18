@@ -9,7 +9,6 @@ import { DataContext } from '@/context/DataContext';
 import { Colors } from '@/constants/Colors';
 import AnimateOpen from '@/app/AnimateOpen';
 
-// if dateString is provided DayScreen is generated with only events from that day
 export default function DayScreen({ dateString, monthEventsData, monthPostMap }) {
   let {
     dayEventsData, dayPostMap

@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         position: 'absolute',
-        top: 50, // adjust for your header height
+        top: 50,
         left: 20,
     },
     button: {

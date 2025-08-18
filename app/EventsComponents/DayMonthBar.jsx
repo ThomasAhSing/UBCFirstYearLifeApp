@@ -10,11 +10,9 @@ import { Colors } from '@/constants/Colors'
 
 const VIEW_MODES = ['Day', 'Month']
 
-
 export default function DayMonthBar({ viewMode, setViewMode }) {
 
     const selectedIndex = VIEW_MODES.indexOf(viewMode)
-    // console.log(viewMode)
 
     return (
         <View style={styles.container}>
@@ -32,14 +30,10 @@ export default function DayMonthBar({ viewMode, setViewMode }) {
             />
         </View>
     );
-
-    
-
 }
 
 const styles = StyleSheet.create({
     container: {
-        // flex: 1,
         alignItems: 'center',
         marginTop: 10,
         paddingBottom: 10,

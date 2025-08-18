@@ -42,16 +42,9 @@ export default function Post({ post }) {
         />
         <Text style={styles.username}>{post.userFetchedFrom}</Text>
       </View>
-
-      {/* wrap Sidecar with double-tap */}
-      {/* <GestureHandlerRootView> */}
-        {/* <GestureDetector gesture={doubleTapGesture}> */}
           <View>
             <Sidecar post={post} />
           </View>
-        {/* </GestureDetector> */}
-      {/* </GestureHandlerRootView>  */}
-
       <PostUIBar mode="posts" post={post} />
       <Text
         style={styles.caption}

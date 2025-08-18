@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Dimensions, FlatList, Image, StyleSheet, View } from 'react-native'
 
-export default function Sidecar({ post }) { // media is 
+export default function Sidecar({ post }) { 
     const screenWidth = Dimensions.get('window').width
 
     const [imgWidth, setImgWidth] = useState(screenWidth);
-    const [imgHeight, setImgHeight] = useState(screenWidth);  // default aspect ratio of 1
+    const [imgHeight, setImgHeight] = useState(screenWidth); 
 
     useEffect(() => {
         const imgURL = post.media[0]
@@ -28,7 +28,6 @@ export default function Sidecar({ post }) { // media is
         const offsetX = event.nativeEvent.contentOffset.x
         const index = Math.round(offsetX / screenWidth);
         setCurrentIndex(index)
-        // console.log(currentIndex)
     }
     return (
         <View>
@@ -44,7 +43,6 @@ export default function Sidecar({ post }) { // media is
                         <Image
                             style={{ width: imgWidth, height: imgHeight }}
                             resizeMode='cover'
-                            // source={imageMap[item.image_url]} 
                             source={{uri: item}} 
                             />
                     )

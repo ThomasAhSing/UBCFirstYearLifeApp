@@ -36,7 +36,6 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
             position: 'relative',
             height: 80,
             backgroundColor: Colors.background,
@@ -93,19 +92,6 @@ export default function TabLayout() {
           } 
         }}
       />
-      {/* <Tabs.Screen
-        name="jumpStart"
-        options={{
-          title: 'Jump Start',
-          tabBarIcon: ({ color, focused }) => {
-            if (focused) {
-              return <JumpStartFilled size={50} color={iconColor} />
-            } else {
-              return <JumpStartOutline size={50} color={iconColor} />;
-            }
-          } 
-        }}
-      /> */}
     </Tabs>
   );
 }

@@ -23,14 +23,7 @@ export default function UploadEvent() {
         if (!parsedPost) return Alert.alert('Error', 'No post data found.');
         if (!luxonDate) return Alert.alert('Select date', 'Please pick a date & time for the event.');
         try {
-            //   await api.post('/api/events', {
-            //     ...parsedPost,
-            //     isEvent: true,
-            //     startAt: luxonDate.toISO(),
-            //   });
-            // await api.post
             const shortcode = parsedPost.shortcode;
-
     
             await api.post('/api/events', {
                 shortcode,
@@ -66,9 +59,6 @@ export default function UploadEvent() {
             <Text style={styles.info}>
                 Selected ISO: {luxonDate ? luxonDate.toISO() : '—'}
             </Text>
-            {/* <Text style={styles.info}>
-                Vancouver: {luxonDate ? `${luxonDate.toFormat('yyyy-MM-dd')} at ${luxonDate.toFormat('h a')}` : '—'}
-            </Text> */}
             <Text style={styles.info}>
                 Vancouver:{' '}
                 {luxonDate

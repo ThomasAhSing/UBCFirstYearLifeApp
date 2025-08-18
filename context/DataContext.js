@@ -2,7 +2,6 @@ import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { DateTime } from 'luxon';
 
-// TODO make loading component
 export const DataContext = createContext();
 console.log(process.env.EXPO_PUBLIC_API_BASE_URL)
 const API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:10000"
@@ -173,28 +172,6 @@ function formatFetchedData(fetched = []) {
   }
   return Array.from(groups.values()); // already newest->oldest by postID
 }
-
-// function formatFetchedData(fetchedConfessions = []) {
-//     const grouped = {};
-//     for (const conf of fetchedConfessions) {
-//         if (!grouped[conf.postID]) {
-//             grouped[conf.postID] = [];
-//         }
-//         grouped[conf.postID].push(conf);
-//     }
-
-//     // Step 2: Sort postIDs descending
-//     const sortedPostIDs = Object.keys(grouped)
-//         .map(Number)
-//         .sort((a, b) => b - a);
-
-//     // Step 3: For each postID, sort its confessions by confessionIndex ascending
-//     const result = sortedPostIDs.map(postID =>
-//         grouped[postID].sort((a, b) => a.confessionIndex - b.confessionIndex)
-//     );
-
-//     return result;
-// }
 
 function formatEventsData(fetchedEventsData = []) {
     const grouped = {};

@@ -80,7 +80,6 @@ router.post('/post-batch', async (req, res) => {
     } = req.body;
     const summary = []
 
-    // TODO fix case where there are staged 
     for (const residence of RESIDENCES) {
       const unposted = await Confession.find({
         residence: residence,

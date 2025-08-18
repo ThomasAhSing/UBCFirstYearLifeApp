@@ -7,16 +7,14 @@ export default function DateTimeInput({ value, onChange }) {
   const [tempDate, setTempDate] = useState(initial);
 
   if (Platform.OS === 'ios') {
-    // PERSISTENT: keep both pickers on screen; don't auto-hide
     return (
       <View>
         <DateTimePicker
           value={tempDate}
           mode="date"
-          display="compact"                  // stays visible
+          display="compact"              
           onChange={(_, d) => {
             if (!d) return;
-            // keep existing time, change date part
             const merged = new Date(d);
             merged.setHours(tempDate.getHours(), tempDate.getMinutes(), 0, 0);
             setTempDate(merged);
@@ -26,7 +24,7 @@ export default function DateTimeInput({ value, onChange }) {
         <DateTimePicker
           value={tempDate}
           mode="time"
-          display="spinner"                 // also stays visible
+          display="spinner"               
           onChange={(_, d) => {
             if (!d) return;
             const merged = new Date(tempDate);
@@ -39,8 +37,6 @@ export default function DateTimeInput({ value, onChange }) {
     );
   }
 
-  // Android note: pickers are modal and auto-close by design.
-  // We keep the two-step, but it will close after each step.
   const [stage, setStage] = useState('date');
 
   const handleAndroid = (event, selected) => {

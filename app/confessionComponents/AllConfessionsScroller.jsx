@@ -9,9 +9,8 @@ export default function AllConfessionsScroller({
 }) {
   const listRef = useRef(null);
 
-  // Square media area uses screen width; add some extra for dots + PostUIBar
   const POST_SIZE = Math.floor(Dimensions.get('window').width);
-  const EXTRA_VERTICAL = 84; // ← tweak if your PostUIBar is taller/shorter
+  const EXTRA_VERTICAL = 84;
   const ROW_HEIGHT = POST_SIZE + EXTRA_VERTICAL;
 
   return (
@@ -36,8 +35,6 @@ export default function AllConfessionsScroller({
           <ConfessionsPost confessions={item} />
         </View>
       )}
-      // optional nice-to-have spacing between posts:
-      // ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
     />
   );
 }
@@ -45,40 +42,3 @@ export default function AllConfessionsScroller({
 const styles = StyleSheet.create({
   container: { flex: 1 },
 });
-
-
-// import {
-//   TouchableOpacity,
-//   StyleSheet,
-//   FlatList,
-//   Dimensions,
-//   Image,
-//   View
-// } from 'react-native'
-
-
-// import ConfessionsPost from "./ConfessionsPost"
-
-// export default function AllConfessionsScroller({ RES_CON_DATA }) {
-//   return (
-//     <FlatList
-//       data={RES_CON_DATA}
-//       renderItem={({ item }) => (
-//         // <ConfessionsPost confessions = {item.confessions}/>
-//         <View>
-//           <ConfessionsPost confessions={item} />
-//         </View>
-
-//       )}
-
-//     />
-//   )
-
-
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
-// })

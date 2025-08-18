@@ -27,8 +27,6 @@ export default function MonthScreen() {
   return (
     <AnimateOpen>
       <View style={styles.container}>
-
-
         <Calendar
           style={{
             borderWidth: 1,
@@ -52,10 +50,8 @@ export default function MonthScreen() {
             return (
               <TouchableOpacity
                 onPress={() => {
-                  // const shortcodes = eventsData[date.dateString] || [];
-                  // const numEvents = monthEventsData
                   if (count > 0) {
-                    setOverlayDate(date.dateString); // this triggers the overlay view
+                    setOverlayDate(date.dateString); 
                   }
                 }}
                 style={{
