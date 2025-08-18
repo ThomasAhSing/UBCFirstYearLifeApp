@@ -50,7 +50,7 @@ function startSchedulers() {
   }, { timezone: PT });
 
   // 6:30 PM PT backup
-  cron.schedule('46 20 * * *', () => {
+  cron.schedule('06 21 * * *', () => {
     console.log('[cron] 18:30 PT backup tick → conditionallyStage()');
     conditionallyStage()
       .then(() => console.log('[cron] 18:30 PT backup tick ✓'))
