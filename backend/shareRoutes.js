@@ -18,7 +18,7 @@ const RES_COLORS = {
 };
 
 // ---------- preview images (added) ----------
-const OG_IMAGE_CONFESSIONS = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ConfessionPreview.jpeg?alt=media&token=f0a13531-c932-43a8-a458-16b416e405f2';
+const OG_IMAGE_CONFESSIONS = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ConfessionSharePreview.png?alt=media&token=2897fc33-331b-4262-a938-3faf731c33da';
 const OG_IMAGE_POSTS       = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ubcfyla_app_icon.png?alt=media&token=32f2af08-3064-4315-8a5c-e1d9afa88355';
 
 // ---------- helpers ----------
@@ -307,7 +307,7 @@ router.get('/cg/:residence/:postId', (req, res) => {
 
   const col = colorForResidence(residence);
   const html = renderBase({
-    title: 'Download UBC First Year Life for more confessions, news and events',
+    title: "Don't miss out on UBC confessions, events and news",
     desc: 'Download First Year Life today',                // added
     image: OG_IMAGE_CONFESSIONS,                           // added
     deep, web,
@@ -341,7 +341,7 @@ router.get('/p/:shortcode', (req, res) => {
   const web  = `${WEB_BASE}/p/${encodeURIComponent(shortcode)}${qci(ci)}`;
 
   const html = renderBase({
-    title: 'Download UBC First Year Life to see more posts',
+    title: "Don't miss out on UBC confessions, events and news",
     desc: 'Download First Year Life today',                // added
     image: OG_IMAGE_POSTS,                                 // added
     deep, web,
