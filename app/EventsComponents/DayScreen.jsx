@@ -73,7 +73,7 @@ function formatDatestringToTitle(dateString) {
 // ISO String to 9 A.M.
 function formatEventTimePDT(startAt) {
   return DateTime.fromISO(startAt, { zone: 'America/Vancouver' })
-    .toFormat("h a")
+    .toFormat("h:mm a")
     .replace("AM", "A.M.")
     .replace("PM", "P.M.");
 }
