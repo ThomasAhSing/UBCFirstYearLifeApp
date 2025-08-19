@@ -25,7 +25,7 @@ const EXPO_PUBLIC_API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 console.log("EXPO_PUBLIC_API_BASE_URL")
 console.log(EXPO_PUBLIC_API_BASE_URL)
 
-const ACCENT = '#3B82F6'; 
+const ACCENT = '#3B82F6';
 
 export default function SettingsScreen() {
     const router = useRouter();
@@ -195,8 +195,15 @@ export default function SettingsScreen() {
                     <Text style={{ fontWeight: '600', marginBottom: 6, color: 'white' }}>About</Text>
                     <Text style={{ color: 'white' }}>First Year Life - for UBC Students</Text>
                     {/* <Text style={{ color: 'white' }}>For Students. By Students.</Text> */}
-                    <Text style={{ fontWeight: '600', marginBottom: 6, color: 'white', marginTop: 20, }}>Request a feature or report a bug:</Text>
-                    <Text style={{ color: 'white',  }}>ahsingthomas@gmail.com</Text>
+                    <Text style={{ fontWeight: '600', marginBottom: 6, color: 'white', marginTop: 20, }}>For collaborations, feature requests or bug reports, contact:</Text>
+                    <Text style={{ color: 'white', }}>ahsingthomas@gmail.com</Text>
+                    <TouchableOpacity
+                        onPress={() => Linking.openURL('https://ubcfirstyearlifeapp.onrender.com/support')}
+                        activeOpacity={0.7}
+                        style={{ marginTop: 16 }}
+                    >
+                        <Text style={{ color: '#3B82F6', fontWeight: '600' }}>Support, Privacy and Terms</Text>
+                    </TouchableOpacity>
                     <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 20 }}>
                         Version {Application.nativeApplicationVersion || '1.0.0'}
                     </Text>
