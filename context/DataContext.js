@@ -8,7 +8,7 @@ const API_BASE =
   (process.env.EXPO_PUBLIC_API_BASE_URL || "").trim() ||
   "https://ubcfirstyearlifeapp.onrender.com" ||
   "http://localhost:10000";
-  
+
 export const api = axios.create({
     baseURL: API_BASE,
     timeout: 10000,
