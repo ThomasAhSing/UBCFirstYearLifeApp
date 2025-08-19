@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, Pressable, Alert, StyleSheet, Modal, Button, TextInput } from 'react-native';
-// import { ADMIN_PASSCODE } from '@env';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import SettingsButton from '@/app/uiButtons/SettingsButton';
@@ -27,17 +26,28 @@ export default function Heading() {
     }
   };
 
-  const checkPasscode = () => {
-    if (passcode === Constants.expoConfig.extra.ADMIN_PASSCODE) {
-      setModalVisible(false);
-      setPasscode('');
-      router.push('/admin/AdminDashboard');
+  const checkPasscode = async () => {
+    try {
+      const res = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/admin/check-passcode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passcode }),
+      });
+      const data = await res.json();
 
-      console.log("admin accessed")
-    } else {
-      alert('Incorrect passcode');
+      if (data.ok) {
+        setModalVisible(false);
+        setPasscode('');
+        router.push('/admin/AdminDashboard');
+        console.log("admin accessed");
+      } else {
+        alert('Incorrect passcode');
+      }
+    } catch (err) {
+      alert('Server error');
     }
   };
+
 
   return (
     <View style={styles.container}>

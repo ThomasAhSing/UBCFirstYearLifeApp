@@ -15,6 +15,7 @@ export default ({ config }) => ({
   ios: {
     supportsTablet: false,
     bundleIdentifier: "com.ahsingthomas.firstyearlife",
+    buildNumber: "1",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false
     }
@@ -26,7 +27,8 @@ export default ({ config }) => ({
       backgroundColor: "#0C2A42"
     },
     edgeToEdgeEnabled: true,
-    package: "com.ahsingthomas.firstyearlife"
+    package: "com.ahsingthomas.firstyearlife",
+    versionCode: 1 
   },
 
   web: {

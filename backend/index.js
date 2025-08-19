@@ -36,6 +36,7 @@ app.use('/push', require('./routes/push')); // Expo push token registration
 app.use('/support', require('./routes/support'));
 app.use('/privacy', require('./routes/privacy'));
 app.use('/terms',   require('./routes/terms'));
+app.use('/api/admin', require('./routes/admin'));
 
 
 // ---------- Jobs ----------
