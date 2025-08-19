@@ -19,11 +19,8 @@ import { enablePushAsync, unsubscribePushAsync, ensureRegistered } from '@/lib/n
 import { Colors } from '@/constants/Colors';
 import BackIcon from '@/assets/icons/BackIcon';
 
-const EXPO_PUBLIC_API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+import { API_BASE } from '@/lib/config';
 
-
-console.log("EXPO_PUBLIC_API_BASE_URL")
-console.log(EXPO_PUBLIC_API_BASE_URL)
 
 const ACCENT = '#3B82F6';
 
@@ -60,7 +57,7 @@ export default function SettingsScreen() {
                 setSubscribed(sub !== 'false'); // default true if unknown
 
                 if (status === 'granted') {
-                    await ensureRegistered(EXPO_PUBLIC_API_BASE_URL); // silent re-register
+                    await ensureRegistered(API_BASE); // silent re-register
                 }
             } catch (e) {
                 console.warn('Settings init failed', e);
@@ -78,7 +75,7 @@ export default function SettingsScreen() {
         setLoading(true);
         try {
             if (next) {
-                const res = await enablePushAsync(EXPO_PUBLIC_API_BASE_URL);
+                const res = await enablePushAsync(API_BASE);
                 if (res.ok) {
                     setPermGranted(true);
                     setSubscribed(true);
@@ -96,7 +93,7 @@ export default function SettingsScreen() {
                     Alert.alert('Notifications', msg);
                 }
             } else {
-                await unsubscribePushAsync(EXPO_PUBLIC_API_BASE_URL);
+                await unsubscribePushAsync(API_BASE);
                 setSubscribed(false);
             }
         } finally {

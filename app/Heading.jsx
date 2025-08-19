@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, Pressable, Alert, StyleSheet, Modal, Button, TextInput } from 'react-native';
-import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import SettingsButton from '@/app/uiButtons/SettingsButton';
+import { API_BASE } from '@/lib/config';
 
 export default function Heading() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function Heading() {
 
   const checkPasscode = async () => {
     try {
-      const res = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/admin/check-passcode`, {
+      const res = await fetch(`${API_BASE}/api/admin/check-passcode`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ passcode }),
@@ -39,12 +39,12 @@ export default function Heading() {
         setModalVisible(false);
         setPasscode('');
         router.push('/admin/AdminDashboard');
-        console.log("admin accessed");
+        console.log('admin accessed');
       } else {
-        alert('Incorrect passcode');
+        Alert.alert('Incorrect passcode');
       }
     } catch (err) {
-      alert('Server error');
+      Alert.alert('Server error');
     }
   };
 

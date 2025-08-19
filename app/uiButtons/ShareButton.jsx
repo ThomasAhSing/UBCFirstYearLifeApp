@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { Alert, Platform, Share, StyleSheet, TouchableOpacity } from 'react-native';
 import ShareIcon from '@/assets/icons/ShareIcon';
+import { API_BASE } from '@/lib/config';
 
 // --- Env & helpers ----------------------------------------------------------
-const WEB_BASE = (process.env.EXPO_PUBLIC_WEB_BASE_URL || process.env.EXPO_PUBLIC_API_BASE_URL || '')
-  .replace(/\/+$/, '');
+const WEB_BASE = API_BASE.replace(/\/+$/, '');
 const APP_SCHEME = ((process.env.EXPO_PUBLIC_APP_SCHEME || 'ubcfirstyearlifeapp') + '://');
 
 const enc  = (s) => encodeURIComponent(String(s ?? ''));
