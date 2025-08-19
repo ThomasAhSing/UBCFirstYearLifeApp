@@ -66,6 +66,5 @@ export default ({ config }) => ({
     eas: {
       projectId: "a4c5d400-288e-447f-9133-7065f74f1ef6"
     },
-    ADMIN_PASSCODE: process.env.ADMIN_PASSCODE
   }
 });
