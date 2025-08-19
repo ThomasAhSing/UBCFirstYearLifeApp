@@ -33,6 +33,9 @@ app.use('/api/posts', require('./routes/posts'));
 app.use('/api/events', require('./routes/events'));
 app.use(require('./shareRoutes'));
 app.use('/push', require('./routes/push')); // Expo push token registration
+const supportRoutes = require('./routes/support');
+app.use('/support', require('./routes/support'));
+
 
 // ---------- Jobs ----------
 const conditionallyStage = require('./jobs/conditionallyStage'); // stage tonight if needed
@@ -50,7 +53,7 @@ function startSchedulers() {
   }, { timezone: PT });
 
   // 6:30 PM PT backup
-  cron.schedule('30 18 * * *', () => {
+  cron.schedule('3  0 18 * * *', () => {
     console.log('[cron] 18:30 PT backup tick → conditionallyStage()');
     conditionallyStage()
       .then(() => console.log('[cron] 18:30 PT backup tick ✓'))

@@ -18,8 +18,6 @@ import ConfessionFilled from '@/assets/icons/ConfessionsFld'
 import ConfessionOutline from  '@/assets/icons/ConfessionsOtln'
 import EventFilled from  '@/assets/icons/EventFilled'
 import EventOutline from  '@/assets/icons/EventOutline'
-import JumpStartFilled from  '@/assets/icons/JumpStartFilled'
-import JumpStartOutline from  '@/assets/icons/JumpStartOutline'
 
 
 export default function TabLayout() {
@@ -43,7 +41,7 @@ export default function TabLayout() {
         borderTopColor: '#173E63',
           },
           default: {
-            position: 'relative',
+            position: 'realtive',
             height: 80,
             backgroundColor: Colors.background,
             borderTopWidth: 1,
