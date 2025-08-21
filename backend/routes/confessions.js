@@ -18,14 +18,14 @@ function getNextPostTime() {
 
 router.post('/', async (req, res) => {
   try {
-    const { residence, content, submittedAt, posted, scheduledPostAt, postID, confessionIndex } = req.body;
+    const { residence, content, submittedAt, posted, scheduledPostAt, postID, confessionIndex, submittedFrom  } = req.body;
 
 
-    if (!residence || !content) {
+    if (!residence || !content || !submittedFrom ) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    const newEntry = new Confession({ residence, content, submittedAt, posted, scheduledPostAt, postID, confessionIndex });
+    const newEntry = new Confession({ residence, content, submittedAt, posted, scheduledPostAt, postID, confessionIndex, submittedFrom });
     await newEntry.save();
     res.status(201).json({
       success: true,

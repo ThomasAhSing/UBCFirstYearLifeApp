@@ -1,3 +1,5 @@
+// app/confessions/AddConfessionScreen.jsx
+import React, { useEffect, useState } from 'react';
 import {
   TouchableOpacity,
   StyleSheet,
@@ -10,22 +12,22 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-} from 'react-native'
+} from 'react-native';
 
-import { useState } from 'react'
 import { Dropdown } from 'react-native-element-dropdown';
-import ResidenceIcon from '@/assets/icons/ResidenceIcon'
+import ResidenceIcon from '@/assets/icons/ResidenceIcon';
 import { Colors } from '@/constants/Colors';
-import { api } from '@/context/DataContext'
+import { api } from '@/context/DataContext';
 import AnimateOpen from '@/app/AnimateOpen';
+import { getOrCreateAnonAuthorId } from '@/app/utils/anonAuthorId';
 
 const data = [
   { label: 'Totem Park', residence: 'TotemPark' },
   { label: 'Orchard Commons', residence: 'OrchardCommons' },
-  { label: 'Place Vanier', residence: 'PlaceVanier' }
+  { label: 'Place Vanier', residence: 'PlaceVanier' },
 ];
 
-const MAX_LENGTH_CONFESSION = 250
+const MAX_LENGTH_CONFESSION = 250;
 
 // -------- Objectionable content filtering (client-side) --------
 const BLOCKLIST = [
@@ -35,14 +37,8 @@ const BLOCKLIST = [
   /\btrann?y\b/i,
   /\bkike\b/i,
   /\bchink\b/i,
-  /\bspic\b/i,
-  /\bretard(ed)?\b/i,
 
   // Extreme threats / violence (keep narrow)
-  /\bshoot\s+up\b/i,
-  /\bpipe\s*bomb\b/i,
-  /\bkill\s+(you|him|her|them)\b/i,
-  /\bstab\s+(you|him|her|them)\b/i,
   /\brape(s|d|ing)?\b/i,
 
   // Explicit sexual / illegal content
@@ -50,60 +46,81 @@ const BLOCKLIST = [
   // /\bcp\b/i, // optional: catches "cp" shorthand; comment out if too strict
   /\bbestiality\b/i,
   /\bincest\b/i,
-  /\bsend\s+nudes?\b/i,
 ];
 
-function findBlockedTerm(input) {
-  const text = (input || "").toLowerCase();
+function containsBlockedTerm(input) {
+  const text = String(input || '').toLowerCase();
   for (let i = 0; i < BLOCKLIST.length; i++) {
     if (BLOCKLIST[i].test(text)) return true;
   }
   return false;
 }
 
-
-export default function AddConfessionScreen({ RES_CON_DATA }) {
+export default function AddConfessionScreen() {
   const [residence, setResidence] = useState(null);
-  const [text, onChangeText] = useState('')
-  const [errorMessage, setErrorMessage] = useState("")
+  const [text, onChangeText] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [authorId, setAuthorId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Load or create per-install anonymous author id
+  useEffect(() => {
+    (async () => {
+      const id = await getOrCreateAnonAuthorId();
+      setAuthorId(id);
+    })();
+  }, []);
 
   const submitConfession = async () => {
     try {
-      const dayEventsRes = await api.post("/api/confessions", {
-        residence: residence,
+      setSubmitting(true);
+      await api.post('/api/confessions', {
+        residence,
         content: text,
+        submittedFrom: authorId, // ← include stable anon author id
       });
       onChangeText('');
       setResidence(null);
       Alert.alert('Success', 'Your confession was submitted');
     } catch (err) {
-      if (err.response) {
-        console.error("❌ Confession upload, Server error:", err.response.data);
+      if (err?.response) {
+        console.error('❌ Confession upload, Server error:', err.response.data);
+        Alert.alert('Error', err.response.data?.message || 'Server error.');
       } else {
-        console.error("❌ Confession upload, Network or other error:", err.message);
+        console.error('❌ Confession upload, Network or other error:', err?.message);
+        Alert.alert('Error', 'Network error. Please try again.');
       }
+    } finally {
+      setSubmitting(false);
     }
-  }
+  };
 
   const onPress = () => {
+    const trimmed = text.trim();
+      console.log(authorId)
+
     if (residence === null) {
-      setErrorMessage("*** Please select your residence ***")
+      setErrorMessage('*** Please select your residence ***');
       return;
     }
-    if (text === '') {
-      setErrorMessage("*** Confession can't be empty ***")
+    if (!trimmed) {
+      setErrorMessage("*** Confession can't be empty ***");
       return;
     }
-    if (findBlockedTerm(trimmed)) {
+    if (!authorId) {
+      setErrorMessage('*** Initializing… please try again in a moment ***');
+      return;
+    }
+    if (containsBlockedTerm(trimmed)) {
       setErrorMessage(
-        "*** Your confession contains disallowed content. Please remove objectionable terms (hate speech, explicit content, or serious violent threats). ***"
+        '*** Your confession contains disallowed content. Please remove objectionable terms (hate speech, explicit content, or serious violent threats). ***'
       );
       return;
     }
-    setErrorMessage("")
-    submitConfession()
-  }
 
+    setErrorMessage('');
+    if (!submitting) submitConfession();
+  };
 
   return (
     <AnimateOpen>
@@ -128,7 +145,7 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
                 containerStyle={styles.dropdownContaienr}
                 itemTextStyle={styles.itemTextStyle}
                 selectedStyle={styles.selectedStyle}
-                activeColor='#1E5A8A'
+                activeColor="#1E5A8A"
                 data={data}
                 maxHeight={300}
                 labelField="label"
@@ -136,39 +153,36 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
                 placeholder="Select Residence"
                 searchPlaceholder="Search..."
                 value={residence}
-                onChange={item => {
-                  setResidence(item.residence);
-                }}
+                onChange={item => setResidence(item.residence)}
                 renderLeftIcon={() => (
-                  <ResidenceIcon style={styles.residenceIcon} size={24} color='white' />
+                  <ResidenceIcon style={styles.residenceIcon} size={24} color="white" />
                 )}
-
               />
+
               <Text style={styles.subheading}>Insert Confession Below</Text>
+
               <View>
                 <TextInput
                   style={styles.confessionInput}
                   onChangeText={onChangeText}
-                  multiline={true}
+                  multiline
                   value={text}
-                  placeholder='. . . . . . . . .'
+                  placeholder=". . . . . . . . ."
                   placeholderTextColor={'#8C9AAE'}
                   textAlignVertical="top"
                   maxLength={MAX_LENGTH_CONFESSION}
+                  editable={!submitting}
                 />
+
                 <View style={styles.charCounterWrapper}>
-                  <Text style={styles.charCounter}>{text.length}/{MAX_LENGTH_CONFESSION}</Text>
+                  <Text style={styles.charCounter}>
+                    {text.length}/{MAX_LENGTH_CONFESSION}
+                  </Text>
                 </View>
 
-                <TouchableOpacity
-                  style={styles.submitBtn}
-                  onPress={onPress}
-                >
-                  <Text style={{
-                    color: '#2C2C2C',
-                    fontFamily: "RobotoBold",
-                  }}>
-                    Submit Confession
+                <TouchableOpacity style={styles.submitBtn} onPress={onPress} disabled={submitting}>
+                  <Text style={{ color: '#2C2C2C', fontFamily: 'RobotoBold' }}>
+                    {submitting ? 'Submitting…' : 'Submit Confession'}
                   </Text>
                 </TouchableOpacity>
 
@@ -176,7 +190,7 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
                   Note: Your confession will be included in the next post, not immediately
                 </Text>
 
-                <Text style={styles.errorMessage}>{errorMessage}</Text>
+                {!!errorMessage && <Text style={styles.errorMessage}>{errorMessage}</Text>}
               </View>
             </View>
           </ScrollView>
@@ -184,13 +198,10 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
       </KeyboardAvoidingView>
     </AnimateOpen>
   );
-
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   dropdownContaienr: {
     backgroundColor: '#2B4C65',
     borderWidth: 0,
@@ -208,37 +219,17 @@ const styles = StyleSheet.create({
     paddingLeft: 50,
     marginRight: 7,
   },
-  placeholderStyle: {
-    fontSize: 16,
-    color: 'white',
-    // paddingLeft: 30,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-    color: 'white'
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-    marginRight: 15,
-  },
+  placeholderStyle: { fontSize: 16, color: 'white' },
+  selectedTextStyle: { fontSize: 16, color: 'white' },
+  iconStyle: { width: 20, height: 20, marginRight: 15 },
   itemContainer: {
     backgroundColor: 'transparent',
     borderRadius: 10,
     border: 'none',
   },
-  itemTextStyle: {
-    color: 'white'
-  },
-  selectedStyle: {
-
-  },
-  subheading: {
-    color: 'white',
-    paddingLeft: 20,
-    fontSize: 20,
-    marginTop: 15,
-  },
+  itemTextStyle: { color: 'white' },
+  selectedStyle: {},
+  subheading: { color: 'white', paddingLeft: 20, fontSize: 20, marginTop: 15 },
   confessionInput: {
     height: 150,
     margin: 12,
@@ -249,13 +240,8 @@ const styles = StyleSheet.create({
     border: 'none',
     marginTop: 15,
   },
-  charCounterWrapper: {
-    alignItems: 'flex-end',
-    paddingRight: 20,
-  },
-  charCounter: {
-    color: "white"
-  },
+  charCounterWrapper: { alignItems: 'flex-end', paddingRight: 20 },
+  charCounter: { color: 'white' },
   submitBtn: {
     backgroundColor: Colors.goldAccent,
     alignSelf: 'flex-start',
@@ -277,5 +263,4 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginLeft: 15,
   },
-
-})
+});

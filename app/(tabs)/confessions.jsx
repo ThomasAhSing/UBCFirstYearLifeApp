@@ -19,6 +19,8 @@ export default function ConfessionsScreen() {
   } = useContext(DataContext);
 
   const [selectedResidence, setSelectedResidence] = useState("TotemPark");
+  const [screen, setScreen] = useState('preview');
+  const [startIndex, setStartIndex] = useState(0);
 
   // Always run hooks, no early returns before this
   useEffect(() => {
@@ -51,10 +53,16 @@ export default function ConfessionsScreen() {
               style={styles.optionsBar}
               selectedResidence={selectedResidence}
               setSelectedResidence={setSelectedResidence}
+              setScreen={setScreen}
+              setStartIndex={setStartIndex}
             />
             <ConfessionsGrid
               selectedResidence={selectedResidence}
               setSelectedResidence={setSelectedResidence}
+              screen={screen}
+              setScreen={setScreen}
+              startIndex={startIndex}
+              setStartIndex={setStartIndex}
             />
           </>
         )}

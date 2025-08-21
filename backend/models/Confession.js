@@ -12,6 +12,7 @@ const confessionSchema = new mongoose.Schema({
   submittedAt: { type: Date, default: Date.now },
   postedAt: { type: Date },
   content: { type: String, required: true },
+  submittedFrom: { type: String, required: true },
 });
 
 

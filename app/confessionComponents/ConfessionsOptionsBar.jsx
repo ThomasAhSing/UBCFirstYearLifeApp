@@ -1,27 +1,39 @@
 import { TouchableOpacity, StyleSheet, Text, View } from 'react-native'
 import { Colors } from "@/constants/Colors"
 
-export default function ConfessionsOptionsBar({selectedResidence, setSelectedResidence}) {
+export default function ConfessionsOptionsBar({ selectedResidence, setSelectedResidence, setScreen, setStartIndex }) {
 
     return (
-        <View style = {styles.container}>
-            <TouchableOpacity 
-            style={[styles.resBtn, styles.totemUnselected, selectedResidence==="TotemPark" && styles.totemSelected]}
-            onPress = {() => setSelectedResidence("TotemPark")}>
+        <View style={styles.container}>
+            <TouchableOpacity
+                style={[styles.resBtn, styles.totemUnselected, selectedResidence === "TotemPark" && styles.totemSelected]}
+                onPress={() => {
+                    setSelectedResidence("TotemPark")
+                    setScreen("preview")
+                    setStartIndex(0)
+                }}>
                 <Text style={styles.resBtnText}>Totem</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-            style={[styles.resBtn, styles.orchardUnselected, selectedResidence==="OrchardCommons" && styles.orchardSelected]}
-            onPress = {() => setSelectedResidence("OrchardCommons")}>
+
+            <TouchableOpacity
+                style={[styles.resBtn, styles.orchardUnselected, selectedResidence === "OrchardCommons" && styles.orchardSelected]}
+                onPress={() => {
+                    setSelectedResidence("OrchardCommons")
+                    setScreen("preview")
+                    setStartIndex(0)
+                }}>
                 <Text style={styles.resBtnText}>Orchard</Text>
             </TouchableOpacity>
             <TouchableOpacity
-            style={[styles.resBtn, styles.vanierUnselected, selectedResidence==="PlaceVanier" && styles.vanierSelected]}
-            onPress = {() => setSelectedResidence("PlaceVanier")}>
+                style={[styles.resBtn, styles.vanierUnselected, selectedResidence === "PlaceVanier" && styles.vanierSelected]}
+                onPress={() => {
+                    setSelectedResidence("PlaceVanier")
+                    setScreen("preview")
+                    setStartIndex(0)
+                }}>
                 <Text style={styles.resBtnText}>Vanier</Text>
             </TouchableOpacity>
-        </View>    
+        </View>
     )
 }
 
@@ -42,7 +54,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 7,
-        
+
     },
     totemUnselected: {
         color: Colors.confessions.TotemPark.accent,

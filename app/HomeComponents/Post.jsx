@@ -1,36 +1,37 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { useState, useMemo, useCallback } from 'react';
-import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'; // ← updated API
-import Sidecar from './Sidecar';
 import PostUIBar from './PostUIBar';
-
-// shared like toggle (assumes likes.js from earlier)
+import Sidecar from './Sidecar';
 import { toggleLikedByKey } from '@/lib/likes';
 
-export default function Post({ post }) {
+export default function Post({ post, hiddenReason, onUserBlocked }) {
   const [expanded, setExpanded] = useState(false);
+  const [hidden, setHidden] = useState(false); // local immediate cover for this card
 
-  // compute storage key once for this post
   const storageKey = useMemo(() => String(post?.shortcode ?? '').trim(), [post]);
 
-  // double-tap handler
   const onDoubleTap = useCallback(async () => {
     if (!storageKey) return;
     await toggleLikedByKey(storageKey);
-    // (optional) trigger a heart animation overlay here
   }, [storageKey]);
 
-  // gesture: double tap
-  const doubleTapGesture = useMemo(
-    () =>
-      Gesture.Tap()
-        .numberOfTaps(2)
-        .maxDuration(250)
-        .onEnd((_e, success) => {
-          if (success) onDoubleTap();
-        }),
-    [onDoubleTap]
-  );
+  // decide if we should show a cover and which message to show
+  const isHidden = hidden || !!hiddenReason;
+  const hiddenMessage = hidden
+    ? 'This post was hidden.'
+    : hiddenReason === 'blocked'
+      ? 'Post hidden from blocked user.'
+      : hiddenReason === 'hidden'
+        ? 'This post was hidden.'
+        : '';
+
+  if (isHidden) {
+    return (
+      <View style={[styles.container, styles.hiddenCard]}>
+        <Text style={styles.hiddenText}>{hiddenMessage}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -42,10 +43,19 @@ export default function Post({ post }) {
         />
         <Text style={styles.username}>{post.userFetchedFrom}</Text>
       </View>
-          <View>
-            <Sidecar post={post} />
-          </View>
-      <PostUIBar mode="posts" post={post} />
+
+      <View>
+        <Sidecar post={post} />
+      </View>
+
+      <PostUIBar
+        mode="posts"
+        post={post}
+        onHide={() => setHidden(true)}          // immediate cover on "Hide post"
+        onBlocked={() => setHidden(true)}       // immediate cover on "Block user" (this card)
+        onBlockUser={onUserBlocked}             // tell the list to mark other rows as blocked
+      />
+
       <Text
         style={styles.caption}
         numberOfLines={expanded ? undefined : 2}
@@ -64,37 +74,20 @@ export default function Post({ post }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
-  profile_pic: {
-    width: 30,
-    height: 30,
-    borderRadius: 25,
-    marginLeft: 10,
-  },
-  header: {
-    flexDirection: 'row',
+  container: { width: '100%', paddingTop: 10, paddingBottom: 10 },
+  hiddenCard: {
+    minHeight: 120,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 10,
+    backgroundColor: '#0f2941',
+    borderRadius: 12,
+    marginHorizontal: 10,
   },
-  username: {
-    color: 'white',
-    paddingLeft: 15,
-  },
-  caption: {
-    color: 'white',
-    paddingLeft: 15,
-    paddingRight: 15,
-  },
-  captionUsername: {
-    color: 'white',
-    paddingRight: 10,
-    fontWeight: 'bold',
-  },
-  more: {
-    color: 'gray',
-  },
+  hiddenText: { color: '#cfe3ff' },
+  profile_pic: { width: 30, height: 30, borderRadius: 25, marginLeft: 10 },
+  header: { flexDirection: 'row', alignItems: 'center', paddingBottom: 10 },
+  username: { color: 'white', paddingLeft: 15 },
+  caption: { color: 'white', paddingLeft: 15, paddingRight: 15 },
+  captionUsername: { color: 'white', paddingRight: 10, fontWeight: 'bold' },
+  more: { color: 'gray' },
 });
