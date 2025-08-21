@@ -15,7 +15,7 @@ export default function WelcomeEULA({ visible, onAgree, onExit }) {
             style={styles.icon}
           />
 
-          <Text style={styles.title}>Welcome to First Year Life 🎉</Text>
+          <Text style={styles.title}>Welcome to First Year Life</Text>
           <Text style={styles.text}>
             By continuing, you agree to our community guidelines and Terms of Use. We do
             not tolerate objectionable or abusive content (e.g., hate speech, harassment,
