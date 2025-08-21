@@ -15,7 +15,7 @@ export default ({ config }) => ({
   ios: {
     supportsTablet: false,
     bundleIdentifier: "com.ahsingthomas.firstyearlife",
-    buildNumber: "4",
+    buildNumber: "5",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false
     }
@@ -44,8 +44,7 @@ export default ({ config }) => ({
       "expo-splash-screen",
       {
         image: "./assets/images/ubcfyla_splashscreen.png",
-        imageWidth: 200,
-        resizeMode: "contain",
+        resizeMode: "cover",
         backgroundColor: "#0C2A42"
       }
     ],

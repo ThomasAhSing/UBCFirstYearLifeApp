@@ -1,36 +1,66 @@
-import { View, Text, StyleSheet, Button } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
-
 export default function AdminDashboard() {
-    const router = useRouter();
+  const router = useRouter();
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.backButton}>
-                <Button title="⬅ Back" onPress={() => router.back()} />
-            </View>
-            <Button style={styles.button} title="📋 Mark Post as Events" onPress={() => router.push('/admin/MarkEvents')} />
-        </View>
-    )
+  return (
+    <View style={styles.container}>
+      {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Text style={styles.backText}>⬅ Back</Text>
+      </TouchableOpacity>
+
+      {/* Main Action */}
+      <TouchableOpacity
+        style={styles.actionButton}
+        onPress={() => router.push('/admin/MarkEvents')}
+      >
+        <Text style={styles.buttonText}>📋 Mark Post as Events</Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
+const BLUE = '#1E88E5';
+const LIGHT_BLUE = '#90CAF9';
+
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#f5f5f5'
-    },
-    backButton: {
-        position: 'absolute',
-        top: 50,
-        left: 20,
-    },
-    button: {
-        width: '80%',
-        marginVertical: 10,
-        marginBottom: 30
-    }
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f0f4ff',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    backgroundColor: LIGHT_BLUE,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    elevation: 2,
+  },
+  backText: {
+    color: BLUE,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  actionButton: {
+    backgroundColor: BLUE,
+    paddingVertical: 16,
+    paddingHorizontal: 25,
+    borderRadius: 12,
+    width: '80%',
+    alignItems: 'center',
+    marginTop: 40,
+    elevation: 3,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+  },
 });
