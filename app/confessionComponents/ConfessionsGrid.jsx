@@ -1,5 +1,5 @@
 import { TouchableOpacity, StyleSheet, FlatList, Dimensions, View } from 'react-native'
-import { useState, useContext, useEffect, useMemo } from 'react'
+import { useState, useContext, useEffect, useMemo, useCallback } from 'react'
 import { Colors } from '@/constants/Colors'
 import AllConfessionsScroller from './AllConfessionsScroller'
 import BackIcon from '@/assets/icons/BackIcon'
@@ -7,22 +7,40 @@ import PlusIcon from '@/assets/icons/PlusIcon'
 import AddConfessionScreen from './AddConfessionScreen'
 import PreviewConfession from './PreviewConfession'
 import { DataContext } from '@/context/DataContext'
-import { loadHiddenConfPostIds } from '@/app/utils/moderationStore'  // ⟵ only hidden IDs
+import {
+  loadHiddenConfPostIds,
+  loadBlockedConfAuthors,
+  blockConfAuthor,
+} from '@/app/utils/moderationStore'
 
 export default function ConfessionsGrid({ selectedResidence, screen, setScreen, startIndex, setStartIndex }) {
   const { postedConfessionsByResidence } = useContext(DataContext);
 
   const [hiddenPostIds, setHiddenPostIds] = useState([]);
+  const [blockedAuthors, setBlockedAuthors] = useState([]);
 
   // load on mount and when returning to preview
   useEffect(() => {
-    (async () => setHiddenPostIds(await loadHiddenConfPostIds()))();
+    (async () => {
+      setHiddenPostIds(await loadHiddenConfPostIds());
+      setBlockedAuthors(await loadBlockedConfAuthors());  // ← load persisted blocked authors
+    })();
   }, []);
   useEffect(() => {
     if (screen === 'preview') {
-      (async () => setHiddenPostIds(await loadHiddenConfPostIds()))();
+      (async () => {
+        setHiddenPostIds(await loadHiddenConfPostIds());
+        setBlockedAuthors(await loadBlockedConfAuthors());
+      })();
     }
   }, [screen]);
+
+  // When any ConfessionsPost blocks an author, update global (memory + storage)
+  const onAuthorBlockedGlobal = useCallback(async (authorId) => {
+    if (!authorId) return;
+    setBlockedAuthors(prev => (prev.includes(authorId) ? prev : [...prev, authorId]));
+    await blockConfAuthor(authorId); // persist in AsyncStorage
+  }, []);
 
   const windowWidth = Math.floor(Dimensions.get('window').width);
   const numCols = 3;
@@ -110,6 +128,8 @@ export default function ConfessionsGrid({ selectedResidence, screen, setScreen, 
           <AllConfessionsScroller
             style={styles.allConfessionsScroller}
             RES_CON_DATA={filteredGroups.length ? filteredGroups : data} // pass filtered
+            blockedAuthors={blockedAuthors}           // ← pass global list
+            onAuthorBlocked={onAuthorBlockedGlobal}   // ← pass updater
             initialIndex={startIndex}
           />
         </View>

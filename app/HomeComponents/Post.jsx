@@ -20,7 +20,7 @@ export default function Post({ post, hiddenReason, onUserBlocked }) {
   const hiddenMessage = hidden
     ? 'This post was hidden.'
     : hiddenReason === 'blocked'
-      ? 'Post hidden from blocked user.'
+      ? `Post hidden from ${post?.userFetchedFrom ?? 'blocked user'}.`
       : hiddenReason === 'hidden'
         ? 'This post was hidden.'
         : '';

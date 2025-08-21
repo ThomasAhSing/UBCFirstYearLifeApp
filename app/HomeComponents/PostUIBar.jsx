@@ -55,7 +55,8 @@ export default function PostUIBar(props) {
       const uname = String(props.post?.userFetchedFrom ?? '');
       if (uname) {
         await blockPostUser(uname);
-        props.onBlocked?.(); // ok to cover just this card in posts
+        props.onBlocked?.();            // cover this card immediately
+       props.onBlockUser?.(uname);
         Alert.alert('Post hidden from blocked user', 'You won’t see posts from this account.');
       }
       return;

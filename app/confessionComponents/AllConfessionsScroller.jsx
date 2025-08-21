@@ -5,6 +5,8 @@ import ConfessionsPost from './ConfessionsPost';
 export default function AllConfessionsScroller({
   RES_CON_DATA = [],
   initialIndex = 0,
+  blockedAuthors = [],
+  onAuthorBlocked = () => { },
   style,
 }) {
   const listRef = useRef(null);
@@ -17,6 +19,7 @@ export default function AllConfessionsScroller({
     <FlatList
       ref={listRef}
       style={[styles.container, style]}
+      contentContainerStyle={{ paddingBottom: 50 }} // 👈 add space at the end
       data={RES_CON_DATA}
       keyExtractor={(item, idx) => String(item?.[0]?.postID ?? idx)}
       initialScrollIndex={Math.max(0, Math.min(initialIndex, RES_CON_DATA.length - 1))}
@@ -32,10 +35,16 @@ export default function AllConfessionsScroller({
       }}
       renderItem={({ item }) => (
         <View style={{ height: ROW_HEIGHT }}>
-          <ConfessionsPost confessions={item} />
+          <ConfessionsPost
+            confessions={item}
+            blockedAuthors={blockedAuthors}
+            onAuthorBlocked={onAuthorBlocked}
+          />
         </View>
       )}
     />
+
+
   );
 }
 

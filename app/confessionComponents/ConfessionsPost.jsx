@@ -1,31 +1,29 @@
+// app/HomeComponents/ConfessionsPost.jsx
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Dimensions, FlatList, StyleSheet, View, Text } from 'react-native';
-import { toggleLikedByKey } from '@/lib/likes';
 import RenderedConfession from './RenderedConfession';
 import PostUIBar from '@/app/HomeComponents/PostUIBar';
-import { loadBlockedConfAuthors } from '@/app/utils/moderationStore';
+import { toggleLikedByKey } from '@/lib/likes';
 
-export default function ConfessionsPost({ confessions = [] }) {
+export default function ConfessionsPost({
+  confessions = [],
+  blockedAuthors = [],         // global list from parent (persisted in AsyncStorage)
+  onAuthorBlocked = () => {},  // parent updater: adds to global list + persists
+}) {
   const postSize = Dimensions.get('window').width;
   const listRef = useRef(null);
 
   const first = confessions[0] || {};
   const groupResidence = first.residence ?? first.Residence ?? first.res ?? '';
-  const groupPostId    = String(first.postId ?? first.postID ?? first.post_id ?? first.id ?? '');
-  const groupKey       = `${groupResidence}:${groupPostId}`;
+  const groupPostId = String(first.postId ?? first.postID ?? first.post_id ?? first.id ?? '');
+  const groupKey = `${groupResidence}:${groupPostId}`;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [hidden, setHidden] = useState(false); // “Hide post” covers whole group
-  const [blockedGlobal, setBlockedGlobal] = useState([]);  // from AsyncStorage
-  const [blockedLocal, setBlockedLocal] = useState([]);    // session-only for instant UI
+  const [hidden, setHidden] = useState(false);  // “Hide post” covers whole group
+  const [blockedLocal, setBlockedLocal] = useState([]); // session-only for instant UI in this group
 
-  // Load persisted blocked authors
-  useEffect(() => {
-    (async () => {
-      const list = await loadBlockedConfAuthors();
-      setBlockedGlobal(list || []);
-    })();
-  }, []);
+  // If parent’s global list changes, re-render uses latest `blockedAuthors`
+  useEffect(() => {}, [blockedAuthors]);
 
   // Reset when group changes; jump to first slide
   useEffect(() => {
@@ -45,24 +43,34 @@ export default function ConfessionsPost({ confessions = [] }) {
     }
   }, [confessions.length, currentIndex]);
 
-  const onScroll = useCallback((e) => {
-    const x = e.nativeEvent.contentOffset.x;
-    const idx = Math.max(0, Math.min(confessions.length - 1, Math.floor((x + postSize / 2) / postSize)));
-    if (idx !== currentIndex) setCurrentIndex(idx);
-  }, [confessions.length, postSize, currentIndex]);
+  const getAuthorId = useCallback((c) => {
+    return String(c?.submittedFrom ?? c?.authorHandle ?? c?.uid ?? '');
+  }, []);
+
+  const isBlockedAuthor = useCallback((c) => {
+    const id = getAuthorId(c);
+    if (!id) return false;
+    return blockedLocal.includes(id) || blockedAuthors.includes(id);
+  }, [blockedLocal, blockedAuthors, getAuthorId]);
+
+  const findNextUnblockedIndex = useCallback((startIdx) => {
+    if (!Array.isArray(confessions) || confessions.length === 0) return -1;
+    for (let i = startIdx; i < confessions.length; i++) {
+      if (!isBlockedAuthor(confessions[i])) return i;
+    }
+    // Also search left if needed (e.g., you blocked the last one)
+    for (let i = startIdx - 1; i >= 0; i--) {
+      if (!isBlockedAuthor(confessions[i])) return i;
+    }
+    return -1;
+  }, [confessions, isBlockedAuthor]);
 
   const onDoubleTap = useCallback(async () => {
     if (!groupResidence || !groupPostId) return;
     await toggleLikedByKey(`conf:${groupResidence}:${groupPostId}`);
   }, [groupResidence, groupPostId]);
 
-  const isBlockedAuthor = useCallback((c) => {
-    const id = String(c?.submittedFrom ?? c?.authorHandle ?? c?.uid ?? '');
-    if (!id) return false;
-    return blockedLocal.includes(id) || blockedGlobal.includes(id);
-  }, [blockedLocal, blockedGlobal]);
-
-  // Show cover if whole post hidden
+  // If user hid the entire post, show a cover
   if (hidden) {
     return (
       <View key={`hidden:${groupKey}`} style={[styles.hiddenCard, { width: postSize, minHeight: postSize }]}>
@@ -99,7 +107,12 @@ export default function ConfessionsPost({ confessions = [] }) {
                   borderRadius: 12,
                 }}
               >
-                <Text style={{ color: '#cfe3ff' }}>Confession hidden from blocked author.</Text>
+                <Text style={{ color: '#cfe3ff', paddingBottom: 5 }}>
+                  Confession hidden from blocked author.
+                </Text>
+                <Text style={{ color: '#cfe3ff' }}>
+                  Swipe to see other confessions.
+                </Text>
               </View>
             );
           }
@@ -109,7 +122,11 @@ export default function ConfessionsPost({ confessions = [] }) {
             </View>
           );
         }}
-        onScroll={onScroll}
+        onScroll={(e) => {
+          const x = e.nativeEvent.contentOffset.x;
+          const idx = Math.max(0, Math.min(confessions.length - 1, Math.floor((x + postSize / 2) / postSize)));
+          if (idx !== currentIndex) setCurrentIndex(idx);
+        }}
         scrollEventThrottle={16}
         style={{ width: postSize, height: postSize }}
       />
@@ -126,11 +143,28 @@ export default function ConfessionsPost({ confessions = [] }) {
         mode="confessions"
         ci={currentIndex}
         confessions={confessions}
-        onHide={() => setHidden(true)} // “Hide post” should still cover whole group
-        // Do NOT call onBlocked to hide the whole post; we only hide the current slide:
+        onHide={() => setHidden(true)}                  // hide whole group
         onBlockAuthor={(authorId) => {
           if (!authorId) return;
+          // 1) session-only for this group (instant slide cover)
           setBlockedLocal(prev => (prev.includes(authorId) ? prev : [...prev, authorId]));
+          // 2) global (all groups) — triggers immediate hide elsewhere
+          onAuthorBlocked(authorId);
+
+          // 3) if current slide now blocked, jump to next unblocked or cover post
+          const curr = confessions[currentIndex];
+          const currId = getAuthorId(curr);
+          if (currId && (currId === authorId)) {
+            const next = findNextUnblockedIndex(currentIndex + 1);
+            if (next >= 0) {
+              setCurrentIndex(next);
+              requestAnimationFrame(() => {
+                listRef.current?.scrollToIndex?.({ index: next, animated: true });
+              });
+            } else {
+              setHidden(true);
+            }
+          }
         }}
       />
     </View>
@@ -139,10 +173,20 @@ export default function ConfessionsPost({ confessions = [] }) {
 
 const styles = StyleSheet.create({
   dotContainer: {
-    paddingTop: 5, paddingBottom: 5,
-    flexDirection: 'row', justifyContent: 'center', flex: 1,
+    paddingTop: 5,
+    paddingBottom: 5,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flex: 1,
   },
-  dot: { marginLeft: 2, marginRight: 2, width: 6, height: 6, borderRadius: 4, backgroundColor: '#A77F2E' },
+  dot: {
+    marginLeft: 2,
+    marginRight: 2,
+    width: 6,
+    height: 6,
+    borderRadius: 4,
+    backgroundColor: '#A77F2E',
+  },
   activeDot: { backgroundColor: '#F5D054' },
   hiddenCard: {
     justifyContent: 'center',
