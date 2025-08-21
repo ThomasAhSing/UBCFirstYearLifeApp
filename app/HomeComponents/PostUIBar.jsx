@@ -1,9 +1,11 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-
+// app/uiBars/PostUIBar.jsx
+import React, { useCallback, useMemo, useState } from 'react';
+import { StyleSheet, View, Platform, ActionSheetIOS, Alert } from 'react-native';
 import LikeButton from '@/app/uiButtons/LikeButton';
 import ShareButton from '@/app/uiButtons/ShareButton';
-import SaveButton from '@/app/uiButtons/SaveButton';
+import BurgerButton from '@/app/uiButtons/BurgerButton';
+import ReportPrompt from '@/app/components/ReportPrompt';
+// import { api } from '@/context/DataContext';
 
 /**
  * Props:
@@ -15,77 +17,109 @@ import SaveButton from '@/app/uiButtons/SaveButton';
  *    - ci?: number                     // index to focus (defaults to 0)
  *    - confessionIndex?: number        // index of confession to move to front
  */
+
 export default function PostUIBar(props) {
   const { mode } = props;
 
-  // helper to pull shared ids from first confession
-  const getIdsFromList = (list = []) => {
-    const c = list[0] || {};
-    const residence = c.residence ?? c.Residence ?? c.res ?? '';
-    const postId = String(c.postID ?? c.postId ?? c.post_id ?? c.id ?? '');
-    return { residence, postId };
-  };
-
-  // derive an initial like count from the list (fallbacks included)
-  const getInitialLikeCount = (list = []) => {
-    const c = list[0] || {};
-    return (
-      c.groupLikes ??
-      c.likesGroup ??
-      c.likes ??
-      0
-    );
-  };
-
-  // --- Reorder list so confessionIndex element comes first ---
-  const reorderedConfessions = React.useMemo(() => {
+  const reorderedConfessions = useMemo(() => {
     if (mode !== 'confessions' || !Array.isArray(props.confessions)) return props.confessions;
     const idx = Number.isFinite(props.confessionIndex) ? props.confessionIndex : -1;
     if (idx < 0 || idx >= props.confessions.length) return props.confessions;
-
     const arr = [...props.confessions];
     const [target] = arr.splice(idx, 1);
     return [target, ...arr];
   }, [props.confessions, props.confessionIndex, mode]);
 
+  const getReportIds = useCallback(() => {
+    if (mode === 'posts') {
+      const post = props.post || {};
+      const postId = String(post.shortcode ?? post.id ?? post._id ?? '');
+      return { postId, confessionId: '' };
+    }
+    const c0 = (reorderedConfessions && reorderedConfessions[0]) || {};
+    const postId = String(c0.postID ?? c0.postId ?? c0.post_id ?? '');
+    const confessionId = String(c0.confessionId ?? c0._id ?? c0.id ?? '');
+    return { postId, confessionId };
+  }, [mode, props.post, reorderedConfessions]);
+
+  const [showPrompt, setShowPrompt] = useState(false);
+
+  const openReportPrompt = useCallback(() => setShowPrompt(true), []);
+  const closeReportPrompt = useCallback(() => setShowPrompt(false), []);
+
+  const handleReportSubmit = useCallback(async (reasonText) => {
+    const { postId, confessionId } = getReportIds();
+    try {
+      // await api.post('/api/reports', {
+      //   postId,
+      //   confessionId,
+      //   reason: reasonText,
+      // });
+      console.log(postId,confessionId)
+    } catch (e) {
+      // console.log('Report failed', e);
+    } finally {
+      Alert.alert(
+        'Thanks for reporting',
+        'We will address this issue within 24 hours.'
+      );
+    }
+  }, [getReportIds]);
+
+  const openMenu = useCallback(() => {
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'hide post', 'block user', 'Report'],
+          cancelButtonIndex: 0,
+          destructiveButtonIndex: 3,
+          userInterfaceStyle: 'dark',
+        },
+        (i) => { if (i === 3) openReportPrompt(); }
+      );
+    } else {
+      Alert.alert('Options', '', [
+        { text: 'Report', style: 'destructive', onPress: openReportPrompt },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
+  }, [openReportPrompt]);
+
   return (
     <View style={styles.container}>
-        {mode === 'posts' ? (
-          <>
-            <LikeButton
-              mode={mode}
-              post = {props.post}
-            />
-
-            <ShareButton
-              mode="posts"
-              post={props.post}
-              style={styles.btn}
-            />
-          </>
-        ) : (
-          (() => {
-            const ci = Number.isFinite(props.ci) ? props.ci : 0;
-            const { residence, postId } = getIdsFromList(reorderedConfessions);
-            const initialLikes = getInitialLikeCount(reorderedConfessions);
-
-            return (
-              <>
-                <LikeButton
-                  mode="confessions"
-                  confession={props.confessions[0]}
-                />
-
+      {mode === 'posts' ? (
+        <>
+          <LikeButton mode={mode} post={props.post} />
+          <View style={{ flexDirection: 'row' }}>
+            <ShareButton mode="posts" post={props.post} style={styles.btn} />
+            <BurgerButton style={{ paddingRight: 15 }} onPress={openMenu} />
+          </View>
+        </>
+      ) : (
+        (() => {
+          return (
+            <>
+              <LikeButton mode="confessions" confession={props.confessions?.[0]} />
+              <View style={{ flexDirection: 'row' }}>
                 <ShareButton
                   mode="confessions"
                   confessions={reorderedConfessions}
-                  ci={ci}
+                  ci={Number.isFinite(props.ci) ? props.ci : 0}
                   style={styles.btn}
                 />
-              </>
-            );
-          })()
-        )}
+                <BurgerButton style={{ paddingRight: 15 }} onPress={openMenu} />
+              </View>
+            </>
+          );
+        })()
+      )}
+
+      {/* Report text prompt */}
+      <ReportPrompt
+        visible={showPrompt}
+        onCancel={closeReportPrompt}
+        onSubmit={(payload) => { closeReportPrompt(); handleReportSubmit(payload); }}
+      />
     </View>
   );
 }
@@ -97,7 +131,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  left: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   btn: { paddingLeft: 15, paddingRight: 15 },
-  saveButton: { paddingRight: 15 },
 });

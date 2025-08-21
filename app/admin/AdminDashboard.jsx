@@ -11,7 +11,6 @@ export default function AdminDashboard() {
                 <Button title="⬅ Back" onPress={() => router.back()} />
             </View>
             <Button style={styles.button} title="📋 Mark Post as Events" onPress={() => router.push('/admin/MarkEvents')} />
-            <Button style={styles.button} title="➕ Create New Post" onPress={() => router.push('/admin/CreatePost')} />
         </View>
     )
 }

@@ -27,6 +27,41 @@ const data = [
 
 const MAX_LENGTH_CONFESSION = 250
 
+// -------- Objectionable content filtering (client-side) --------
+const BLOCKLIST = [
+  // Hate slurs (block both exact and common obfuscations)
+  /\bnigg(a|er|@|4)\b/i,
+  /\bfag(got)?\b/i,
+  /\btrann?y\b/i,
+  /\bkike\b/i,
+  /\bchink\b/i,
+  /\bspic\b/i,
+  /\bretard(ed)?\b/i,
+
+  // Extreme threats / violence (keep narrow)
+  /\bshoot\s+up\b/i,
+  /\bpipe\s*bomb\b/i,
+  /\bkill\s+(you|him|her|them)\b/i,
+  /\bstab\s+(you|him|her|them)\b/i,
+  /\brape(s|d|ing)?\b/i,
+
+  // Explicit sexual / illegal content
+  /\bchild\s*porn\b/i,
+  // /\bcp\b/i, // optional: catches "cp" shorthand; comment out if too strict
+  /\bbestiality\b/i,
+  /\bincest\b/i,
+  /\bsend\s+nudes?\b/i,
+];
+
+function findBlockedTerm(input) {
+  const text = (input || "").toLowerCase();
+  for (let i = 0; i < BLOCKLIST.length; i++) {
+    if (BLOCKLIST[i].test(text)) return true;
+  }
+  return false;
+}
+
+
 export default function AddConfessionScreen({ RES_CON_DATA }) {
   const [residence, setResidence] = useState(null);
   const [text, onChangeText] = useState('')
@@ -57,6 +92,12 @@ export default function AddConfessionScreen({ RES_CON_DATA }) {
     }
     if (text === '') {
       setErrorMessage("*** Confession can't be empty ***")
+      return;
+    }
+    if (findBlockedTerm(trimmed)) {
+      setErrorMessage(
+        "*** Your confession contains disallowed content. Please remove objectionable terms (hate speech, explicit content, or serious violent threats). ***"
+      );
       return;
     }
     setErrorMessage("")

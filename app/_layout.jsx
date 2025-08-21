@@ -1,13 +1,19 @@
 // external imports
+import React, { useEffect, useState } from 'react';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DataProvider } from '@/context/DataContext';
-// project imports
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+
+// NEW: storage + modal
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import WelcomeModal from '@/app/screens/WelcomeEULA';
+
+const TOS_KEY = 'tosAccepted_v1'; // bump to _v2 when Terms change
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -22,29 +28,48 @@ export default function RootLayout() {
     CourgetteRegular: require('../assets/fonts/Courgette-Regular.ttf'),
   });
 
-  if (!fontsLoaded) {
-    return null;
+  const [ready, setReady] = useState(false);
+  const [needsConsent, setNeedsConsent] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const val = await AsyncStorage.getItem(TOS_KEY);
+        setNeedsConsent(val !== '1');
+      } finally {
+        setReady(true);
+      }
+    })();
+  }, []);
+
+  if (!fontsLoaded || !ready) {
+    return null; // or splash
   }
 
+  const handleAgree = async () => {
+    await AsyncStorage.setItem(TOS_KEY, '1');
+    setNeedsConsent(false);
+  };
 
   return (
-      <SafeAreaProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <DataProvider>
-            <Stack >
+    <SafeAreaProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <DataProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </DataProvider>
 
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-          </DataProvider>
-          <StatusBar style="auto" />
-        </ThemeProvider>
-      </SafeAreaProvider>
+        {/* EULA / Welcome gate */}
+        <WelcomeModal visible={needsConsent} onAgree={handleAgree} />
+
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-})
+  container: { flex: 1 },
+});

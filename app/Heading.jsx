@@ -20,7 +20,7 @@ export default function Heading() {
     }
     lastTapTime.current = now;
 
-    if (tapCount.current === 4) {
+    if (tapCount.current === 8) {
       tapCount.current = 0;
       setModalVisible(true); // Show passcode modal
     }
