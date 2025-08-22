@@ -6,7 +6,7 @@ const { DateTime } = require('luxon');
 router.use(express.json())
 
 router.get('/', async (req, res) => {
-  const DEFAULT_LIMIT = 10;
+  const DEFAULT_LIMIT = 50;
   const limit = parseInt(req.query.limit) || DEFAULT_LIMIT;
   const now = DateTime.now().setZone('America/Los_Angeles');
   const beforeISO = req.query.before || now.toISO()
