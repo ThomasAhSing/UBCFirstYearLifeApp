@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, Alert, TouchableOpacity, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { DateTime } from 'luxon';
 import { api } from '@/context/DataContext';
@@ -14,6 +14,7 @@ export default function UploadEvent() {
 
     const [date, setDate] = useState(null);
     const [showPicker, setShowPicker] = useState(false);
+    const [title, setTitle] = useState(''); // ← optional title
 
     const luxonDate = date
         ? DateTime.fromJSDate(date, { zone: 'America/Vancouver' })
@@ -24,10 +25,11 @@ export default function UploadEvent() {
         if (!luxonDate) return Alert.alert('Select date', 'Please pick a date & time for the event.');
         try {
             const shortcode = parsedPost.shortcode;
-    
+
             await api.post('/api/events', {
                 shortcode,
                 startAt: luxonDate.toISO(),
+                title: title?.trim() || undefined, // ← include only if provided
             });
             await api.patch(`/api/posts/${shortcode}`);
             Alert.alert('Success', 'Event uploaded successfully!');
@@ -62,9 +64,18 @@ export default function UploadEvent() {
             <Text style={styles.info}>
                 Vancouver:{' '}
                 {luxonDate
-                    ? luxonDate.toFormat("yyyy-MM-dd 'at' h:mm a") // <-- show minutes
+                    ? luxonDate.toFormat("yyyy-MM-dd 'at' h:mm a")
                     : '—'}
             </Text>
+
+            {/* Optional Title Input (between Vancouver and Upload button) */}
+            <TextInput
+                value={title}
+                onChangeText={setTitle}
+                placeholder="Optional title"
+                placeholderTextColor="#9AA4AF"
+                style={styles.input}
+            />
 
             <Button title="Upload Event" onPress={handleUpload} color="#4CAF50" />
         </View>
@@ -77,4 +88,14 @@ const styles = StyleSheet.create({
     backText: { color: '#4CAF50', fontSize: 16 },
     title: { fontSize: 20, color: 'white', marginBottom: 20, fontWeight: 'bold' },
     info: { color: 'white', marginTop: 10, marginBottom: 10, borderRadius: 7 },
+    input: {
+        backgroundColor: '#0f172a',
+        color: 'white',
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#173E63',
+        marginBottom: 12,
+    },
 });

@@ -45,7 +45,16 @@ export default function DayScreen({ dateString, monthEventsData, monthPostMap })
                   renderItem={({ item: eventObj }) => {
                     return (
                       <View>
-                        <Text style={styles.timeText}>{formatEventTimePDT(eventObj.startAt)}</Text>
+                        <View >
+                          <Text style={styles.timeText}>
+                            {formatEventTimePDT(eventObj.startAt)}
+                          </Text>
+
+                          {eventObj.title ? (
+                            <Text style={styles.titleText}>{eventObj.title}</Text>
+                          ) : null}
+                        </View>
+
                         <Post post={dayPostMap[eventObj.shortcode]} />
                       </View>
                     )
@@ -99,13 +108,20 @@ const styles = StyleSheet.create({
     fontFamily: 'CourgetteRegular',
     fontSize: 25,
     paddingLeft: 15,
+    paddingBottom: 10,
   },
   timeText: {
     color: 'white',
     fontFamily: 'CourgetteRegular',
     paddingLeft: 15,
     fontSize: 20,
+    paddingBottom: 5,
+  },
+  titleText: {
+    color: 'white',
+    fontFamily: 'CourgetteRegular',
+    paddingLeft: 15,
+    fontSize: 15,
     paddingBottom: 10,
-    paddingTop: 10,
   }
 });
