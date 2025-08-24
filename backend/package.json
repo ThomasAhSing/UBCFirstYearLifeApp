@@ -21,8 +21,11 @@
     "dotenv": "^17.2.1",
     "expo-server-sdk": "^3.15.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
+    "jsonwebtoken": "^9.0.2",
     "luxon": "^3.7.1",
     "mongoose": "^8.17.1",
+    "nanoid": "^5.1.5",
     "node-cron": "^4.2.1"
   },
   "devDependencies": {

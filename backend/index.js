@@ -5,6 +5,7 @@ const cors = require('cors');
 const cron = require('node-cron');
 const { PT } = require('./utils/time'); // America/Los_Angeles
 const Event = require('./models/Event'); // unchanged
+const ClickCredit = require('./models/ClickCredit');
 
 // Load .env only when running this file directly (not in tests)
 if (require.main === module) {
@@ -38,6 +39,9 @@ app.use('/privacy', require('./routes/privacy'));
 app.use('/terms',   require('./routes/terms'));
 app.use('/api/admin', require('./routes/admin'));
 
+
+// ✅ NEW: Referral routes (register/share link, QR, credit, and public /r/:token redirect)
+app.use('/', require('./routes/referral'));
 
 // ---------- Jobs ----------
 const conditionallyStage = require('./jobs/conditionallyStage'); // stage tonight if needed
@@ -132,4 +136,3 @@ if (require.main === module) {
 }
 
 module.exports = app;
-

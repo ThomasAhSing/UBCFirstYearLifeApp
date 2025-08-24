@@ -18,6 +18,8 @@ import ConfessionFilled from '@/assets/icons/ConfessionsFld'
 import ConfessionOutline from  '@/assets/icons/ConfessionsOtln'
 import EventFilled from  '@/assets/icons/EventFilled'
 import EventOutline from  '@/assets/icons/EventOutline'
+import GiftOutline from  '@/assets/icons/GiftOutline'
+import GiftFilled from  '@/assets/icons/GiftFilled'
 
 
 export default function TabLayout() {
@@ -86,6 +88,19 @@ export default function TabLayout() {
               return <EventFilled size={28} color={iconColor} />
             } else {
               return  <EventOutline size={28} color={iconColor} />
+            }
+          } 
+        }}
+      />
+      <Tabs.Screen
+        name="giveaway"
+        options={{
+          title: 'Giveaway',
+          tabBarIcon: ({ color, focused }) => {
+            if (focused) {
+              return <GiftFilled size={28} color={iconColor} />
+            } else {
+              return  <GiftOutline size={28} color={iconColor} />
             }
           } 
         }}

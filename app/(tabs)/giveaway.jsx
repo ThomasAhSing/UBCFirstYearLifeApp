@@ -13,7 +13,8 @@ import {
   Alert,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { api } from '@/context/DataContext'; // ✅ your Axios instance
+// If you already have this in your app:
+import { api } from '@/context/DataContext';
 
 const COLORS = {
   bg: '#0C2A42',
@@ -52,16 +53,15 @@ export default function GiveawayScreen({
   subtitle = 'Invite friends. Earn entries. Win campus prizes.',
   endsAt = '2025-09-20T23:59:59-07:00',
   totalEntries = 0,
-  userEntries = 0,             // prop from parent (initial)
+  userEntries = 0,
   onEnter = () => {},
-  onShare: onShareProp,        // optional external handler
-  onRegistered,                // ✅ optional: (payload) => void
+  onShare: onShareProp, // optional external handler
   bannerImage,
   winnersAnnounceText = 'Winners announced on Instagram @ubcfirstyearlife',
 }) {
   const { ended, parts } = useCountdown(endsAt);
 
-  // --- Referral registration state ---
+  // --- New state for referral registration ---
   const [email, setEmail] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -69,12 +69,13 @@ export default function GiveawayScreen({
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 
-  // ✅ local mirror so we can update after register
-  const [youEntriesLocal, setYouEntriesLocal] = useState(userEntries);
-
-  const emailValid = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()), [email]);
+  const emailValid = useMemo(() => {
+    // Simple validation; you can tighten this if you want.
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  }, [email]);
 
   const qrSrc = useMemo(() => {
+    // Use Google Charts to avoid adding a library
     return shareUrl
       ? `https://chart.googleapis.com/chart?chs=512x512&cht=qr&chld=L|1&chl=${encodeURIComponent(shareUrl)}`
       : '';
@@ -88,26 +89,11 @@ export default function GiveawayScreen({
     }
     try {
       setLoading(true);
-      const normalized = email.trim().toLowerCase();
-
-      // 🔌 Axios call via your api instance
-      const res = await api.post('/referral/register', { email: normalized });
-
-      // Expect backend to return: { code, shareUrl, entries? }
-      const { shareUrl: urlFromApi, code: codeFromApi, entries } = res?.data || {};
+      const res = await api.post('/referral/register', { email: email.trim().toLowerCase() });
+      const { shareUrl: urlFromApi, code: codeFromApi } = res?.data || {};
       if (!urlFromApi) throw new Error('Missing shareUrl');
-
       setShareUrl(urlFromApi);
       setCode(codeFromApi || '');
-
-      const newEntries =
-     typeof entries === 'number'
-       ? entries
-       : (youEntriesLocal <= 0 ? 1 : youEntriesLocal);
-   setYouEntriesLocal(newEntries);
-
-      // Let parent know if they care
-      onRegistered?.({ email: normalized, code: codeFromApi, shareUrl: urlFromApi, entries: newEntries });
     } catch (e) {
       console.error(e);
       setError('Could not generate your link. Please try again in a moment.');
@@ -125,7 +111,7 @@ export default function GiveawayScreen({
     try {
       await Share.share({
         message: `Join the UBC First Year Life app! Use my link: ${shareUrl}`,
-        url: shareUrl,
+        url: shareUrl, // iOS uses this field too
         title: 'UBC First Year Life',
       });
     } catch (e) {
@@ -183,8 +169,7 @@ export default function GiveawayScreen({
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Your entries</Text>
           <View style={styles.entriesRow}>
-            {/* 📌 show local count that updates after register */}
-            <Stat label="You" value={youEntriesLocal} />
+            <Stat label="You" value={userEntries} />
             <Stat label="Total" value={totalEntries} />
           </View>
 
@@ -207,7 +192,7 @@ export default function GiveawayScreen({
           )}
         </View>
 
-        {/* Email → personal link & QR */}
+        {/* NEW: Email → personal link & QR */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Get your personal link</Text>
 
@@ -260,7 +245,7 @@ export default function GiveawayScreen({
                 </Pressable>
               </View>
 
-              {/* QR (Google Charts image; swap to react-native-qrcode-svg if you want offline) */}
+              {/* QR */}
               <Text style={[styles.cardTitle, { marginTop: 16 }]}>Your QR code</Text>
               <View style={styles.qrWrap}>
                 <Image
@@ -422,7 +407,7 @@ const styles = StyleSheet.create({
 
   footer: { color: COLORS.subtext, textAlign: 'center', marginTop: 4, fontSize: 12 },
 
-  // New styles
+  // --- New styles ---
   input: {
     backgroundColor: COLORS.bg,
     borderColor: COLORS.border,
