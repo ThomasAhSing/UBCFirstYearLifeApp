@@ -70,9 +70,6 @@ small{color:var(--muted)}
       <li><strong>Giveaway email:</strong> You may request deletion of your giveaway email at any time; note this may remove your entries.</li>
     </ul>
 
-    <h2>Children’s Privacy</h2>
-    <p>Our app is not directed to children under 13, and we do not knowingly collect personal information from them. If you believe a child has provided personal information, contact us and we will delete it.</p>
-
     <h2>Contact</h2>
     <p>Email: <a href="mailto:ahsingthomas@gmail.com">ahsingthomas@gmail.com</a></p>
 
