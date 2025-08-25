@@ -5,7 +5,7 @@ export default ({ config }) => ({
   owner: "ahsingthomas",
   name: "FirstYearLife",
   slug: "firstyearlife",
-  version: "1.0.0",
+  version: "1.0.1",
   orientation: "portrait",
   icon: "./assets/images/ubcfyla_app_icon.png",
   scheme: "firstyearlife",
@@ -15,7 +15,7 @@ export default ({ config }) => ({
   ios: {
     supportsTablet: false,
     bundleIdentifier: "com.ahsingthomas.firstyearlife",
-    buildNumber: "8",
+    buildNumber: "2",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false
     }

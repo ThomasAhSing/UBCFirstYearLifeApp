@@ -22,6 +22,7 @@ import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DateTime } from 'luxon';
 import { api } from '@/context/DataContext';
+import Heading from '@/app/Heading';
 
 // Firebase Storage (banner image + info/rules text)
 import { ref, getDownloadURL } from 'firebase/storage';
@@ -32,6 +33,7 @@ import InfoOutline from '@/assets/icons/InfoOutline';
 
 // Cross-platform QR (iOS/Android/Web)
 import QRCode from 'react-native-qrcode-svg';
+import AnimateOpen from '@/app/AnimateOpen';
 
 const COLORS = {
   bg: '#0C2A42',
@@ -379,232 +381,235 @@ export default function GiveawayScreen() {
     bannerNatural.w > 0 ? Math.round((imgW * bannerNatural.h) / bannerNatural.w) : 0;
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView
-        contentContainerStyle={[styles.container, { paddingBottom: 120 }]}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-      >
-        <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-          {/* Hero (image replaces trophy only; title/subtitle remain visible) */}
-          <View style={styles.hero}>
-            <View style={styles.heroFallback}>
-              {!bannerFailed && bannerUrl ? (
-                <View style={styles.heroImageWrap}>
-                  <Image
-                    source={{ uri: bannerUrl }}
-                    style={[styles.heroDynamicImage, { width: imgW, height: imgH || 120 }]}
-                    resizeMode="cover"
-                    onError={() => setBannerFailed(true)}
-                  />
-                  {/* (Info button moved beside title per your layout) */}
+    <AnimateOpen>
+      <SafeAreaView style={styles.safe}>
+        <Heading />
+        <ScrollView
+          contentContainerStyle={[styles.container, { paddingBottom: 120 }]}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
+          <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
+            {/* Hero (image replaces trophy only; title/subtitle remain visible) */}
+            <View style={styles.hero}>
+              <View style={styles.heroFallback}>
+                {!bannerFailed && bannerUrl ? (
+                  <View style={styles.heroImageWrap}>
+                    <Image
+                      source={{ uri: bannerUrl }}
+                      style={[styles.heroDynamicImage, { width: imgW, height: imgH || 120 }]}
+                      resizeMode="cover"
+                      onError={() => setBannerFailed(true)}
+                    />
+                    {/* (Info button moved beside title per your layout) */}
+                  </View>
+                ) : (
+                  <Text style={styles.trophy}>🏆</Text>
+                )}
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={styles.heroTitle}>{TITLE}</Text>
+                  <TouchableOpacity
+                    onPress={openRulesModal}
+                    activeOpacity={0.8}
+                    style={styles.infoBtn}
+                    accessibilityRole="button"
+                    accessibilityLabel="Open Giveaway Info"
+                  >
+                    <InfoOutline width={18} height={18} color={COLORS.gold} />
+                  </TouchableOpacity>
                 </View>
-              ) : (
-                <Text style={styles.trophy}>🏆</Text>
-              )}
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={styles.heroTitle}>{TITLE}</Text>
-                <TouchableOpacity
-                  onPress={openRulesModal}
-                  activeOpacity={0.8}
-                  style={styles.infoBtn}
-                  accessibilityRole="button"
-                  accessibilityLabel="Open Giveaway Info"
-                >
-                  <InfoOutline width={18} height={18} color={COLORS.gold} />
-                </TouchableOpacity>
+
+                <Text style={styles.heroSubtitle}>{SUBTITLE}</Text>
               </View>
-
-              <Text style={styles.heroSubtitle}>{SUBTITLE}</Text>
             </View>
-          </View>
 
-          {/* Countdown / Closed */}
-          <View style={styles.card}>
-            {!ended ? (
-              <>
-                <Text style={styles.cardTitle}>Time left</Text>
-                <View style={styles.countdownRow}>
-                  <TimeChip label="Days" value={parts.days} />
-                  <TimeChip label="Hours" value={parts.hours} />
-                  <TimeChip label="Min" value={parts.minutes} />
-                  <TimeChip label="Sec" value={parts.seconds} />
-                </View>
-                <Text style={styles.endsAt}>Ends: {endsAtDisplay}</Text>
+            {/* Countdown / Closed */}
+            <View style={styles.card}>
+              {!ended ? (
+                <>
+                  <Text style={styles.cardTitle}>Time left</Text>
+                  <View style={styles.countdownRow}>
+                    <TimeChip label="Days" value={parts.days} />
+                    <TimeChip label="Hours" value={parts.hours} />
+                    <TimeChip label="Min" value={parts.minutes} />
+                    <TimeChip label="Sec" value={parts.seconds} />
+                  </View>
+                  <Text style={styles.endsAt}>Ends: {endsAtDisplay}</Text>
 
-                <View style={styles.legalRow}>
-                  <Pressable onPress={() => setLegalVisible(true)} style={({ pressed }) => pressed && { opacity: 0.8 }}>
-                    <Text style={styles.linkText}>Official Rules</Text>
-                  </Pressable>
-                </View>
-              </>
-            ) : (
-              <>
-                <ClosedBadge />
-                <Text style={[styles.endsAt, { marginTop: 8 }]}>{WINNERS_TEXT}</Text>
-                <View style={styles.legalRow}>
-                  <Pressable onPress={() => setLegalVisible(true)} style={({ pressed }) => pressed && { opacity: 0.8 }}>
-                    <Text style={styles.linkText}>Official Rules</Text>
-                  </Pressable>
-                </View>
-              </>
-            )}
-          </View>
-
-          {/* Entries (populated via GET endpoints) */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Your entries</Text>
-            <View style={styles.entriesRow}>
-              <Stat label="You" value={youEntriesLocal} />
-              <Stat label="Total" value={totalEntries} />
+                  <View style={styles.legalRow}>
+                    <Pressable onPress={() => setLegalVisible(true)} style={({ pressed }) => pressed && { opacity: 0.8 }}>
+                      <Text style={styles.linkText}>Official Rules</Text>
+                    </Pressable>
+                  </View>
+                </>
+              ) : (
+                <>
+                  <ClosedBadge />
+                  <Text style={[styles.endsAt, { marginTop: 8 }]}>{WINNERS_TEXT}</Text>
+                  <View style={styles.legalRow}>
+                    <Pressable onPress={() => setLegalVisible(true)} style={({ pressed }) => pressed && { opacity: 0.8 }}>
+                      <Text style={styles.linkText}>Official Rules</Text>
+                    </Pressable>
+                  </View>
+                </>
+              )}
             </View>
-            <Text style={styles.note}>
-             Earn more entries when friends scan your QR code or click your custom link. Refresh the app to see new entries.
-            </Text>
-          </View>
 
-          {/* Email → personal link & QR */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Get your personal link</Text>
-
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              editable={!shareUrl}                               // 🔒 lock after link is created
-              onBlur={() => setEmailTouched(true)}
-              placeholder="your.email@ubc.ca"
-              placeholderTextColor="#89A9C6"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              style={[styles.input, shareUrl && { opacity: 0.6 }]} // dim when locked
-            />
-            {!!(emailTouched && !emailValid) && (
-              <Text style={styles.inputError}>Please enter a valid email.</Text>
-            )}
-
-            <Text style={styles.helper}>
-              This email is used only for the giveaway (entries & winner contact). It is <Text style={{ fontWeight: '700', color: COLORS.white }}>not</Text> used for anonymous confessions.
-            </Text>
-
-            <Pressable
-              onPress={handleRegister}
-              disabled={!emailValid || loading || !!shareUrl}      // ⛔️ disable after link exists
-              style={({ pressed }) => [
-                styles.cta,
-                (!emailValid || loading || !!shareUrl) && { opacity: 0.6 },
-                pressed && styles.ctaPressed,
-              ]}
-            >
-              <Text style={styles.ctaText}>
-                {loading ? 'Generating…' : shareUrl ? 'Link Created' : 'Get My Link'}
+            {/* Entries (populated via GET endpoints) */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Your entries</Text>
+              <View style={styles.entriesRow}>
+                <Stat label="You" value={youEntriesLocal} />
+                <Stat label="Total" value={totalEntries} />
+              </View>
+              <Text style={styles.note}>
+                Earn more entries when friends scan your QR code or click your custom link. Refresh the app to see new entries.
               </Text>
-            </Pressable>
+            </View>
 
-            {!!error && <Text style={[styles.inputError, { marginTop: 8 }]}>{error}</Text>}
+            {/* Email → personal link & QR */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Get your personal link</Text>
 
-            {!!shareUrl && (
-              <>
-                <View style={styles.linkRow}>
-                  <Text style={styles.linkLabel}>Your link</Text>
-                  <Text numberOfLines={1} style={styles.linkValue}>{shareUrl}</Text>
-                </View>
-                <View style={styles.row}>
-                  <Pressable
-                    onPress={handleShareLink}
-                    style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed, { flex: 1 }]}
-                  >
-                    <Text style={styles.secondaryText}>Share Link</Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={handleCopy}
-                    style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed, { flex: 1 }]}
-                  >
-                    <Text style={styles.secondaryText}>Copy Link</Text>
-                  </Pressable>
-                </View>
+              <TextInput
+                value={email}
+                onChangeText={setEmail}
+                editable={!shareUrl}                               // 🔒 lock after link is created
+                onBlur={() => setEmailTouched(true)}
+                placeholder="your.email@ubc.ca"
+                placeholderTextColor="#89A9C6"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                style={[styles.input, shareUrl && { opacity: 0.6 }]} // dim when locked
+              />
+              {!!(emailTouched && !emailValid) && (
+                <Text style={styles.inputError}>Please enter a valid email.</Text>
+              )}
 
-                <Text style={[styles.cardTitle, { marginTop: 16 }]}>Your QR code</Text>
-                <Text style={styles.footer}>Share this QR code to earn more entries!</Text>
-                <View style={styles.qrWrap}>
-                  {/* Local QR that renders on iOS/Android/Web */}
-                  <QRCode
-                    value={shareUrl}
-                    size={220}
-                    backgroundColor="transparent"
-                    color={COLORS.white}
-                  />
-                </View>
-              </>
-            )}
-          </View>
+              <Text style={styles.helper}>
+                This email is used only for the giveaway (entries & winner contact). It is <Text style={{ fontWeight: '700', color: COLORS.white }}>not</Text> used for anonymous confessions.
+              </Text>
 
-          {/* Footer + Apple disclaimer */}
-          {/* <Text style={styles.footer}>Share this QR code to earn more entries!</Text> */}
-          <Text style={styles.appleDisclaimer}>
-            Apple Inc. is not a sponsor, nor affiliated with, nor responsible for this giveaway.
-          </Text>
-          <View style={{ height: 24 }} />
-        </Pressable>
-      </ScrollView>
-
-      {/* End overlay (dismissible) */}
-      {ended && endedOverlayVisible && (
-        <EndedOverlay
-          winnersAnnounceText={WINNERS_TEXT}
-          onClose={() => setEndedOverlayVisible(false)}
-        />
-      )}
-
-      {/* Info / Prizes Modal */}
-      <Modal
-        visible={rulesVisible}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setRulesVisible(false)}
-      >
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Giveaway Prizes</Text>
-              <Pressable onPress={() => setRulesVisible(false)} style={({ pressed }) => pressed && { opacity: 0.6 }}>
-                <Text style={styles.modalClose}>✕</Text>
+              <Pressable
+                onPress={handleRegister}
+                disabled={!emailValid || loading || !!shareUrl}      // ⛔️ disable after link exists
+                style={({ pressed }) => [
+                  styles.cta,
+                  (!emailValid || loading || !!shareUrl) && { opacity: 0.6 },
+                  pressed && styles.ctaPressed,
+                ]}
+              >
+                <Text style={styles.ctaText}>
+                  {loading ? 'Generating…' : shareUrl ? 'Link Created' : 'Get My Link'}
+                </Text>
               </Pressable>
-            </View>
-            <ScrollView style={{ maxHeight: 420 }}>
-              <Text style={styles.rulesText}>{rulesText}</Text>
-              <Text style={[styles.appleDisclaimer, { marginTop: 12 }]}>
-                Apple Inc. is not a sponsor, nor affiliated with, nor responsible for this giveaway.
-              </Text>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
 
-      {/* Official Rules Modal */}
-      <Modal
-        visible={legalVisible}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setLegalVisible(false)}
-      >
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Official Rules</Text>
-              <Pressable onPress={() => setLegalVisible(false)} style={({ pressed }) => pressed && { opacity: 0.6 }}>
-                <Text style={styles.modalClose}>✕</Text>
-              </Pressable>
+              {!!error && <Text style={[styles.inputError, { marginTop: 8 }]}>{error}</Text>}
+
+              {!!shareUrl && (
+                <>
+                  <View style={styles.linkRow}>
+                    <Text style={styles.linkLabel}>Your link</Text>
+                    <Text numberOfLines={1} style={styles.linkValue}>{shareUrl}</Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Pressable
+                      onPress={handleShareLink}
+                      style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed, { flex: 1 }]}
+                    >
+                      <Text style={styles.secondaryText}>Share Link</Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={handleCopy}
+                      style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed, { flex: 1 }]}
+                    >
+                      <Text style={styles.secondaryText}>Copy Link</Text>
+                    </Pressable>
+                  </View>
+
+                  <Text style={[styles.cardTitle, { marginTop: 16 }]}>Your QR code</Text>
+                  <Text style={styles.footer}>Share this QR code to earn more entries!</Text>
+                  <View style={styles.qrWrap}>
+                    {/* Local QR that renders on iOS/Android/Web */}
+                    <QRCode
+                      value={shareUrl}
+                      size={220}
+                      backgroundColor="transparent"
+                      color={COLORS.white}
+                    />
+                  </View>
+                </>
+              )}
             </View>
-            <ScrollView style={{ maxHeight: 420 }}>
-              <Text style={styles.rulesText}>{OFFICIAL_RULES_FALLBACK}</Text>
-              <Text style={[styles.appleDisclaimer, { marginTop: 12 }]}>
-                Apple Inc. is not a sponsor, nor affiliated with, nor responsible for this giveaway.
-              </Text>
-            </ScrollView>
+
+            {/* Footer + Apple disclaimer */}
+            <Text style={[styles.footer, {marginTop: 5}]}>Download First Year Life for the full first year experience</Text>
+            <Text style={styles.appleDisclaimer}>
+              Apple Inc. is not a sponsor, nor affiliated with, nor responsible for this giveaway.
+            </Text>
+            <View style={{ height: 24 }} />
+          </Pressable>
+        </ScrollView>
+
+        {/* End overlay (dismissible) */}
+        {ended && endedOverlayVisible && (
+          <EndedOverlay
+            winnersAnnounceText={WINNERS_TEXT}
+            onClose={() => setEndedOverlayVisible(false)}
+          />
+        )}
+
+        {/* Info / Prizes Modal */}
+        <Modal
+          visible={rulesVisible}
+          animationType="slide"
+          transparent
+          onRequestClose={() => setRulesVisible(false)}
+        >
+          <View style={styles.modalBackdrop}>
+            <View style={styles.modalCard}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Giveaway Prizes</Text>
+                <Pressable onPress={() => setRulesVisible(false)} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+                  <Text style={styles.modalClose}>✕</Text>
+                </Pressable>
+              </View>
+              <ScrollView style={{ maxHeight: 420 }}>
+                <Text style={styles.rulesText}>{rulesText}</Text>
+                <Text style={[styles.appleDisclaimer, { marginTop: 12 }]}>
+                  Apple Inc. is not a sponsor, nor affiliated with, nor responsible for this giveaway.
+                </Text>
+              </ScrollView>
+            </View>
           </View>
-        </View>
-      </Modal>
-    </SafeAreaView>
+        </Modal>
+
+        {/* Official Rules Modal */}
+        <Modal
+          visible={legalVisible}
+          animationType="slide"
+          transparent
+          onRequestClose={() => setLegalVisible(false)}
+        >
+          <View style={styles.modalBackdrop}>
+            <View style={styles.modalCard}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Official Rules</Text>
+                <Pressable onPress={() => setLegalVisible(false)} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+                  <Text style={styles.modalClose}>✕</Text>
+                </Pressable>
+              </View>
+              <ScrollView style={{ maxHeight: 420 }}>
+                <Text style={styles.rulesText}>{OFFICIAL_RULES_FALLBACK}</Text>
+                <Text style={[styles.appleDisclaimer, { marginTop: 12 }]}>
+                  Apple Inc. is not a sponsor, nor affiliated with, nor responsible for this giveaway.
+                </Text>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+      </SafeAreaView>
+    </AnimateOpen>
   );
 
 }
@@ -888,7 +893,7 @@ const styles = StyleSheet.create({
     color: COLORS.subtext,
     textAlign: 'center',
     fontSize: 10,
-    marginTop: 6,
+    marginTop: 16,
     opacity: 0.9,
   },
 
