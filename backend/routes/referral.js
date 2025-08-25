@@ -116,4 +116,43 @@ router.get('/r/:token', async (req, res) => {
   return res.redirect(302, appStore);
 });
 
+/**
+ * GET /referral/entries/:email
+ * Returns: { email, entries }
+ */
+router.get('/referral/entries/:email', async (req, res) => {
+  try {
+    const email = normalizeEmail(req.params.email);
+    const ref = await Referrer.findOne({ email });
+    if (!ref) return res.status(404).json({ error: 'not_found' });
+
+    return res.json({
+      email: ref.email,
+      entries: ref.entries,
+    });
+  } catch (err) {
+    console.error('entries lookup error', err);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
+/**
+ * GET /referral/entries
+ * Returns: { totalEntries }
+ */
+router.get('/referral/entries', async (req, res) => {
+  try {
+    const total = await Referrer.aggregate([
+      { $group: { _id: null, total: { $sum: "$entries" } } }
+    ]);
+
+    const totalEntries = total[0]?.total || 0;
+    return res.json({ totalEntries });
+  } catch (err) {
+    console.error('total entries lookup error', err);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
+
 module.exports = router;

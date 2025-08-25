@@ -6,26 +6,37 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "android": { "buildType": "apk" },
+      "android": {
+        "buildType": "apk"
+      },
       "ios": {
-        "simulator": false  
+        "simulator": false
       }
     },
     "preview": {
       "distribution": "internal",
-      "android": { "buildType": "apk" },
+      "android": {
+        "buildType": "apk"
+      },
       "ios": {
         "simulator": false
       }
     },
     "production": {
-      "android": { "buildType": "app-bundle" },
+      "android": {
+        "buildType": "app-bundle"
+      },
       "ios": {
         "simulator": false
       },
       "env": {
         "EXPO_PUBLIC_API_BASE_URL": "https://ubcfirstyearlifeapp.onrender.com",
-        "EXPO_PUBLIC_APP_SCHEME": "ubcfirstyearlifeapp"
+        "EXPO_PUBLIC_APP_SCHEME": "ubcfirstyearlifeapp",
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyAIkbBeKYx_xouaQMFF-7M_pija2maoTXM",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "ubcfirstyearlifeapp.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "ubcfirstyearlifeapp",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "ubcfirstyearlifeapp.firebasestorage.app",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:962800030316:web:a27a0972b2fa2e0f853e49"
       }
     }
   },
