@@ -16,19 +16,22 @@ import {
   Easing,
   useWindowDimensions,
   Modal,
-  ActivityIndicator,
+  Keyboard
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DateTime } from 'luxon';
 import { api } from '@/context/DataContext';
 
-// Firebase Storage (for the banner image only)
+// Firebase Storage (banner image + info/rules text)
 import { ref, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/src/firebase';
 
-// Info icon component
+// Info icon
 import InfoOutline from '@/assets/icons/InfoOutline';
+
+// Cross-platform QR (iOS/Android/Web)
+import QRCode from 'react-native-qrcode-svg';
 
 const COLORS = {
   bg: '#0C2A42',
@@ -38,6 +41,7 @@ const COLORS = {
   border: '#173E63',
   gold: '#E6B800',
   white: '#FFFFFF',
+  dark_blue: "#062036",
 };
 
 const TITLE = 'First Year Life • Fall Giveaway';
@@ -52,7 +56,7 @@ const STORAGE_EMAIL = 'giveaway_email';
 const STORAGE_SHARE_URL = 'giveaway_share_url';
 const STORAGE_CODE = 'giveaway_code';
 
-// ——— Helpers for local state persistence ———
+// ---------- AsyncStorage helpers ----------
 async function saveReferralToDevice({ email, shareUrl, code }) {
   try {
     if (email !== undefined) await AsyncStorage.setItem(STORAGE_EMAIL, email || '');
@@ -103,47 +107,44 @@ function useCountdown(endsAtISO) {
   return { ended, parts };
 }
 
-// Simple, static rules text (editable here; no network fetch)
-const RULES_TEXT = `
-OFFICIAL RULES
+// ---- Local fallback for info/prizes ----
+const LOCAL_INFO_FALLBACK = `1x Tshirt
+1x flask bottle
+1x Thunderbird pop socket`.trim();
 
-NO PURCHASE NECESSARY. VOID WHERE PROHIBITED.
+// ---- Apple-required long rules fallback ----
+const OFFICIAL_RULES_FALLBACK = `
+Apple Disclaimer: Apple Inc. is not a sponsor of, does not endorse, and is not involved in this giveaway in any way.
 
-Sponsor: UBC First Year Life (“Sponsor”).
+This giveaway is organized by the First Year Life app team to promote the app.
 
-Eligibility: Open to eligible participants as described by Sponsor (e.g., student status, age, residency). Employees/contractors of Sponsor and their immediate family/household members are not eligible.
+Free Participation: Participation is 100% free. There is no payment, no in-app purchase, and no external purchase required to enter or to win. This giveaway is not a raffle, sweepstakes with paid entry, or any form of gambling.
 
-How to Enter: Follow in-app instructions. Entries may include using a personal referral link as described. Automated/bulk entries prohibited.
+Eligibility: Open to current UBC students and incoming first-year students. Must be 18+ years old (to match the app’s App Store age rating). Void where prohibited by law. By entering, participants agree to these rules.
 
-Entry Period: Begins upon in-app announcement and ends at the date/time displayed in the countdown. Entries outside this period are void.
+How to Enter: Enter your email address in the app to receive one entry. Additional entries are earned if you share your referral link or QR code and someone else clicks / scans it. We will not send push notifications or unsolicited messages about this giveaway. Participation is entirely user-initiated.
 
-Prizes & ARV: See in-app communications for prize descriptions. Prizes are non-transferable; substitutions at Sponsor’s sole discretion.
+Giveaway Period: Entries are accepted from 2025/08/25 to 2025/09/07. After the end date, the giveaway screen will clearly display a “Giveaway Ended” message, and no further entries will be counted. The screen will remain in the app for transparency, but will not appear broken or misleading once the giveaway is over.
 
-Odds: Depend on the number of eligible entries received.
+Prizes: Items such as T-shirts, bottles, and accessories that were either personally purchased by the team or donated for free. No cash prizes will be awarded.
 
-Winner Selection & Notification: Random drawing after the Entry Period ends. Potential winners notified via the email provided and may need to respond/complete verification within a stated time or forfeit.
+Winner Selection: Winners will be chosen at random from all valid entries after the giveaway ends. The draw will take place within 7 days after closing. Winners will be contacted only by email. If a winner does not respond within 7 days, another entrant may be selected.
 
-General Conditions: Sponsor may disqualify any entry that tampers with the giveaway or violates these Rules. Sponsor may cancel/suspend/modify if fraud or other causes impair integrity.
-
-Release: By participating, entrants release Sponsor and affiliates from claims arising from participation or use of any prize.
-
-Publicity: Except where prohibited, participation constitutes consent for Sponsor to use entrant’s name/likeness for promotional purposes without additional compensation.
-
-Platform Disclaimer: Apple Inc. is not a sponsor, administrator, or affiliated with this giveaway.
-
-Privacy: Information is used only to administer the giveaway and contact winners, as described in the app.
-
-Sponsor Contact: See in-app Sponsor contact information.
+Data/Privacy: Emails are collected solely to track entries and notify winners. They will not be shared, sold, or used for any other purpose. All collected emails will be deleted within 30 days after the giveaway ends.
 `.trim();
 
 export default function GiveawayScreen() {
   const { width: screenWidth } = useWindowDimensions();
-
-  const [youEntriesLocal, setYouEntriesLocal] = useState(0);
-  const [totalEntries] = useState(0);
   const { ended, parts } = useCountdown(GIVEAWAY_END_UTC);
 
-  // Referral registration state
+  // Dismiss state for the end overlay (so users can navigate even after end)
+  const [endedOverlayVisible, setEndedOverlayVisible] = useState(true);
+
+  // Entries state
+  const [youEntriesLocal, setYouEntriesLocal] = useState(0);
+  const [totalEntries, setTotalEntries] = useState(0);
+
+  // Referral state
   const [email, setEmail] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -151,14 +152,50 @@ export default function GiveawayScreen() {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
 
-  // Banner (image replacing the trophy) + natural size for aspect ratio
+  // Banner state (image replaces trophy) + natural size for aspect ratio
   const [bannerUrl, setBannerUrl] = useState(null);
   const [bannerFailed, setBannerFailed] = useState(false);
   const [bannerNatural, setBannerNatural] = useState({ w: 0, h: 0 });
 
-  // Rules modal
+  // Info/Prizes modal (Firebase-loaded text with local fallback)
   const [rulesVisible, setRulesVisible] = useState(false);
+  const [rulesText, setRulesText] = useState(LOCAL_INFO_FALLBACK);
 
+  // NEW: Official Rules modal
+  const [legalVisible, setLegalVisible] = useState(false);
+
+  // ---- Fetch info/prizes text once from Firebase Storage (fallback to LOCAL_INFO_FALLBACK) ----
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const candidates = [
+          'appImages/giveaway_details.txt',
+          'appImages/giveaway_details.md',
+          'appImages/giveaway_details.txt',
+          'appImages/giveaway_details.md',
+        ];
+        for (const path of candidates) {
+          try {
+            const url = await getDownloadURL(ref(storage, path));
+            const resp = await fetch(url, { cache: 'no-store' });
+            const txt = await resp.text();
+            if (alive && txt && txt.trim()) {
+              setRulesText(txt.trim());
+              break;
+            }
+          } catch {
+            // try next
+          }
+        }
+      } catch {
+        // keep fallback
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  // ---- Fetch banner once (multi-ext) ----
   useEffect(() => {
     let alive = true;
     async function resolveBannerUrl() {
@@ -167,7 +204,6 @@ export default function GiveawayScreen() {
         try {
           const url = await getDownloadURL(ref(storage, `appImages/Giveaway.${ext}`));
           if (!alive) return;
-          // get natural size to preserve aspect ratio
           Image.getSize(
             url,
             (w, h) => {
@@ -178,7 +214,6 @@ export default function GiveawayScreen() {
             },
             () => {
               if (!alive) return;
-              // If size lookup fails, still show image with a safe default ratio (16:9)
               setBannerNatural({ w: 16, h: 9 });
               setBannerUrl(url);
               setBannerFailed(false);
@@ -195,64 +230,124 @@ export default function GiveawayScreen() {
     return () => { alive = false; };
   }, []);
 
-  // Load saved email/link/code on mount and refresh entries
+  // ---- On mount: restore from storage, then load entries + total ----
   useEffect(() => {
+    let alive = true;
     (async () => {
+      // Always get total entries, even if user has no email yet
+      fetchTotalEntries();
+
       const { email: savedEmail, shareUrl: savedUrl, code: savedCode } = await loadReferralFromDevice();
-      if (savedEmail) setEmail(savedEmail);
-      if (savedUrl) setShareUrl(savedUrl);
-      if (savedCode) setCode(savedCode);
+      if (!alive) return;
 
       if (savedEmail) {
-        try {
-          const res = await api.post('/referral/register', { email: savedEmail });
-          const { shareUrl: u, code: c, entries } = res?.data || {};
-          if (u) setShareUrl(u);
-          if (c) setCode(c);
-          if (typeof entries === 'number') setYouEntriesLocal(entries);
-        } catch (e) {
-          console.log('Refresh entries failed', e?.message);
-        }
+        setEmail(savedEmail);
+        if (savedUrl) setShareUrl(savedUrl);
+        if (savedCode) setCode(savedCode);
+
+        // Get the user's entries using GET endpoint
+        fetchYourEntries(savedEmail);
       }
     })();
+
+    return () => { alive = false; };
   }, []);
+
+  // ---- Helpers to call your GET endpoints ----
+  async function fetchYourEntries(targetEmail) {
+    const normalized = (targetEmail || '').trim().toLowerCase();
+    if (!normalized) return;
+    try {
+      const res = await api.get(`/referral/entries/${encodeURIComponent(normalized)}`);
+      const entries = res?.data?.entries;
+      if (typeof entries === 'number') {
+        setYouEntriesLocal((curr) => Math.max(curr, entries));
+      }
+    } catch (e) {
+      if (e?.response?.status === 404) {
+        setYouEntriesLocal(0);
+        return;
+      }
+      console.log('fetchYourEntries error:', e?.message);
+    }
+  }
+
+  async function fetchTotalEntries() {
+    try {
+      const res = await api.get('/referral/entries');
+      const total = res?.data?.totalEntries;
+      if (typeof total === 'number') setTotalEntries(total);
+    } catch (e) {
+      console.log('fetchTotalEntries error:', e?.message);
+    }
+  }
 
   const emailValid = useMemo(
     () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((email || '').trim()),
     [email]
   );
 
-  const qrSrc = useMemo(() => {
-    return shareUrl
-      ? `https://chart.googleapis.com/chart?chs=512x512&cht=qr&chld=L|1&chl=${encodeURIComponent(shareUrl)}`
-      : '';
-  }, [shareUrl]);
-
+  // ---- Register flow (optimistic 1; save only on success) ----
   async function handleRegister() {
     setError('');
+    if (shareUrl) return; // already registered on this device (lock)
     if (!emailValid) { setEmailTouched(true); return; }
+
+    const normalized = email.trim().toLowerCase();
+    const hadEntries = youEntriesLocal > 0;
+
     try {
       setLoading(true);
-      const normalized = email.trim().toLowerCase();
+
+      // Optimistic UX: user sees at least 1 entry immediately
+      setYouEntriesLocal((n) => (n <= 0 ? 1 : n));
+
       const res = await api.post('/referral/register', { email: normalized });
-      const { shareUrl: urlFromApi, code: codeFromApi, entries } = res?.data || {};
-      if (!urlFromApi) throw new Error('Missing shareUrl');
+      const { shareUrl: urlFromApi, code: codeFromApi } = res?.data || {};
+
+      if (!urlFromApi) {
+        // Treat as failure: revert optimistic bump (back to 0 if we had none)
+        if (!hadEntries) setYouEntriesLocal(0);
+        throw new Error('Missing shareUrl');
+      }
 
       setShareUrl(urlFromApi);
-      setCode(codeFromApi || '');
+      if (codeFromApi) setCode(codeFromApi);
 
-      const newEntries =
-        typeof entries === 'number'
-          ? entries
-          : (youEntriesLocal <= 0 ? 1 : youEntriesLocal);
-      setYouEntriesLocal(newEntries);
+      // Save ONLY on success
+      await saveReferralToDevice({
+        email: normalized,
+        shareUrl: urlFromApi,
+        code: codeFromApi || '',
+      });
 
-      await saveReferralToDevice({ email: normalized, shareUrl: urlFromApi, code: codeFromApi });
+      // Reconcile entries from server (won't drop below 1 due to Math.max logic)
+      fetchYourEntries(normalized);
+
+      // Refresh total entries (optional but nice)
+      fetchTotalEntries();
     } catch (e) {
       console.error(e);
       setError('Could not generate your link. Please try again in a moment.');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleShareLink() {
+    if (!shareUrl) {
+      Alert.alert('Create your link', 'Enter your email and tap “Get My Link” first.');
+      return;
+    }
+    try {
+      // Share API is a no-op on some web environments; still safe to call
+      await Share.share({
+        message: `Join the UBC First Year Life app! Use my link: ${shareUrl}`,
+        url: shareUrl,
+        title: 'UBC First Year Life',
+      });
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -265,10 +360,9 @@ export default function GiveawayScreen() {
     Alert.alert('Copied', 'Your personal link has been copied to the clipboard.');
   }
 
-  // Open Rules modal
-  function openRulesModal() {
-    setRulesVisible(true);
-  }
+  // Modal controls
+  function openRulesModal() { setRulesVisible(true); }
+  function closeRulesModal() { setRulesVisible(false); }
 
   // Display end time in Vancouver time
   const endsAtDisplay = useMemo(
@@ -279,184 +373,189 @@ export default function GiveawayScreen() {
     []
   );
 
-  // Dynamic image size (80% of screen width, preserve natural aspect)
+  // Dynamic image size (80% of screen width, original aspect ratio)
   const imgW = Math.round(screenWidth * 0.8);
   const imgH =
     bannerNatural.w > 0 ? Math.round((imgW * bannerNatural.h) / bannerNatural.w) : 0;
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Hero (image replaces trophy only; title/subtitle remain visible) */}
-        <View style={styles.hero}>
-          <View style={styles.heroFallback}>
-            {!bannerFailed && bannerUrl ? (
-              <View style={styles.heroImageWrap}>
-                <Image
-                  source={{ uri: bannerUrl }}
-                  style={[styles.heroDynamicImage, { width: imgW, height: imgH || 120 }]}
-                  resizeMode="cover"
-                  onError={() => setBannerFailed(true)}
-                />
-                {/* Info icon (opens Official Rules modal) */}
+      <ScrollView
+        contentContainerStyle={[styles.container, { paddingBottom: 120 }]}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
+        <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
+          {/* Hero (image replaces trophy only; title/subtitle remain visible) */}
+          <View style={styles.hero}>
+            <View style={styles.heroFallback}>
+              {!bannerFailed && bannerUrl ? (
+                <View style={styles.heroImageWrap}>
+                  <Image
+                    source={{ uri: bannerUrl }}
+                    style={[styles.heroDynamicImage, { width: imgW, height: imgH || 120 }]}
+                    resizeMode="cover"
+                    onError={() => setBannerFailed(true)}
+                  />
+                  {/* (Info button moved beside title per your layout) */}
+                </View>
+              ) : (
+                <Text style={styles.trophy}>🏆</Text>
+              )}
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={styles.heroTitle}>{TITLE}</Text>
                 <TouchableOpacity
                   onPress={openRulesModal}
                   activeOpacity={0.8}
                   style={styles.infoBtn}
                   accessibilityRole="button"
-                  accessibilityLabel="Open Official Rules"
+                  accessibilityLabel="Open Giveaway Info"
                 >
-                  {/* Adjust props based on your icon component API */}
                   <InfoOutline width={18} height={18} color={COLORS.gold} />
                 </TouchableOpacity>
               </View>
+
+              <Text style={styles.heroSubtitle}>{SUBTITLE}</Text>
+            </View>
+          </View>
+
+          {/* Countdown / Closed */}
+          <View style={styles.card}>
+            {!ended ? (
+              <>
+                <Text style={styles.cardTitle}>Time left</Text>
+                <View style={styles.countdownRow}>
+                  <TimeChip label="Days" value={parts.days} />
+                  <TimeChip label="Hours" value={parts.hours} />
+                  <TimeChip label="Min" value={parts.minutes} />
+                  <TimeChip label="Sec" value={parts.seconds} />
+                </View>
+                <Text style={styles.endsAt}>Ends: {endsAtDisplay}</Text>
+
+                <View style={styles.legalRow}>
+                  <Pressable onPress={() => setLegalVisible(true)} style={({ pressed }) => pressed && { opacity: 0.8 }}>
+                    <Text style={styles.linkText}>Official Rules</Text>
+                  </Pressable>
+                </View>
+              </>
             ) : (
-              <Text style={styles.trophy}>🏆</Text>
+              <>
+                <ClosedBadge />
+                <Text style={[styles.endsAt, { marginTop: 8 }]}>{WINNERS_TEXT}</Text>
+                <View style={styles.legalRow}>
+                  <Pressable onPress={() => setLegalVisible(true)} style={({ pressed }) => pressed && { opacity: 0.8 }}>
+                    <Text style={styles.linkText}>Official Rules</Text>
+                  </Pressable>
+                </View>
+              </>
             )}
-            <Text style={styles.heroTitle}>{TITLE}</Text>
-            <Text style={styles.heroSubtitle}>{SUBTITLE}</Text>
           </View>
-        </View>
 
-        {/* Countdown / Closed */}
-        <View style={styles.card}>
-          {!ended ? (
-            <>
-              <Text style={styles.cardTitle}>Time left</Text>
-              <View style={styles.countdownRow}>
-                <TimeChip label="Days" value={parts.days} />
-                <TimeChip label="Hours" value={parts.hours} />
-                <TimeChip label="Min" value={parts.minutes} />
-                <TimeChip label="Sec" value={parts.seconds} />
-              </View>
-              <Text style={styles.endsAt}>Ends: {endsAtDisplay}</Text>
-
-              {/* Official Rules text link also opens modal */}
-              <View style={styles.legalRow}>
-                <Pressable onPress={openRulesModal} style={({ pressed }) => pressed && { opacity: 0.8 }}>
-                  <Text style={styles.linkText}>Official Rules</Text>
-                </Pressable>
-              </View>
-            </>
-          ) : (
-            <>
-              <ClosedBadge />
-              <Text style={[styles.endsAt, { marginTop: 8 }]}>{WINNERS_TEXT}</Text>
-              <View style={styles.legalRow}>
-                <Pressable onPress={openRulesModal} style={({ pressed }) => pressed && { opacity: 0.8 }}>
-                  <Text style={styles.linkText}>Official Rules</Text>
-                </Pressable>
-              </View>
-            </>
-          )}
-        </View>
-
-        {/* Entries (no action buttons) */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Your entries</Text>
-          <View style={styles.entriesRow}>
-            <Stat label="You" value={youEntriesLocal} />
-            <Stat label="Total" value={totalEntries} />
+          {/* Entries (populated via GET endpoints) */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Your entries</Text>
+            <View style={styles.entriesRow}>
+              <Stat label="You" value={youEntriesLocal} />
+              <Stat label="Total" value={totalEntries} />
+            </View>
+            <Text style={styles.note}>
+             Earn more entries when friends scan your QR code or click your custom link. Refresh the app to see new entries.
+            </Text>
           </View>
-          <Text style={styles.note}>
-            Entries update automatically as friends join using your link.
+
+          {/* Email → personal link & QR */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Get your personal link</Text>
+
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              editable={!shareUrl}                               // 🔒 lock after link is created
+              onBlur={() => setEmailTouched(true)}
+              placeholder="your.email@ubc.ca"
+              placeholderTextColor="#89A9C6"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              style={[styles.input, shareUrl && { opacity: 0.6 }]} // dim when locked
+            />
+            {!!(emailTouched && !emailValid) && (
+              <Text style={styles.inputError}>Please enter a valid email.</Text>
+            )}
+
+            <Text style={styles.helper}>
+              This email is used only for the giveaway (entries & winner contact). It is <Text style={{ fontWeight: '700', color: COLORS.white }}>not</Text> used for anonymous confessions.
+            </Text>
+
+            <Pressable
+              onPress={handleRegister}
+              disabled={!emailValid || loading || !!shareUrl}      // ⛔️ disable after link exists
+              style={({ pressed }) => [
+                styles.cta,
+                (!emailValid || loading || !!shareUrl) && { opacity: 0.6 },
+                pressed && styles.ctaPressed,
+              ]}
+            >
+              <Text style={styles.ctaText}>
+                {loading ? 'Generating…' : shareUrl ? 'Link Created' : 'Get My Link'}
+              </Text>
+            </Pressable>
+
+            {!!error && <Text style={[styles.inputError, { marginTop: 8 }]}>{error}</Text>}
+
+            {!!shareUrl && (
+              <>
+                <View style={styles.linkRow}>
+                  <Text style={styles.linkLabel}>Your link</Text>
+                  <Text numberOfLines={1} style={styles.linkValue}>{shareUrl}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Pressable
+                    onPress={handleShareLink}
+                    style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed, { flex: 1 }]}
+                  >
+                    <Text style={styles.secondaryText}>Share Link</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={handleCopy}
+                    style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed, { flex: 1 }]}
+                  >
+                    <Text style={styles.secondaryText}>Copy Link</Text>
+                  </Pressable>
+                </View>
+
+                <Text style={[styles.cardTitle, { marginTop: 16 }]}>Your QR code</Text>
+                <Text style={styles.footer}>Share this QR code to earn more entries!</Text>
+                <View style={styles.qrWrap}>
+                  {/* Local QR that renders on iOS/Android/Web */}
+                  <QRCode
+                    value={shareUrl}
+                    size={220}
+                    backgroundColor="transparent"
+                    color={COLORS.white}
+                  />
+                </View>
+              </>
+            )}
+          </View>
+
+          {/* Footer + Apple disclaimer */}
+          {/* <Text style={styles.footer}>Share this QR code to earn more entries!</Text> */}
+          <Text style={styles.appleDisclaimer}>
+            Apple Inc. is not a sponsor, nor affiliated with, nor responsible for this giveaway.
           </Text>
-        </View>
-
-        {/* Email → personal link & QR */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Get your personal link</Text>
-
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            onBlur={() => setEmailTouched(true)}
-            placeholder="your.email@ubc.ca"
-            placeholderTextColor="#89A9C6"
-            autoCapitalize="none"
-            keyboardType="email-address"
-            style={styles.input}
-          />
-          {!!(emailTouched && !emailValid) && (
-            <Text style={styles.inputError}>Please enter a valid email.</Text>
-          )}
-
-          <Text style={styles.helper}>
-            This email is used only for the giveaway (entries & winner contact).
-            It is <Text style={{ fontWeight: '700', color: COLORS.white }}>not</Text> used for anonymous confessions.
-          </Text>
-
-          <Pressable
-            onPress={handleRegister}
-            disabled={!emailValid || loading}
-            style={({ pressed }) => [
-              styles.cta,
-              (!emailValid || loading) && { opacity: 0.6 },
-              pressed && styles.ctaPressed,
-            ]}
-          >
-            <Text style={styles.ctaText}>{loading ? 'Generating…' : 'Get My Link'}</Text>
-          </Pressable>
-
-          {!!error && <Text style={[styles.inputError, { marginTop: 8 }]}>{error}</Text>}
-
-          {!!shareUrl && (
-            <>
-              <View style={styles.linkRow}>
-                <Text style={styles.linkLabel}>Your link</Text>
-                <Text numberOfLines={1} style={styles.linkValue}>{shareUrl}</Text>
-              </View>
-              <View style={styles.row}>
-                <Pressable onPress={async () => {
-                  try {
-                    await Share.share({
-                      message: `Join the UBC First Year Life app! Use my link: ${shareUrl}`,
-                      url: shareUrl,
-                      title: 'UBC First Year Life',
-                    });
-                  } catch (e) { console.error(e); }
-                }} style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed, { flex: 1 }]}>
-                  <Text style={styles.secondaryText}>Share Link</Text>
-                </Pressable>
-                <Pressable onPress={handleCopy} style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed, { flex: 1 }]}>
-                  <Text style={styles.secondaryText}>Copy Link</Text>
-                </Pressable>
-              </View>
-
-              <Text style={[styles.cardTitle, { marginTop: 16 }]}>Your QR code</Text>
-              <View style={styles.qrWrap}>
-                <Image
-                  source={{ uri: shareUrl ? `https://chart.googleapis.com/chart?chs=512x512&cht=qr&chld=L|1&chl=${encodeURIComponent(shareUrl)}` : undefined }}
-                  style={{ width: 220, height: 220, borderRadius: 12 }}
-                />
-              </View>
-
-              <Pressable
-                onPress={async () => {
-                  await clearReferralFromDevice();
-                  setEmail(''); setShareUrl(''); setCode(''); setYouEntriesLocal(0);
-                  Alert.alert('Reset', 'Saved giveaway email and link cleared. Enter a new email to start again.');
-                }}
-                style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed, { marginTop: 8 }]}
-              >
-                <Text style={styles.secondaryText}>Reset saved email</Text>
-              </Pressable>
-            </>
-          )}
-        </View>
-
-        {/* Footer + Apple disclaimer */}
-        <Text style={styles.footer}>Made with ❤️ for UBC First Years</Text>
-        <Text style={styles.appleDisclaimer}>
-          Apple Inc. is not a sponsor, nor affiliated with, nor responsible for this giveaway.
-        </Text>
-        <View style={{ height: 24 }} />
+          <View style={{ height: 24 }} />
+        </Pressable>
       </ScrollView>
 
-      {/* End overlay */}
-      {ended && <EndedOverlay winnersAnnounceText={WINNERS_TEXT} />}
+      {/* End overlay (dismissible) */}
+      {ended && endedOverlayVisible && (
+        <EndedOverlay
+          winnersAnnounceText={WINNERS_TEXT}
+          onClose={() => setEndedOverlayVisible(false)}
+        />
+      )}
 
-      {/* Official Rules Modal (simple, no network) */}
+      {/* Info / Prizes Modal */}
       <Modal
         visible={rulesVisible}
         animationType="slide"
@@ -466,13 +565,38 @@ export default function GiveawayScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Official Rules</Text>
+              <Text style={styles.modalTitle}>Giveaway Prizes</Text>
               <Pressable onPress={() => setRulesVisible(false)} style={({ pressed }) => pressed && { opacity: 0.6 }}>
                 <Text style={styles.modalClose}>✕</Text>
               </Pressable>
             </View>
             <ScrollView style={{ maxHeight: 420 }}>
-              <Text style={styles.rulesText}>{RULES_TEXT}</Text>
+              <Text style={styles.rulesText}>{rulesText}</Text>
+              <Text style={[styles.appleDisclaimer, { marginTop: 12 }]}>
+                Apple Inc. is not a sponsor, nor affiliated with, nor responsible for this giveaway.
+              </Text>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Official Rules Modal */}
+      <Modal
+        visible={legalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setLegalVisible(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Official Rules</Text>
+              <Pressable onPress={() => setLegalVisible(false)} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+                <Text style={styles.modalClose}>✕</Text>
+              </Pressable>
+            </View>
+            <ScrollView style={{ maxHeight: 420 }}>
+              <Text style={styles.rulesText}>{OFFICIAL_RULES_FALLBACK}</Text>
               <Text style={[styles.appleDisclaimer, { marginTop: 12 }]}>
                 Apple Inc. is not a sponsor, nor affiliated with, nor responsible for this giveaway.
               </Text>
@@ -482,6 +606,7 @@ export default function GiveawayScreen() {
       </Modal>
     </SafeAreaView>
   );
+
 }
 
 function TimeChip({ label, value }) {
@@ -511,7 +636,7 @@ function ClosedBadge() {
   );
 }
 
-function EndedOverlay({ winnersAnnounceText }) {
+function EndedOverlay({ winnersAnnounceText, onClose }) {
   const opacity = useRef(new Animated.Value(0)).current;
   const { width, height } = useWindowDimensions();
   const [particles] = useState(() => {
@@ -524,7 +649,6 @@ function EndedOverlay({ winnersAnnounceText }) {
       duration: 2500 + Math.random() * 1200,
     }));
   });
-
   const anims = useRef(particles.map(() => new Animated.Value(-60))).current;
 
   useEffect(() => {
@@ -534,7 +658,6 @@ function EndedOverlay({ winnersAnnounceText }) {
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
-
     const animations = anims.map((v, idx) =>
       Animated.timing(v, {
         toValue: height + 40,
@@ -567,8 +690,12 @@ function EndedOverlay({ winnersAnnounceText }) {
           {p.emoji}
         </Animated.Text>
       ))}
-
       <View style={styles.overlayCard}>
+        <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end', width: '100%' }}>
+          <Pressable onPress={onClose} style={({ pressed }) => [styles.overlayCloseBtn, pressed && { opacity: 0.8 }]}>
+            <Text style={styles.overlayCloseIcon}>✕</Text>
+          </Pressable>
+        </View>
         <Text style={styles.overlayTitle}>Giveaway Ended</Text>
         <Text style={styles.overlaySub}>{winnersAnnounceText}</Text>
       </View>
@@ -589,10 +716,8 @@ const styles = StyleSheet.create({
   },
   heroFallback: { padding: 20, alignItems: 'center', gap: 8 },
 
-  // Trophy size stays the same
   trophy: { fontSize: 48 },
 
-  // Dynamic banner image wrapper (positions the info icon)
   heroImageWrap: {
     position: 'relative',
     alignItems: 'center',
@@ -605,17 +730,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bg,
   },
   infoBtn: {
-    position: 'absolute',
-    right: 8,
-    bottom: 8,
-    padding: 8,
-    borderRadius: 16,
+    padding: 5,
+    marginLeft: 6,
+    borderRadius: 10,
     backgroundColor: 'rgba(0,0,0,0.35)',
     borderWidth: 1,
     borderColor: 'rgba(230,184,0,0.5)',
   },
 
-  heroTitle: { color: COLORS.text, fontSize: 20, fontWeight: '800', textAlign: 'center' },
+  heroTitle: { color: COLORS.text, fontSize: 18, fontWeight: '800', textAlign: 'center' },
   heroSubtitle: { color: COLORS.subtext, fontSize: 14, textAlign: 'center' },
 
   card: {
@@ -733,23 +856,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   overlayCard: {
-    backgroundColor: 'rgba(16, 47, 75, 0.9)',
-    paddingVertical: 18,
+    backgroundColor: 'rgba(6, 32, 54, 0.9)',
+    paddingTop: 10,
+    paddingBottom: 18,
     paddingHorizontal: 20,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
     alignItems: 'center',
+    width: '86%',
   },
   overlayTitle: { color: COLORS.gold, fontSize: 20, fontWeight: '800', marginBottom: 6 },
   overlaySub: { color: COLORS.subtext, fontSize: 13, textAlign: 'center' },
 
-  confetti: {
-    position: 'absolute',
-    fontSize: 22,
+  // Close button INSIDE overlay card header
+  overlayCloseBtn: {
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    borderWidth: 1,
+    borderColor: 'rgba(230,184,0,0.6)',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginLeft: 8,
   },
+  overlayCloseIcon: { color: COLORS.gold, fontSize: 16, fontWeight: '800' },
 
-  footer: { color: COLORS.subtext, textAlign: 'center', marginTop: 4, fontSize: 12 },
+  confetti: { position: 'absolute', fontSize: 22 },
+
+  footer: { color: COLORS.subtext, textAlign: 'center', marginTop: 4, marginBottom: 10, fontSize: 14 },
   appleDisclaimer: {
     color: COLORS.subtext,
     textAlign: 'center',
@@ -766,7 +900,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modalCard: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.dark_blue,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -781,4 +915,14 @@ const styles = StyleSheet.create({
   modalTitle: { color: COLORS.text, fontSize: 18, fontWeight: '800' },
   modalClose: { color: COLORS.subtext, fontSize: 18, paddingHorizontal: 8, paddingVertical: 4 },
   rulesText: { color: COLORS.text, fontSize: 14, lineHeight: 20 },
+
+  closedWrap: {
+    backgroundColor: 'rgba(230,184,0,0.1)',
+    borderWidth: 1,
+    borderColor: COLORS.gold,
+    borderRadius: 12,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  closedText: { color: COLORS.gold, fontWeight: '800' },
 });

@@ -15,7 +15,7 @@ export default ({ config }) => ({
   ios: {
     supportsTablet: false,
     bundleIdentifier: "com.ahsingthomas.firstyearlife",
-    buildNumber: "7",
+    buildNumber: "8",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false
     }
