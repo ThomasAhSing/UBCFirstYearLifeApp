@@ -4,7 +4,7 @@ const router = express.Router();
 // ---------- config ----------
 const APP_SCHEME   = (process.env.APP_SCHEME || 'firstyearlife') + '://';
 const WEB_BASE     = (process.env.WEB_BASE || 'https://ubcfirstyearlifeapp.onrender.com').replace(/\/+$/,'');
-const APPSTORE_URL = 'https://apps.apple.com/app/idMY_APP_ID';                  // TODO
+const APPSTORE_URL = 'https://apps.apple.com/ca/app/first-year-life/id6751215460';                
 const PLAY_URL     = 'https://play.google.com/store/apps/details?id=MY.PACKAGE'; // TODO
 
 // Page background
@@ -275,7 +275,6 @@ ${rootOverride}
 
       <div class="badges">
         <a href="${APPSTORE_URL}"><img alt="App Store" src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"></a>
-        <a href="${PLAY_URL}"><img alt="Google Play" src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"></a>
       </div>
 
       <div class="footer">First Year Life - For UBC Students</div>
