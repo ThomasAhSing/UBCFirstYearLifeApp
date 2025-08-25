@@ -43,7 +43,7 @@ small{color:var(--muted)}
       <li>Send notifications you opt into.</li>
       <li>Operate and moderate content, including removing violations of our Terms.</li>
       <li>Improve reliability and safety of the service.</li>
-      <li><strong>Giveaway:</strong> Generate your referral link, track entries, prevent abuse/fraud, and notify potential winners via the email you provided.</li>
+      <li><strong>Giveaway:</strong> Generate your referral link, track entries and notify potential winners via the email you provided.</li>
     </ul>
     <p><small>We do <strong>not</strong> use giveaway emails for advertising or newsletters, and we do <strong>not</strong> share them with Apple.</small></p>
 
