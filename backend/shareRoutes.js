@@ -269,10 +269,6 @@ ${rootOverride}
 
       <div id="dotsMount"></div>
 
-      <div class="btnRow">
-        <a class="btn primary" id="openApp" href="${esc(deep)}">Open in the app</a>
-      </div>
-
       <div class="badges">
         <a href="${APPSTORE_URL}"><img alt="App Store" src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"></a>
       </div>
