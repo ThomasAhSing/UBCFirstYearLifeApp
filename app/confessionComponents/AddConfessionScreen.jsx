@@ -1,461 +1,266 @@
-// GiveawayScreen.jsx
-import React, { useEffect, useMemo, useState } from 'react';
+// app/confessions/AddConfessionScreen.jsx
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
+  TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
-  ScrollView,
-  Pressable,
-  Image,
+  Text,
+  View,
   TextInput,
-  Share,
   Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from 'react-native';
-import * as Clipboard from 'expo-clipboard';
-import { api } from '@/context/DataContext'; // ✅ your Axios instance
 
-const COLORS = {
-  bg: '#0C2A42',
-  card: '#102F4B',
-  text: '#FFFFFF',
-  subtext: '#C6DAF3',
-  border: '#173E63',
-  gold: '#E6B800',
-  white: '#FFFFFF',
-};
+import { Dropdown } from 'react-native-element-dropdown';
+import ResidenceIcon from '@/assets/icons/ResidenceIcon';
+import { Colors } from '@/constants/Colors';
+import { api } from '@/context/DataContext';
+import AnimateOpen from '@/app/AnimateOpen';
+import { getOrCreateAnonAuthorId } from '@/app/utils/anonAuthorId';
 
-function useCountdown(endsAt) {
-  const [now, setNow] = useState(() => Date.now());
+const data = [
+  { label: 'Totem Park', residence: 'TotemPark' },
+  { label: 'Orchard Commons', residence: 'OrchardCommons' },
+  { label: 'Place Vanier', residence: 'PlaceVanier' },
+];
+
+const MAX_LENGTH_CONFESSION = 250;
+
+// -------- Objectionable content filtering (client-side) --------
+const BLOCKLIST = [
+  // Hate slurs (block both exact and common obfuscations)
+  /\bnigg(a|er|@|4)\b/i,
+  /\bfag(got)?\b/i,
+  /\btrann?y\b/i,
+  /\bkike\b/i,
+  /\bchink\b/i,
+
+  // Extreme threats / violence (keep narrow)
+  /\brape(s|d|ing)?\b/i,
+
+  // Explicit sexual / illegal content
+  /\bchild\s*porn\b/i,
+  // /\bcp\b/i, // optional: catches "cp" shorthand; comment out if too strict
+  /\bbestiality\b/i,
+  /\bincest\b/i,
+];
+
+function containsBlockedTerm(input) {
+  const text = String(input || '').toLowerCase();
+  for (let i = 0; i < BLOCKLIST.length; i++) {
+    if (BLOCKLIST[i].test(text)) return true;
+  }
+  return false;
+}
+
+export default function AddConfessionScreen() {
+  const [residence, setResidence] = useState(null);
+  const [text, onChangeText] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [authorId, setAuthorId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Load or create per-install anonymous author id
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
+    (async () => {
+      const id = await getOrCreateAnonAuthorId();
+      setAuthorId(id);
+    })();
   }, []);
 
-  const diff = Math.max(0, new Date(endsAt).getTime() - now);
-  const ended = diff <= 0;
-
-  const parts = useMemo(() => {
-    let remain = diff / 1000;
-    const days = Math.floor(remain / 86400); remain -= days * 86400;
-    const hours = Math.floor(remain / 3600); remain -= hours * 3600;
-    const minutes = Math.floor(remain / 60); remain -= minutes * 60;
-    const seconds = Math.floor(remain);
-    return { days, hours, minutes, seconds };
-  }, [diff]);
-
-  return { ended, parts };
-}
-
-export default function GiveawayScreen({
-  title = 'UBC First Year Life • Fall Giveaway',
-  subtitle = 'Invite friends. Earn entries. Win campus prizes.',
-  endsAt = '2025-09-20T23:59:59-07:00',
-  totalEntries = 0,
-  userEntries = 0,             // prop from parent (initial)
-  onEnter = () => {},
-  onShare: onShareProp,        // optional external handler
-  onRegistered,                // ✅ optional: (payload) => void
-  bannerImage,
-  winnersAnnounceText = 'Winners announced on Instagram @ubcfirstyearlife',
-}) {
-  const { ended, parts } = useCountdown(endsAt);
-
-  // --- Referral registration state ---
-  const [email, setEmail] = useState('');
-  const [emailTouched, setEmailTouched] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [shareUrl, setShareUrl] = useState('');
-  const [code, setCode] = useState('');
-  const [error, setError] = useState('');
-
-  // ✅ local mirror so we can update after register
-  const [youEntriesLocal, setYouEntriesLocal] = useState(userEntries);
-
-  const emailValid = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()), [email]);
-
-  const qrSrc = useMemo(() => {
-    return shareUrl
-      ? `https://chart.googleapis.com/chart?chs=512x512&cht=qr&chld=L|1&chl=${encodeURIComponent(shareUrl)}`
-      : '';
-  }, [shareUrl]);
-
-  async function handleRegister() {
-    setError('');
-    if (!emailValid) {
-      setEmailTouched(true);
-      return;
-    }
+  const submitConfession = async () => {
     try {
-      setLoading(true);
-      const normalized = email.trim().toLowerCase();
-
-      // 🔌 Axios call via your api instance
-      const res = await api.post('/referral/register', { email: normalized });
-
-      // Expect backend to return: { code, shareUrl, entries? }
-      const { shareUrl: urlFromApi, code: codeFromApi, entries } = res?.data || {};
-      if (!urlFromApi) throw new Error('Missing shareUrl');
-
-      setShareUrl(urlFromApi);
-      setCode(codeFromApi || '');
-
-      const newEntries =
-     typeof entries === 'number'
-       ? entries
-       : (youEntriesLocal <= 0 ? 1 : youEntriesLocal);
-   setYouEntriesLocal(newEntries);
-
-      // Let parent know if they care
-      onRegistered?.({ email: normalized, code: codeFromApi, shareUrl: urlFromApi, entries: newEntries });
-    } catch (e) {
-      console.error(e);
-      setError('Could not generate your link. Please try again in a moment.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleShare() {
-    if (onShareProp) return onShareProp(shareUrl, code, email);
-    if (!shareUrl) {
-      Alert.alert('Create your link', 'Enter your email and tap “Get My Link” first.');
-      return;
-    }
-    try {
-      await Share.share({
-        message: `Join the UBC First Year Life app! Use my link: ${shareUrl}`,
-        url: shareUrl,
-        title: 'UBC First Year Life',
+      setSubmitting(true);
+      await api.post('/api/confessions', {
+        residence,
+        content: text,
+        submittedFrom: authorId, // ← include stable anon author id
       });
-    } catch (e) {
-      console.error(e);
+      onChangeText('');
+      setResidence(null);
+      Alert.alert('Success', 'Your confession was submitted');
+    } catch (err) {
+      if (err?.response) {
+        console.error('❌ Confession upload, Server error:', err.response.data);
+        Alert.alert('Error', err.response.data?.message || 'Server error.');
+      } else {
+        console.error('❌ Confession upload, Network or other error:', err?.message);
+        Alert.alert('Error', 'Network error. Please try again.');
+      }
+    } finally {
+      setSubmitting(false);
     }
-  }
+  };
 
-  async function handleCopy() {
-    if (!shareUrl) {
-      Alert.alert('Create your link', 'Enter your email and tap “Get My Link” first.');
+  const onPress = () => {
+    const trimmed = text.trim();
+      console.log(authorId)
+
+    if (residence === null) {
+      setErrorMessage('*** Please select your residence ***');
       return;
     }
-    await Clipboard.setStringAsync(shareUrl);
-    Alert.alert('Copied', 'Your personal link has been copied to the clipboard.');
-  }
+    if (!trimmed) {
+      setErrorMessage("*** Confession can't be empty ***");
+      return;
+    }
+    if (!authorId) {
+      setErrorMessage('*** Initializing… please try again in a moment ***');
+      return;
+    }
+    if (containsBlockedTerm(trimmed)) {
+      setErrorMessage(
+        '*** Your confession contains disallowed content. Please remove objectionable terms (hate speech, explicit content, or serious violent threats). ***'
+      );
+      return;
+    }
+
+    setErrorMessage('');
+    if (!submitting) submitConfession();
+  };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Top Banner */}
-        <View style={styles.hero}>
-          {bannerImage ? (
-            <Image source={bannerImage} style={styles.heroImage} resizeMode="cover" />
-          ) : (
-            <View style={styles.heroFallback}>
-              <Text style={styles.trophy}>🏆</Text>
-              <Text style={styles.heroTitle}>{title}</Text>
-              <Text style={styles.heroSubtitle}>{subtitle}</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Countdown / Closed */}
-        <View style={styles.card}>
-          {!ended ? (
-            <>
-              <Text style={styles.cardTitle}>Time left</Text>
-              <View style={styles.countdownRow}>
-                <TimeChip label="Days" value={parts.days} />
-                <TimeChip label="Hours" value={parts.hours} />
-                <TimeChip label="Min" value={parts.minutes} />
-                <TimeChip label="Sec" value={parts.seconds} />
-              </View>
-              <Text style={styles.endsAt}>Ends: {new Date(endsAt).toLocaleString()}</Text>
-            </>
-          ) : (
-            <>
-              <ClosedBadge />
-              <Text style={[styles.endsAt, { marginTop: 8 }]}>{winnersAnnounceText}</Text>
-            </>
-          )}
-        </View>
-
-        {/* Entries */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Your entries</Text>
-          <View style={styles.entriesRow}>
-            {/* 📌 show local count that updates after register */}
-            <Stat label="You" value={youEntriesLocal} />
-            <Stat label="Total" value={totalEntries} />
-          </View>
-
-          {!ended ? (
-            <>
-              <Pressable onPress={onEnter} style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}>
-                <Text style={styles.ctaText}>Enter / Add Entry</Text>
-              </Pressable>
-
-              <Pressable onPress={handleShare} style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed]}>
-                <Text style={styles.secondaryText}>Share to earn +1 entry</Text>
-              </Pressable>
-
-              <Text style={styles.note}>
-                Each friend who installs via your link or scans your QR adds +1 entry.
-              </Text>
-            </>
-          ) : (
-            <Text style={styles.note}>Thanks for participating! Keep an eye out for future events.</Text>
-          )}
-        </View>
-
-        {/* Email → personal link & QR */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Get your personal link</Text>
-
-          <TextInput
-            value={email}
-            onChangeText={(t) => setEmail(t)}
-            onBlur={() => setEmailTouched(true)}
-            placeholder="your.email@ubc.ca"
-            placeholderTextColor="#89A9C6"
-            autoCapitalize="none"
-            keyboardType="email-address"
-            style={styles.input}
-          />
-          {!!(emailTouched && !emailValid) && (
-            <Text style={styles.inputError}>Please enter a valid email.</Text>
-          )}
-
-          <Text style={styles.helper}>
-            This email is used only for the giveaway (entries & winner contact).
-            It is <Text style={{ fontWeight: '700', color: COLORS.white }}>not</Text> used for anonymous confessions.
-          </Text>
-
-          <Pressable
-            onPress={handleRegister}
-            disabled={!emailValid || loading}
-            style={({ pressed }) => [
-              styles.cta,
-              (!emailValid || loading) && { opacity: 0.6 },
-              pressed && styles.ctaPressed,
-            ]}
+    <AnimateOpen>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
           >
-            <Text style={styles.ctaText}>{loading ? 'Generating…' : 'Get My Link'}</Text>
-          </Pressable>
+            <View style={styles.container}>
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                iconStyle={styles.iconStyle}
+                itemContainerStyle={styles.itemContainer}
+                containerStyle={styles.dropdownContaienr}
+                itemTextStyle={styles.itemTextStyle}
+                selectedStyle={styles.selectedStyle}
+                activeColor="#1E5A8A"
+                data={data}
+                maxHeight={300}
+                labelField="label"
+                valueField="residence"
+                placeholder="Select Residence"
+                searchPlaceholder="Search..."
+                value={residence}
+                onChange={item => setResidence(item.residence)}
+                renderLeftIcon={() => (
+                  <ResidenceIcon style={styles.residenceIcon} size={24} color="white" />
+                )}
+              />
 
-          {!!error && <Text style={[styles.inputError, { marginTop: 8 }]}>{error}</Text>}
+              <Text style={styles.subheading}>Insert Confession Below</Text>
 
-          {/* Link + Share/Copy */}
-          {!!shareUrl && (
-            <>
-              <View style={styles.linkRow}>
-                <Text style={styles.linkLabel}>Your link</Text>
-                <Text numberOfLines={1} style={styles.linkValue}>{shareUrl}</Text>
-              </View>
-              <View style={styles.row}>
-                <Pressable onPress={handleShare} style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed, { flex: 1 }]}>
-                  <Text style={styles.secondaryText}>Share Link</Text>
-                </Pressable>
-                <Pressable onPress={handleCopy} style={({ pressed }) => [styles.secondaryBtn, pressed && styles.secondaryBtnPressed, { flex: 1 }]}>
-                  <Text style={styles.secondaryText}>Copy Link</Text>
-                </Pressable>
-              </View>
-
-              {/* QR (Google Charts image; swap to react-native-qrcode-svg if you want offline) */}
-              <Text style={[styles.cardTitle, { marginTop: 16 }]}>Your QR code</Text>
-              <View style={styles.qrWrap}>
-                <Image
-                  source={{ uri: qrSrc }}
-                  style={{ width: 220, height: 220, borderRadius: 12 }}
+              <View>
+                <TextInput
+                  style={styles.confessionInput}
+                  onChangeText={onChangeText}
+                  multiline
+                  value={text}
+                  placeholder=". . . . . . . . ."
+                  placeholderTextColor={'#8C9AAE'}
+                  textAlignVertical="top"
+                  maxLength={MAX_LENGTH_CONFESSION}
+                  editable={!submitting}
                 />
+
+                <View style={styles.charCounterWrapper}>
+                  <Text style={styles.charCounter}>
+                    {text.length}/{MAX_LENGTH_CONFESSION}
+                  </Text>
+                </View>
+
+                <TouchableOpacity style={styles.submitBtn} onPress={onPress} disabled={submitting}>
+                  <Text style={{ color: '#2C2C2C', fontFamily: 'RobotoBold' }}>
+                    {submitting ? 'Submitting…' : 'Submit Confession'}
+                  </Text>
+                </TouchableOpacity>
+
+                <Text style={styles.note}>
+                  Note: Your confession will be included in the next post, not immediately
+                </Text>
+
+                {!!errorMessage && <Text style={styles.errorMessage}>{errorMessage}</Text>}
               </View>
-              <Text style={styles.note}>Friends can scan this to download with your referral.</Text>
-            </>
-          )}
-        </View>
-
-        {/* Rules */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>How it works</Text>
-          <RuleItem text="1. Tap “Enter” to claim your first entry." />
-          <RuleItem text="2. Share your referral link or QR code." />
-          <RuleItem text="3. Each verified install via your link = +1 entry." />
-          <RuleItem text="4. Winner(s) chosen randomly after the end date." />
-          <Text style={styles.disclaimer}>
-            By entering, you agree to the official rules and eligibility requirements.
-          </Text>
-        </View>
-
-        {/* Footer */}
-        <Text style={styles.footer}>Made with ❤️ for UBC First Years</Text>
-        <View style={{ height: 24 }} />
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-function TimeChip({ label, value }) {
-  const vv = String(value).padStart(2, '0');
-  return (
-    <View style={styles.chip}>
-      <Text style={styles.chipValue}>{vv}</Text>
-      <Text style={styles.chipLabel}>{label}</Text>
-    </View>
-  );
-}
-
-function Stat({ label, value }) {
-  return (
-    <View style={styles.stat}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
-function RuleItem({ text }) {
-  return (
-    <View style={styles.ruleRow}>
-      <View style={styles.bullet} />
-      <Text style={styles.ruleText}>{text}</Text>
-    </View>
-  );
-}
-
-function ClosedBadge() {
-  return (
-    <View style={styles.closedWrap}>
-      <Text style={styles.closedText}>GIVEAWAY CLOSED</Text>
-    </View>
+            </View>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </AnimateOpen>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.bg },
-  container: { padding: 16, gap: 16 },
-
-  hero: {
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: COLORS.card,
+  container: { flex: 1 },
+  dropdownContaienr: {
+    backgroundColor: '#2B4C65',
+    borderWidth: 0,
+    borderRadius: 10,
   },
-  heroImage: { width: '100%', height: 160 },
-  heroFallback: { padding: 20, alignItems: 'center', gap: 8 },
-  trophy: { fontSize: 48 },
-  heroTitle: { color: COLORS.text, fontSize: 20, fontWeight: '800', textAlign: 'center' },
-  heroSubtitle: { color: COLORS.subtext, fontSize: 14, textAlign: 'center' },
-
-  card: {
-    backgroundColor: COLORS.card,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 16,
+  dropdown: {
+    margin: 16,
+    height: 50,
+    borderBottomWidth: 0.5,
+    backgroundColor: '#133A5D',
+    borderRadius: 30,
+    width: '80%',
   },
-  cardTitle: { color: COLORS.text, fontWeight: '700', fontSize: 16, marginBottom: 10 },
-
-  countdownRow: { flexDirection: 'row', gap: 10, justifyContent: 'space-between' },
-  chip: {
-    flex: 1,
-    backgroundColor: COLORS.bg,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 12,
-    paddingVertical: 10,
-    alignItems: 'center',
+  residenceIcon: {
+    paddingLeft: 50,
+    marginRight: 7,
   },
-  chipValue: { color: COLORS.gold, fontSize: 24, fontWeight: '800' },
-  chipLabel: { color: COLORS.subtext, fontSize: 12, marginTop: 2 },
-  endsAt: { color: COLORS.subtext, fontSize: 12, marginTop: 10 },
-
-  entriesRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 12, marginBottom: 12 },
-  stat: {
-    flex: 1,
-    backgroundColor: COLORS.bg,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: 'center',
+  placeholderStyle: { fontSize: 16, color: 'white' },
+  selectedTextStyle: { fontSize: 16, color: 'white' },
+  iconStyle: { width: 20, height: 20, marginRight: 15 },
+  itemContainer: {
+    backgroundColor: 'transparent',
+    borderRadius: 10,
+    border: 'none',
   },
-  statValue: { color: COLORS.white, fontSize: 22, fontWeight: '800' },
-  statLabel: { color: COLORS.subtext, fontSize: 12, marginTop: 2 },
-
-  cta: {
-    backgroundColor: COLORS.gold,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  ctaPressed: { opacity: 0.9 },
-  ctaText: { color: '#1B1B1B', fontWeight: '800', fontSize: 16 },
-
-  secondaryBtn: {
+  itemTextStyle: { color: 'white' },
+  selectedStyle: {},
+  subheading: { color: 'white', paddingLeft: 20, fontSize: 20, marginTop: 15 },
+  confessionInput: {
+    height: 150,
+    margin: 12,
     borderWidth: 1,
-    borderColor: COLORS.gold,
-    borderRadius: 12,
-    paddingVertical: 10,
-    alignItems: 'center',
+    padding: 15,
+    color: 'white',
+    fontSize: 15,
+    border: 'none',
+    marginTop: 15,
   },
-  secondaryBtnPressed: { opacity: 0.9 },
-  secondaryText: { color: COLORS.gold, fontWeight: '700' },
-
-  note: { color: COLORS.subtext, fontSize: 12, marginTop: 10 },
-
-  ruleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 8 },
-  bullet: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.gold, marginTop: 7 },
-  ruleText: { color: COLORS.text, fontSize: 14, flex: 1 },
-
-  disclaimer: { color: COLORS.subtext, fontSize: 12, marginTop: 8 },
-
-  closedWrap: {
-    backgroundColor: 'rgba(230,184,0,0.1)',
-    borderColor: COLORS.gold,
-    borderWidth: 1,
-    paddingVertical: 10,
-    borderRadius: 12,
-    alignItems: 'center',
+  charCounterWrapper: { alignItems: 'flex-end', paddingRight: 20 },
+  charCounter: { color: 'white' },
+  submitBtn: {
+    backgroundColor: Colors.goldAccent,
+    alignSelf: 'flex-start',
+    padding: 10,
+    borderRadius: 10,
+    marginLeft: 15,
+    marginTop: 25,
   },
-  closedText: { color: COLORS.gold, fontWeight: '800', letterSpacing: 1 },
-
-  footer: { color: COLORS.subtext, textAlign: 'center', marginTop: 4, fontSize: 12 },
-
-  // New styles
-  input: {
-    backgroundColor: COLORS.bg,
-    borderColor: COLORS.border,
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    color: COLORS.white,
-    marginBottom: 8,
+  note: {
+    fontFamily: 'RobotoItalic',
+    color: 'white',
+    fontSize: 12,
+    paddingLeft: 15,
+    marginTop: 15,
   },
-  inputError: { color: '#FFB4B4', fontSize: 12, marginTop: 2 },
-  helper: { color: COLORS.subtext, fontSize: 12, marginBottom: 10 },
-
-  linkRow: {
-    backgroundColor: COLORS.bg,
-    borderColor: COLORS.border,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    marginTop: 8,
-    marginBottom: 10,
-  },
-  linkLabel: { color: COLORS.subtext, fontSize: 12, marginBottom: 6 },
-  linkValue: { color: COLORS.white, fontSize: 13 },
-
-  row: { flexDirection: 'row', gap: 10 },
-  qrWrap: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    borderRadius: 12,
-    backgroundColor: COLORS.bg,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+  errorMessage: {
+    color: '#ff4d4d',
+    fontStyle: 'italic',
+    marginTop: 15,
+    marginLeft: 15,
   },
 });

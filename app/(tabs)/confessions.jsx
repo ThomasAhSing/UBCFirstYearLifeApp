@@ -4,7 +4,6 @@ import { StyleSheet, Text } from 'react-native';
 import { useState, useEffect, useContext, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import * as Notifications from 'expo-notifications';
 
 import { Colors } from '@/constants/Colors';
 
