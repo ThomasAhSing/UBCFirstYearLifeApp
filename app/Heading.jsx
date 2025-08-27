@@ -4,11 +4,11 @@ import { useRouter } from 'expo-router';
 import SettingsButton from '@/app/uiButtons/SettingsButton';
 import { API_BASE } from '@/lib/config';
 
-export default function Heading() {
+export default function Heading({title = "first year life"}) {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
   const [passcode, setPasscode] = useState('');
-  const tapCount = useRef(0);
+  const tapCount = useRef(0); 
   const lastTapTime = useRef(0);
 
   const handleTap = () => {
@@ -52,7 +52,8 @@ export default function Heading() {
   return (
     <View style={styles.container}>
       <Pressable style={styles.pressable} onPress={handleTap}>
-        <Text style={[styles.baseText, styles.mainHeading]}>first year life</Text>
+        {/* <Text style={[styles.baseText, styles.mainHeading]}>first year life</Text> */}
+        <Text style={[styles.baseText, styles.mainHeading]}>{title}</Text>
       </Pressable>
       <SettingsButton style={styles.settingsIcon} />
       <Modal visible={modalVisible} transparent={true} animationType="slide">

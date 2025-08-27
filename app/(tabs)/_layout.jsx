@@ -15,39 +15,40 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import HomeFilled from '@/assets/icons/HomeFilled'
 import HomeOutline from '@/assets/icons/HomeOutline'
 import ConfessionFilled from '@/assets/icons/ConfessionsFld'
-import ConfessionOutline from  '@/assets/icons/ConfessionsOtln'
-import EventFilled from  '@/assets/icons/EventFilled'
-import EventOutline from  '@/assets/icons/EventOutline'
-import GiftOutline from  '@/assets/icons/GiftOutline'
-import GiftFilled from  '@/assets/icons/GiftFilled'
+import ConfessionOutline from '@/assets/icons/ConfessionsOtln'
+import EventFilled from '@/assets/icons/EventFilled'
+import EventOutline from '@/assets/icons/EventOutline'
+import GiftOutline from '@/assets/icons/GiftOutline'
+import GiftFilled from '@/assets/icons/GiftFilled'
 
 
 export default function TabLayout() {
   const styles = getStyles()
-  const colorScheme = useColorScheme();
+  // const colorScheme = useColorScheme();
+  const colorScheme = 'dark';
   const iconColor = "white"
   return (
-    <Tabs 
+    <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarShowLabel: false,
+        // tabBarBackground: TabBarBackground,
+        tabBarShowLabel: true,
         tabBarStyle: Platform.select({
           ios: {
-            position: 'relative',
+            position: 'absolute',
             height: 80,
-            backgroundColor: Colors.background,
+            backgroundColor: Colors.tabBarColor,
             borderTopWidth: 1,
-        borderTopColor: '#173E63',
+            borderTopColor: Colors.lineSeperator,
           },
           default: {
-            position: 'realtive',
+            position: 'absolute',
             height: 80,
-            backgroundColor: Colors.background,
+            backgroundColor: Colors.tabBarColor,
             borderTopWidth: 1,
-          borderTopColor: '#173E63',
+            borderTopColor: Colors.lineSeperator,
           },
         }),
       }}>
@@ -61,22 +62,22 @@ export default function TabLayout() {
             } else {
               return <HomeOutline size={28} color={iconColor} />
             }
-          } 
+          }
         }}
       />
       <Tabs.Screen
         name="confessions"
         options={{
           title: 'Confessions',
-          
+
           tabBarIcon: ({ color, focused }) => {
             if (focused) {
               return <ConfessionFilled size={28} color={iconColor} />
             } else {
               return <ConfessionOutline size={28} color={iconColor} />
             }
-          } 
-          
+          }
+
         }}
       />
       <Tabs.Screen
@@ -87,9 +88,9 @@ export default function TabLayout() {
             if (focused) {
               return <EventFilled size={28} color={iconColor} />
             } else {
-              return  <EventOutline size={28} color={iconColor} />
+              return <EventOutline size={28} color={iconColor} />
             }
-          } 
+          }
         }}
       />
       <Tabs.Screen
@@ -100,9 +101,9 @@ export default function TabLayout() {
             if (focused) {
               return <GiftFilled size={28} color={iconColor} />
             } else {
-              return  <GiftOutline size={28} color={iconColor} />
+              return <GiftOutline size={28} color={iconColor} />
             }
-          } 
+          }
         }}
       />
     </Tabs>
@@ -113,7 +114,7 @@ export default function TabLayout() {
 function getStyles() {
   return StyleSheet.create(
     {
-      
+
     }
   )
 }

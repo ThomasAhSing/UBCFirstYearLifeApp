@@ -14,7 +14,7 @@ export default function HomeScreen() {
 
   if (!postDataLoaded) return (
     <ScreenWrapper>
-      <Heading />
+      <Heading title="home"/>
       <Text style={{ color: "white" }}>Loading home...</Text>
     </ScreenWrapper>
   )
@@ -22,8 +22,8 @@ export default function HomeScreen() {
   return (
     <AnimateOpen>
       <ScreenWrapper>
-        <Heading />
-        <PostFlatList />
+        <Heading title="home" />
+        <PostFlatList style={{flex: 1}}/>
       </ScreenWrapper>
     </AnimateOpen>
 

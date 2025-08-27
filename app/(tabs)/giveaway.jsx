@@ -47,12 +47,12 @@ const COLORS = {
 };
 
 const TITLE = 'First Year Life • Fall Giveaway';
-const SUBTITLE = 'Invite friends. Earn entries. Win prizes.';
+// const SUBTITLE = 'Invite friends. Earn entries. Win prizes.'; // replaced by "How to enter" link
 const WINNERS_TEXT = 'Winners have been emailed';
 
 // Sept 7, 2025 23:59 Vancouver == 2025-09-08T06:59:00Z (can override via env)
 const GIVEAWAY_END_UTC =
-  process.env.EXPO_PUBLIC_GIVEAWAY_END_UTC || '2025-09-08T06:59:00Z';
+  process.env.EXPO_PUBLIC_GIVEAWAY_END_UTC || '2025-09-03T06:59:00Z';
 
 const STORAGE_EMAIL = 'giveaway_email';
 const STORAGE_SHARE_URL = 'giveaway_share_url';
@@ -126,7 +126,7 @@ Eligibility: Open to current UBC students and incoming first-year students. Must
 
 How to Enter: Enter your email address in the app to receive one entry. Additional entries are earned if you share your referral link or QR code and someone else clicks / scans it. We will not send push notifications or unsolicited messages about this giveaway. Participation is entirely user-initiated.
 
-Giveaway Period: Entries are accepted from 2025/08/25 to 2025/09/07. After the end date, the giveaway screen will clearly display a “Giveaway Ended” message, and no further entries will be counted. The screen will remain in the app for transparency, but will not appear broken or misleading once the giveaway is over.
+Giveaway Period: Entries are accepted from 2025/08/25 to 2025/09/02. After the end date, the giveaway screen will clearly display a “Giveaway Ended” message, and no further entries will be counted. The screen will remain in the app for transparency, but will not appear broken or misleading once the giveaway is over.
 
 Prizes: Items such as T-shirts, bottles, and accessories that were either personally purchased by the team or donated for free. No cash prizes will be awarded.
 
@@ -163,8 +163,11 @@ export default function GiveawayScreen() {
   const [rulesVisible, setRulesVisible] = useState(false);
   const [rulesText, setRulesText] = useState(LOCAL_INFO_FALLBACK);
 
-  // NEW: Official Rules modal
+  // Official Rules modal
   const [legalVisible, setLegalVisible] = useState(false);
+
+  // NEW: How to enter modal
+  const [howToVisible, setHowToVisible] = useState(false);
 
   // ---- Fetch info/prizes text once from Firebase Storage (fallback to LOCAL_INFO_FALLBACK) ----
   useEffect(() => {
@@ -383,7 +386,7 @@ export default function GiveawayScreen() {
   return (
     <AnimateOpen>
       <SafeAreaView style={styles.safe}>
-        <Heading />
+        <Heading title="giveaway"/>
         <ScrollView
           contentContainerStyle={[styles.container, { paddingBottom: 120 }]}
           keyboardShouldPersistTaps="handled"
@@ -419,7 +422,16 @@ export default function GiveawayScreen() {
                   </TouchableOpacity>
                 </View>
 
-                <Text style={styles.heroSubtitle}>{SUBTITLE}</Text>
+                {/* REPLACED SUBTITLE WITH LINK */}
+                <TouchableOpacity
+                  onPress={() => setHowToVisible(true)}
+                  activeOpacity={0.8}
+                  style={{ marginTop: 2 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="How to enter"
+                >
+                  <Text style={styles.linkText}>How to enter</Text>
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -455,17 +467,7 @@ export default function GiveawayScreen() {
               )}
             </View>
 
-            {/* Entries (populated via GET endpoints) */}
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Your entries</Text>
-              <View style={styles.entriesRow}>
-                <Stat label="You" value={youEntriesLocal} />
-                <Stat label="Total" value={totalEntries} />
-              </View>
-              <Text style={styles.note}>
-                Earn more entries when friends scan your QR code or click your custom link. Refresh the app to see new entries.
-              </Text>
-            </View>
+            
 
             {/* Email → personal link & QR */}
             <View style={styles.card}>
@@ -542,6 +544,18 @@ export default function GiveawayScreen() {
               )}
             </View>
 
+            {/* Entries (populated via GET endpoints) */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Your entries</Text>
+              <View style={styles.entriesRow}>
+                <Stat label="You" value={youEntriesLocal} />
+                <Stat label="Total" value={totalEntries} />
+              </View>
+              <Text style={styles.note}>
+                Earn more entries when friends scan your QR code or click your custom link. Refresh the app to see new entries.
+              </Text>
+            </View>
+
             {/* Footer + Apple disclaimer */}
             <Text style={[styles.footer, {marginTop: 5}]}>Download First Year Life for the full first year experience</Text>
             <Text style={styles.appleDisclaimer}>
@@ -608,10 +622,44 @@ export default function GiveawayScreen() {
             </View>
           </View>
         </Modal>
+
+        {/* How to enter Modal */}
+        <Modal
+          visible={howToVisible}
+          animationType="slide"
+          transparent
+          onRequestClose={() => setHowToVisible(false)}
+        >
+          <View style={styles.modalBackdrop}>
+            <View style={styles.modalCard}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>How to enter</Text>
+                <Pressable onPress={() => setHowToVisible(false)} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+                  <Text style={styles.modalClose}>✕</Text>
+                </Pressable>
+              </View>
+              <ScrollView style={{ maxHeight: 420 }}>
+                <Text style={styles.rulesText}>
+{`1) Enter any email under "Get your personal link" and tap “Get My Link”. Congrats you've received 1 entry to the giveaway.
+
+2) Share your personal link or the QR code with friends.
+
+3) Every person who joins through your link/QR adds more entries for you. Higher chance for you to win!
+
+Notes:
+• Refresh the app to see your updated entries.
+• Your email is used only for entries and winner contact (not for anonymous confessions).`}
+                </Text>
+                <Text style={[styles.appleDisclaimer, { marginTop: 12 }]}>
+                  Apple Inc. is not a sponsor, nor affiliated with, nor responsible for this giveaway.
+                </Text>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </AnimateOpen>
   );
-
 }
 
 function TimeChip({ label, value }) {

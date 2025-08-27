@@ -26,6 +26,7 @@ export const Colors = {
   background: '#0C2A42',
   goldAccent: '#FFB915',
   lineSeperator: '#173E63',
+  tabBarColor: "#24303B",
   confessions: {
   PlaceVanier: {
     background: "#FFDAD5",

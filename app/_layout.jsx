@@ -53,7 +53,8 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      {/* <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}> */}
+      <ThemeProvider value={DarkTheme}>
         <DataProvider>
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

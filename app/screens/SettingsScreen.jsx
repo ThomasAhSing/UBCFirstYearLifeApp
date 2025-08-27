@@ -155,7 +155,7 @@ export default function SettingsScreen() {
                         )}
                     </View>
 
-                    {!permGranted && (
+                    {/* {!permGranted && (
                         <View style={{ marginTop: 12 }}>
                             <Text style={{ color: 'rgba(255,255,255,0.85)', marginBottom: 10 }}>
                                 Turn this on to get notified when new confessions drop.
@@ -176,7 +176,7 @@ export default function SettingsScreen() {
                                 <Text style={{ color: 'white', fontWeight: '600' }}>Open Phone Settings</Text>
                             </TouchableOpacity>
                         </View>
-                    )}
+                    )} */}
 
                     {permGranted && (
                         <Text style={{ marginTop: 10, color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>

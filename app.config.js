@@ -5,7 +5,7 @@ export default ({ config }) => ({
   owner: "ahsingthomas",
   name: "FirstYearLife",
   slug: "firstyearlife",
-  version: "1.0.1",
+  version: "1.0.3",
   orientation: "portrait",
   icon: "./assets/images/ubcfyla_app_icon.png",
   scheme: "firstyearlife",

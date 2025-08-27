@@ -47,7 +47,7 @@ export default function EventsScreen() {
   return (
     <AnimateOpen>
       <ScreenWrapper>
-        <Heading />
+        <Heading title="upcoming events"/>
         <View style={styles.dayMonthBar}>
           <DayMonthBar viewMode={viewMode} setViewMode={setViewMode} />
         </View>
