@@ -12,12 +12,11 @@ Built by a UBC student, this app makes the transition to university easier and m
 ---
 
 ## ✨ Features
-- 🏠 **Home Feed** – Curated Instagram posts from UBC-related accounts  
+- 🏠 **Home Feed** – Curated UBC related posts 
 - 📝 **Confessions** – Anonymous student confessions, grouped by residence  
-- 📅 **Events Tab** – Calendar with the next 7 days of UBC events (Jump Start, athletics, clubs, etc.)  
+- 📅 **Events Tab** – Calendar with upcoming events on campus
 - 🎁 **Giveaway (Launch-Only)** – Referral-based giveaway to kickstart downloads  
-- ☁️ **Backend API** – Express + MongoDB + Firebase Storage powering the app  
-- 🔐 **Firebase Auth (if enabled)** for user login  
+- ☁️ **Backend API** – Express + MongoDB + Firebase Storage powering the app 
 
 ---
 
