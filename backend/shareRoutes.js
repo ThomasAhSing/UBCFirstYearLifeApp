@@ -152,8 +152,8 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
       return \`
         <div class="slideInner">
           <div class="whiteBlock blockHeader">
-           <div class="heading">${title}</div>
-            <div class="message">${message}</div>
+           <div class="heading">\${title}</div>
+            <div class="message">\${message}</div>
             <div class="note"><em>Submit your own anonymous confession on the First Year Life app on the App Store.</em></div>
           </div>
           <div class="whiteBlock blockBody">
@@ -188,7 +188,7 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
       htmlSlides = slides.map(text => \`
         <div class="slideInner">
           <div class="whiteBlock blockHeader">
-            <div class="heading">${humanResidence(residence)} Confessions</div>
+            <div class="heading">\${humanResidence(residence)} Confessions</div>
             <div class="message">Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person.</div>
             <div class="note"><em>Submit your own anonymous confession on the First Year Life app on the App Store.</em></div>
           </div>
