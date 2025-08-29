@@ -20,7 +20,7 @@ export default function Heading({title = "first year life"}) {
     }
     lastTapTime.current = now;
 
-    if (tapCount.current === 8) {
+    if (tapCount.current === 4) {
       tapCount.current = 0;
       setModalVisible(true); // Show passcode modal
     }

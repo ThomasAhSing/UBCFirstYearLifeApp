@@ -28,8 +28,8 @@ function formatConfessionTime(isoString) {
 }
 
 export default function RenderedConfession({ confessionObj }) {
-  const message = "Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person."
-  const anonymous  = "All confessions are anonymous."
+  const message = "Dump your intrusive thoughts, or confess something you would never have the balls to say in person."
+  const anonymous  = "Submit your own anonymous confession on the First Year Life app on the App Store"
   const postSize = Dimensions.get('window').width;
   const residence = confessionObj.residence.replace(/([a-z])([A-Z])/g, '$1 $2')
     return (

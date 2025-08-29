@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Button, FlatList, TextInput, Pressable, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Button, FlatList, SafeAreaView, TouchableOpacity } from 'react-native'
 import { useRouter } from 'expo-router';
 import { useContext, useState } from 'react';
 import { DataContext } from '@/context/DataContext';
@@ -17,15 +17,29 @@ export default function MarkEvents() {
     const router = useRouter();
 
     if (!postDataLoaded) return (
-        <ScreenWrapper bgColor='black'>
-            <Heading />
+        <SafeAreaView
+            style={{
+                flex: 1,
+                backgroundColor: "black" || Colors.background,
+                width: '100%'
+            }}
+            edges={['top', 'bottom']}
+        >
+            <Heading title="Mark events" />
             <Text style={{ color: "white" }}>Loading home...</Text>
             <DateTimeInput />
-        </ScreenWrapper>
+        </SafeAreaView>
     )
 
     return (
-        <ScreenWrapper bgColor='black'>
+        <SafeAreaView
+            style={{
+                flex: 1,
+                backgroundColor: "black" || Colors.background,
+                width: '100%'
+            }}
+            edges={['top', 'bottom']}
+        >
             <View style={styles.header}>
                 <View style={styles.backButton}>
                     <Button title="⬅ Back" onPress={() => router.back()} />
@@ -48,7 +62,7 @@ export default function MarkEvents() {
                                     router.push({
                                         pathname: '/admin/uploadEvent',
                                         params: {
-                                            post: JSON.stringify(item), 
+                                            post: JSON.stringify(item),
                                         },
                                     })
                                 }
@@ -60,9 +74,7 @@ export default function MarkEvents() {
                     )
                 }}
             />
-
-
-        </ScreenWrapper>
+        </SafeAreaView>
 
     );
 }
@@ -76,7 +88,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5'
     },
     backButton: {
-        
+
     },
     button: {
         width: '80%',
