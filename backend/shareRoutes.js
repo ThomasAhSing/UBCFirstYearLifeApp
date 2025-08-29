@@ -45,7 +45,7 @@ const CSS = `
 body{margin:0;background:var(--bg);color:#fff;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
 .wrap{max-width:860px;margin:0 auto;padding:28px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.title{font-weight:600;font-size:28px;margin:0}
+.title{font-weight:700;font-size:24px;margin:0}
 
 /* buttons / badges / footer */
 .btnRow{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
