@@ -2,29 +2,29 @@ const express = require('express');
 const router = express.Router();
 
 // ---------- config ----------
-const APP_SCHEME = (process.env.APP_SCHEME || 'firstyearlife') + '://';
-const WEB_BASE = (process.env.WEB_BASE || 'https://ubcfirstyearlifeapp.onrender.com').replace(/\/+$/, '');
-const APPSTORE_URL = 'https://apps.apple.com/ca/app/first-year-life/id6751215460';
-const PLAY_URL = 'https://play.google.com/store/apps/details?id=MY.PACKAGE'; // TODO
+const APP_SCHEME   = (process.env.APP_SCHEME || 'firstyearlife') + '://';
+const WEB_BASE     = (process.env.WEB_BASE || 'https://ubcfirstyearlifeapp.onrender.com').replace(/\/+$/,'');
+const APPSTORE_URL = 'https://apps.apple.com/ca/app/first-year-life/id6751215460';                
+const PLAY_URL     = 'https://play.google.com/store/apps/details?id=MY.PACKAGE'; // TODO
 
 // Page background
 const PAGE_BG = '#0C2A42';
 
 // Residence colors
 const RES_COLORS = {
-  PlaceVanier: { background: '#FFDAD5', accent: '#D65A4E' },
-  TotemPark: { background: '#B0E9E3', accent: '#009688' },
-  OrchardCommons: { background: '#E8DFFB', accent: '#7A5CA0' },
+  PlaceVanier:     { background: '#FFDAD5', accent: '#D65A4E' },
+  TotemPark:       { background: '#B0E9E3', accent: '#009688' },
+  OrchardCommons:  { background: '#E8DFFB', accent: '#7A5CA0' },
 };
 
 // ---------- preview images (added) ----------
 const OG_IMAGE_CONFESSIONS = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ConfessionSharePreview.png?alt=media&token=2897fc33-331b-4262-a938-3faf731c33da';
-const OG_IMAGE_POSTS = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ubcfyla_app_icon.png?alt=media&token=32f2af08-3064-4315-8a5c-e1d9afa88355';
+const OG_IMAGE_POSTS       = 'https://firebasestorage.googleapis.com/v0/b/ubcfirstyearlifeapp.firebasestorage.app/o/ubcfyla_app_icon.png?alt=media&token=32f2af08-3064-4315-8a5c-e1d9afa88355';
 
 // ---------- helpers ----------
-const esc = (s = '') => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const qci = (ci) => (Number.isFinite(ci) ? `?ci=${ci}` : '');
-const colorForResidence = (r = '') => RES_COLORS[r] || RES_COLORS.TotemPark;
+const esc = (s='') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const qci  = (ci) => (Number.isFinite(ci) ? `?ci=${ci}` : '');
+const colorForResidence = (r='') => RES_COLORS[r] || RES_COLORS.TotemPark;
 
 // ---------- base CSS ----------
 const CSS = `
@@ -64,9 +64,8 @@ a.primary{background:#2c69a5;color:#fff;border-color:transparent}
 /* confession look */
 .slideInner{width:100%;max-width:760px;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--teal)}
 .whiteBlock{width:88%;background:#fff;border-radius:10px;color:var(--text)}
-.blockHeader{margin-top:28px;height:38%;border-top:10px solid var(--tealTop)}
-.blockBody{margin-top:15px;height:54%}
-.note{font-style:italic;font-size:14px;padding:0 7px 5px 7px;color:var(--text)}
+.blockHeader{margin-top:28px;height:32%;border-top:10px solid var(--tealTop)}
+.blockBody{margin-top:15px;height:60%}
 .heading{font-weight:800;font-size:20px;padding:7px;color:var(--text)}
 .message{font-size:14px;padding:0 7px 5px 7px;color:var(--text)}
 .subheading{font-weight:600;font-size:16px;padding:7px 7px 10px 7px;color:var(--text)}
@@ -152,9 +151,8 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
       return \`
         <div class="slideInner">
           <div class="whiteBlock blockHeader">
-           <div class="heading">\${title}</div>
+            <div class="heading">\${title}</div>
             <div class="message">\${message}</div>
-            <div class="note"><em>Submit your own anonymous confession on the First Year Life app on the App Store.</em></div>
           </div>
           <div class="whiteBlock blockBody">
             <div class="subheading">Insert Confession Below</div>
@@ -190,7 +188,6 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
           <div class="whiteBlock blockHeader">
             <div class="heading">\${humanResidence(residence)} Confessions</div>
             <div class="message">Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person.</div>
-            <div class="note"><em>Submit your own anonymous confession on the First Year Life app on the App Store.</em></div>
           </div>
           <div class="whiteBlock blockBody">
             <div class="subheading">Insert Confession Below</div>
@@ -238,7 +235,7 @@ function buildCarousel({imgs=[], cards=[], slides=[], startIndex=0, residence=''
 `;
 
 // ---------- HTML base ----------
-function renderBase({ title, deep, web, innerHTML, overrides = {}, desc, image }) {
+function renderBase({ title, deep, web, innerHTML, overrides={}, desc, image }) {
   const rootOverride = `
     <style>
       :root{
@@ -279,7 +276,7 @@ ${rootOverride}
       <div class="footer">First Year Life - For UBC Students</div>
     </div>
   </div>
-<script>${JS('' + deep)}</script>
+<script>${JS(''+deep)}</script>
 <script>${JS_UTILS}</script>
 </body></html>`;
 }
@@ -293,20 +290,20 @@ function onlyCarouselInner() {
 // Confessions share page (teal background slide style)
 router.get('/cg/:residence/:postId', (req, res) => {
   const { residence, postId } = req.params;
-  const ci = Number(req.query.ci) || 0;
+  const ci   = Number(req.query.ci) || 0;
   const lenQ = Number(req.query.len);
   let imgs = [], slides = [], cards = [];
-  try { if (req.query.imgs) imgs = JSON.parse(req.query.imgs); } catch { }
-  try { if (req.query.slides) slides = JSON.parse(req.query.slides); } catch { }
-  try { if (req.query.cards) cards = JSON.parse(req.query.cards); } catch { }
+  try { if (req.query.imgs)   imgs   = JSON.parse(req.query.imgs); }   catch {}
+  try { if (req.query.slides) slides = JSON.parse(req.query.slides); } catch {}
+  try { if (req.query.cards)  cards  = JSON.parse(req.query.cards); }  catch {}
 
   const deep = `${APP_SCHEME}cg/${encodeURIComponent(residence)}/${encodeURIComponent(postId)}${qci(ci)}`;
-  const web = `${WEB_BASE}/cg/${encodeURIComponent(residence)}/${encodeURIComponent(postId)}${qci(ci)}`;
+  const web  = `${WEB_BASE}/cg/${encodeURIComponent(residence)}/${encodeURIComponent(postId)}${qci(ci)}`;
 
   const col = colorForResidence(residence);
   const html = renderBase({
-    title: "Don't miss out on UBC confessions, events and news",
-    desc: 'Download First Year Life today',                // added
+    title: "Submit your own confesion on the First Year Life app on the App Store",
+    desc: "Don't miss out on other confessions. Donwload First Year Life today",                // added
     image: OG_IMAGE_CONFESSIONS,                           // added
     deep, web,
     innerHTML: onlyCarouselInner(),
@@ -316,11 +313,11 @@ router.get('/cg/:residence/:postId', (req, res) => {
   const boot = `
     <script>
       (function(){
-        var ci=${Number.isFinite(ci) ? ci : 0};
+        var ci=${Number.isFinite(ci)?ci:0};
         var imgs=${JSON.stringify(imgs)};
         var slides=${JSON.stringify(slides)};
         var cards=${JSON.stringify(cards)};
-        var len=${Number.isFinite(lenQ) ? lenQ : (imgs.length || slides.length || cards.length || 0)};
+        var len=${Number.isFinite(lenQ)?lenQ:(imgs.length||slides.length||cards.length||0)};
         buildCarousel({ imgs: imgs, cards: cards, slides: slides, startIndex: ci, residence: ${JSON.stringify(residence)}, plainImages: false });
       })();
     </script>`;
@@ -330,13 +327,13 @@ router.get('/cg/:residence/:postId', (req, res) => {
 // Posts share page (plain image slides, NO green background)
 router.get('/p/:shortcode', (req, res) => {
   const { shortcode } = req.params;
-  const ci = Number(req.query.ci) || 0;
+  const ci   = Number(req.query.ci) || 0;
   const lenQ = Number(req.query.len);
   let imgs = [];
-  try { if (req.query.imgs) imgs = JSON.parse(req.query.imgs); } catch { }
+  try { if (req.query.imgs) imgs = JSON.parse(req.query.imgs); } catch {}
 
   const deep = `${APP_SCHEME}post/${encodeURIComponent(shortcode)}${qci(ci)}`;
-  const web = `${WEB_BASE}/p/${encodeURIComponent(shortcode)}${qci(ci)}`;
+  const web  = `${WEB_BASE}/p/${encodeURIComponent(shortcode)}${qci(ci)}`;
 
   const html = renderBase({
     title: "Don't miss out on UBC confessions, events and news",
@@ -351,9 +348,9 @@ router.get('/p/:shortcode', (req, res) => {
   const boot = `
     <script>
       (function(){
-        var ci=${Number.isFinite(ci) ? ci : 0};
+        var ci=${Number.isFinite(ci)?ci:0};
         var imgs=${JSON.stringify(imgs)};
-        var len=${Number.isFinite(lenQ) ? lenQ : (imgs.length || 0)};
+        var len=${Number.isFinite(lenQ)?lenQ:(imgs.length||0)};
         buildCarousel({ imgs: imgs, startIndex: ci, residence: '', plainImages: true });
       })();
     </script>`;
