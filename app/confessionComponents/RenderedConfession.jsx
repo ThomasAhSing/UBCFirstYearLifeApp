@@ -29,7 +29,8 @@ function formatConfessionTime(isoString) {
 
 export default function RenderedConfession({ confessionObj }) {
   const message = "Dump your intrusive thoughts, or confess something you would never have the balls to say in person."
-  const anonymous  = "Submit your own anonymous confession on the First Year Life app on the App Store"
+  const anonymous  = "Submit your own anonymous confession on the"
+  const anonymous2  = "First Year Life app on the App Store"
   const postSize = Dimensions.get('window').width;
   const residence = confessionObj.residence.replace(/([a-z])([A-Z])/g, '$1 $2')
     return (
@@ -43,19 +44,24 @@ export default function RenderedConfession({ confessionObj }) {
         }>
         <View style = {[styles.whiteBlock, 
         {
-          marginTop: 28,
-          height: '32%',
+          marginTop: 15,
+          height: '36%',
           borderTopColor: Colors.confessions[confessionObj.residence].accent,
           borderTopWidth: 10,
         }]}>
           <Text style = {styles.heading}>{residence} Confessions</Text>
           <Text style = {styles.message}>{message}</Text>
           <Text style = {styles.anonymous}>{anonymous}</Text>
+          <View style={{flexDirection: "row"}}>
+          <Text style = {styles.anonymous2}>First Year Life</Text>
+          <Text style = {styles.anonymous3}> app on the App Store</Text>
+          </View>
+          
         </View>
         <View style = {[styles.whiteBlock,
           {
           marginTop: 15,
-          height: '50%',
+          height: '52%',
         }
         ]}>
           <Text style = {styles.subheading}>Insert Confession Below</Text>
@@ -89,13 +95,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     paddingLeft: 7,
     paddingRight: 7,
-    paddingBottom: 5,
+    paddingBottom: 15,
   },
   subheading: {
     fontFamily: 'RobotoRegular',
     fontSize: 16,
     padding: 7, 
-    paddingBottom: 10,
+    paddingBottom: 7,
   },
   anonymous: {
     fontFamily: 'RobotoItalic',
@@ -103,8 +109,21 @@ const styles = StyleSheet.create({
     paddingLeft: 7,
     paddingRight: 7,
   },
+  anonymous2: {
+    fontFamily: 'RobotoSemiBoldItalic',
+    fontSize: 14,
+    paddingLeft: 7,
+  },
+  anonymous3: {
+    fontFamily: 'RobotoItalic',
+    fontSize: 14,
+    paddingRight: 7,
+  },
   submittedAtText: {
     color: 'gray',
     fontFamily: 'RobotoItalic',
+    paddingTop: 5,
+    fontSize: 11,
+    paddingRight: 7
   },
 })

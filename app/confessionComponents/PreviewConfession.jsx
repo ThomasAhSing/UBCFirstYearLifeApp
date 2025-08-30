@@ -11,7 +11,7 @@ import { Colors } from '@/constants/Colors'
 
 export default function PreviewConfession({ confessionObj, style }) {
   const message = "Treat this as an intrusive thought dump, or confess something you would never have the balls to say in person."
-  const anonymous = "All confessions are anonymous."
+  const anonymous = "Submit your own anonymous confession on the First Year Life app on the App Store"
   const postSize = Dimensions.get('window').width;
   const residence = confessionObj.residence.replace(/([a-z])([A-Z])/g, '$1 $2')
 

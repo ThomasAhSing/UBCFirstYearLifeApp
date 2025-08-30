@@ -37,7 +37,7 @@ import AnimateOpen from '@/app/AnimateOpen';
 
 const COLORS = {
   bg: '#0C2A42',
-  card: '#102F4B',
+  card: '#  ',
   text: '#FFFFFF',
   subtext: '#C6DAF3',
   border: '#173E63',
